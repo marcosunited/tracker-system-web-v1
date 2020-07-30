@@ -1,0 +1,13 @@
+{
+    "type": "service_account",
+    "project_id": "cloud-printer-187301",
+    "private_key_id": "0b07b8a91d0d70b7f066a685e8476cf486f37174",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCqOGQkd+pSCung\n6aPdKql2noIvV+KxHJGU1oUrMcf93CPRQthXG7b91551TD+XuMHdS/jxhcrTSj22\nO+E5f9fxAoca147PqR0zz1tj0EsqEucfA+ncgz4N2HS/XPz8k4OvjxNKmcsdz5qG\nNU1lnqya4bN2wUc+CrwUUcWPzGIHOmElNncC9JksIEdQNW8wO0l+QuRNwNvZAzf/\nHjd8saCn/ksBVOjqQoIEQSgqfJVzNrWUGpmMCugG/CSWkK10MytIVdK8JBFLkDs0\nlhqXmIyYEUyINeeVHvbK2DbBaDSnx3dKZCahHbkzJonsyFyxQg7k+bA0d+CbNctO\nJStcUMRVAgMBAAECggEAA7cMBc5m2yLegd3M3r8snah4ojyNIl0Y7E0A8Qq6w6vx\n+CzjozBj/lxIsA9Zn/UUqMDHY8tjZth1n6w6OSgKIs9xpWtTnu1Lnt2FWsNUBfdi\n+0akQaoiSOkS0I5gqHPhFDbPg/mhTjrsCMZ8XvMR71DCZZ1y8ZldtiUmu6xemKvA\ns2rRCOISaVFK/j1BstT4UWH/86MU59YoBhPEKmu34+OhgpV04ZfmfGMuLH1j/0ox\nMlqW3QNrPnvZTVvrgZFBSryAkuI4HB7LKwkP1vjEMskgMvSPoQE+fatcOc+mn2Yv\neWpmGkfZVwGH7PD3+L21AVUj6S6twyiHlit+MbVTbQKBgQDiTEur2ABaqlcUIQVZ\nnAsBDhwr/GRypBLZLrnEBNasRBANSto/yto5TVJOdXGMrpp+ETMJrClaGskkOKA1\nsjE7WkThReqQmijgs4eiW+K1/sjjDe8hsMa+GyuKeYmr9q4rdU02KdQpesmF5+k4\nvPYRaEOmL1BfmCzHfbe17W5b7wKBgQDAj9xVsRwalO4S33AM+NWSxUnb/+tgv+9h\nk4Rx4jCSBaJ2HM00xviWOIOZ3uIFPuD6JJ7qzrVM6TMZck2e7T51F5EJb4UnBfV4\nmm4vrlPYtRYAlM7ua0IO/+JEJM+4aR+z1MEdkQJlRLTJlldPjtA92lnSPXyl+GxV\nmhA0fMBv+wKBgQCKPXdgg7Q7rqFBT6a4BgYG3/q/uBAYpDhLairbHuWRGIcBx78p\nhx7mMGDeQwpZmXQRHSqjdwNP4tsLAHiGNNO0YUGAqDhRm4rrMWDjAuSsrvdDFQkG\n+Ll/+pMPpY0/epMNQzwmoUjVCgg/f9tN6Mkc+yeQRoj/zLNWLmtifKeVCwKBgFfd\nTNyNBBXc/wT9j1Nb95gRDbKlA/IRolkTxstwOllm2MqsObZrU+K3xtTfLqLWHjIF\no73gtDlz7y0dSu3Js0YaisOTb15vCaMOVFjNYtTvTCrXu9RufKX7fHM7mMy8qwqT\necrT8BPlVdjmENDsiXivuWyFQes5f7VPpzVL90MhAoGAc8gvZZ2tt1tFmEZJ728r\nNH/e/HR4AdxxkODHcE3nBnes7y1DHDAOBMItr7u7cgPP8XtLkzOncGtrXFDiGmBN\nMJhFr7U5RR3y1UJBrD0R5P9IcjNS3AwC/4BCvRt+hzv5tUw5yNpPfI6TB5j/JydQ\nqgRuxn5kCgtN+whTb8o/h1s=\n-----END PRIVATE KEY-----\n",
+    "client_email": "cloudprinter@cloud-printer-187301.iam.gserviceaccount.com",
+    "client_id": "115036420336950433379",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloudprinter%40cloud-printer-187301.iam.gserviceaccount.com"
+  }
+  
