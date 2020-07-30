@@ -35,79 +35,70 @@
     </div>
     <div style="text-align:center;margin:10px;">
         <b>Period Starting:</b>
-        <b><?=date($start_date)?></b> and <b><?=date($end_date)?></b>.</p>
+        <b><?= date($start_date) ?></b> and <b><?= date($end_date) ?></b>.</p>
     </div>
 
     <table width="95%" border="1" style="border-collapse:collapse" id="table-g" cellspacing="0">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Date</th>
-                <th>Time of Call</th>
                 <th>Arrived</th>
                 <th>Finished</th>
                 <th>Job No</th>
                 <th>Site Name</th>
                 <th>Lift Names</th>
                 <th>Order Number</th>
-                <th>Docket No</th>
                 <th>Call Description</th>
                 <th>Tech Fault</th>
                 <th>Tech Description</th>
                 <th>Technician</th>
-                <th>Response Time Exceeded</th>
             </tr>
         </thead>
         <tbody>
             @foreach($final_callouts as $callout)
-                <tr>
-                    <td>
-                        {{date('Y-m-d',strtotime($callout->callout_time))}}
-                    </td>
-                    <td>
-                    {{$callout->callout_time}}
-                    </td>
-                    <td>
-                        {{$callout->time_of_arrival}}
-                    </td>
-                    <td>
-                        {{$callout->time_of_departure}}
-                    </td>
-                    <td>
-                        {{$callout->job_number}}
-                    </td>
-                    <td>
-                        {{$callout->job_name}}
-                    </td>
-                    <td>
+            <tr>
+                <td>
+                    {{$callout->id}}
+                </td>
+                <td>
+                    {{date('Y-m-d',strtotime($callout->callout_time))}}
+                </td>
+                <td>
+                    {{$callout->time_of_arrival}}
+                </td>
+                <td>
+                    {{$callout->time_of_departure}}
+                </td>
+                <td>
+                    {{$callout->job_number}}
+                </td>
+                <td>
+                    {{$callout->job_name}}
+                </td>
+                <td>
                     {{$callout->lift}}
-                    </td>
-                    <td>
-                        {{$callout->order_number}}
-                    <td>
-                        {{$callout->docket_number}}
-                    </td>
-                    <td>
-                    {{$callout->fault_name}}&nbsp;</td>
-
-                    <td>
-
+                </td>
+                <td>
+                    {{$callout->order_number}}
+                </td>
+                <td>
+                    {{$callout->fault_name}}&nbsp;
+                </td>
+                <td>
                     {{$callout->technician_fault_name}}&nbsp;
-                    </td>
-                    <td>
+                </td>
+                <td>
                     {{$callout->tech_description}}
-                    </td>
-
-                    <td>
+                </td>
+                <td>
                     {{$callout->technician_name}}
-                    </td>
-                    <td>
-                        No
-                    </td>
-                </tr>
+                </td>
+            </tr>
             @endforeach
         </tbody>
     </table>
-    
+
     <h1 id="maintenance">Maintenance</h1>
     <table width="95%" border="1" style="border-collapse:collapse" id="maintable2">
         <thead>
@@ -236,7 +227,6 @@
             color: #000;
             text-decoration: none
         }
-
     </style>
 </div>
 <!--End Print Area!-->
@@ -244,19 +234,18 @@
 
 
 <script>
-    $(document).ready(function () {
-        $("#printPdf").click(function () {
+    $(document).ready(function() {
+        $("#printPdf").click(function() {
             $myVar = $("#printArea").html();
             $("#frm_contents").val($myVar);
             $("#printForm").submit();
         });
     });
-
 </script>
 
 <script>
     jQuery.extend(jQuery.fn.dataTableExt.oSort, {
-        "date-uk-pre": function (a) {
+        "date-uk-pre": function(a) {
             if (a == null || a == "") {
                 return 0;
             }
@@ -264,18 +253,17 @@
             return (ukDatea[2] + ukDatea[1] + ukDatea[0]) * 1;
         },
 
-        "date-uk-asc": function (a, b) {
+        "date-uk-asc": function(a, b) {
             return ((a < b) ? -1 : ((a > b) ? 1 : 0));
         },
 
-        "date-uk-desc": function (a, b) {
+        "date-uk-desc": function(a, b) {
             return ((a < b) ? 1 : ((a > b) ? -1 : 0));
         }
     });
-
 </script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#table-g').DataTable({
             "order": [
                 [0, "asc"]
@@ -294,7 +282,7 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#maintable2').DataTable({
             "order": [
                 [0, "asc"]
@@ -312,20 +300,16 @@
 </script>
 
 <script>
-    $("#hide").click(function () {
-        $("#maintable2,#maintenance,#hide,#show").hide("slow", function () {
+    $("#hide").click(function() {
+        $("#maintable2,#maintenance,#hide,#show").hide("slow", function() {
             alert("Hide complete.");
         });
     });
-
 </script>
 <script>
-    $("#show").click(function () {
-        $("#maintable2,#maintenance").show("slow", function () {
+    $("#show").click(function() {
+        $("#maintable2,#maintenance").show("slow", function() {
             alert("Show complete.");
         });
     });
-
 </script>
-
-

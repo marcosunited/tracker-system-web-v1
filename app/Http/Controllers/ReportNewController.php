@@ -165,8 +165,7 @@ class ReportNewController extends Controller
                 $faults[$row['fault_name']] = 0;
             $faults[$row['fault_name']]++;
         }
-        //$pdf = PDF::loadView('reportnew.groupReportGenerate',compact('callouts','faults','group_name','start_date','end_date','maintenances','final_callouts'));
-        //dd($callouts);
+
         return view('reportnew.groupReportGenerate', compact('logo', 'callouts', 'faults', 'group_name', 'start_date', 'end_date', 'maintenances', 'final_callouts',));
     }
 
@@ -373,18 +372,18 @@ class ReportNewController extends Controller
             )
             ->get();
 
+        $final_callouts = (array) null;
+
         foreach ($callouts as $callout) {
 
-            $tp = [];
             $lifts = CalloutLift::select('lifts.lift_name as lift_name')
                 ->leftjoin('lifts', 'lifts.id', '=', 'callout_lift.lift_id')
                 ->where('callout_lift.calloutn_id', $callout->id)->get();
 
             $tp_lifts = '';
             foreach ($lifts as $lift_one) $tp_lifts .= ' ' . $lift_one->lift_name;
-            $tp['callout'] = $callout;
-            $tp['lift'] = $tp_lifts;
-            $final_callouts[] = $tp;
+            $callout->lift = $tp_lifts;
+            array_push($final_callouts, $callout);
         }
 
 
@@ -406,8 +405,6 @@ class ReportNewController extends Controller
         }
         $pdf = PDF::loadView('reportnew.groupReportGenerate', compact('logo', 'callouts', 'faults', 'group_name', 'start_date', 'end_date', 'maintenances', 'final_callouts'))->setPaper('a3', 'landscape');
 
-        return $pdf->download('name.pdf');
-        //dd($callouts);
-        // return view('reportnew.groupReportGenerate',compact('callouts','faults','group_name','start_date','end_date','maintenances','final_callouts'));
+        return $pdf->download('Group Report-'.$group_name.'.pdf');
     }
 }
