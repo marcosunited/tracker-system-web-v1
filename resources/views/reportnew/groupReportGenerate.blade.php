@@ -43,6 +43,7 @@
             <tr>
                 <th>ID</th>
                 <th>Date</th>
+                <th>Time of Call</th>
                 <th>Arrived</th>
                 <th>Finished</th>
                 <th>Job No</th>
@@ -62,7 +63,10 @@
                     {{$callout->id}}
                 </td>
                 <td>
-                    {{date('Y-m-d',strtotime($callout->callout_time))}}
+                    {{date('d-m-Y',strtotime($callout->callout_time))}}
+                </td>
+                <td>
+                    {{ date('h:i',strtotime($callout->callout_time)) }}
                 </td>
                 <td>
                     {{$callout->time_of_arrival}}
