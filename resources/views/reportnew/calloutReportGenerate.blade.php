@@ -4,8 +4,14 @@
 <script src="{{ mix('js/laravel.app.js') }}"></script>
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js">
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js"></script>
 </script>
 <div id="topbar">
     <a href="#" id="printPdf">Print As PDF</a>
@@ -22,14 +28,15 @@
             <td class="postal">ABN 81 082 447 658</td>
             <td class="postal">
                 <div style="">
-                     Postal Address:<br> P.O.Box 280<br> KEW VIC 3101<br> Telephone: (03)9687 9099
+                    Postal Address:<br> P.O.Box 280<br> KEW VIC 3101<br> Telephone: (03)9687 9099
                 </div>
             </td>
         </tr>
     </table>
 
-    <h1>Site Report: <?=$job["job_name"]?></h1>
+    @if($job != null)
 
+    <h1>Site Report: <?= $job["job_name"] ?></h1>
 
     <table width="100%" border="1" style="border-collapse:collapse">
         <tr>
@@ -55,7 +62,7 @@
             <td></td>
             <td><strong>Date:</strong></td>
             <td>
-                <?=date("d/m/Y",time())?>
+                <?= date("d/m/Y", time()) ?>
             </td>
         </tr>
         <tr>
@@ -69,22 +76,30 @@
             <td>Monthly Reports</td>
             <td><strong>Premises:</strong></td>
             <td>
-                <?=$job["job_address"]?>
+                <?= $job["job_address"] ?>
             </td>
         </tr>
     </table>
+
+
 
     <div id="disclaimer">
         This document is confidential. It is intended exclusively for the use of the addressee. Any form of disclosure
         is unauthorised. Please advise the sender if you recieve this in error. Your reasonable cost in advising us of
         the error will be reimbursed.
     </div>
+    @endif
 
     <div id="dear">
+        @if($job != null)
         Dear
-        <?=$job["job_contact_details"]?>,
+        <?= $job["job_contact_details"] ?>,
+        @endif
         <p>Please find detailed below a list of the calls and routine maintenance we attended between
-        <b><?=date($start_date)?></b> and <b><?=date($end_date)?></b>.</p>
+            <b><?= date($start_date) ?></b> and <b><?= date($end_date) ?></b>.</p>
+
+        <input id="startDate" type="hidden" value="{{ $start_date }}">
+        <input id="endDate" type="hidden" value="{{ $end_date }}">
     </div>
 
     <div style="text-align:center;">
@@ -99,6 +114,7 @@
         <thead>
             <tr>
                 <td align="center" width="200px">Date</td>
+                <td align="center" width="200px">Job number</td>
                 <td align="center" width="150px">Lifts</td>
                 <td align="center" width="200px">Fault Reported</td>
                 <td align="center" width="200px">Tech Reported Fault</td>
@@ -111,28 +127,31 @@
             @foreach($final_callouts as $callout)
             <tr>
                 <td align="center">
-                {{date('Y-m-d',strtotime($callout['callout']->callout_time))}}
+                    {{date('Y-m-d',strtotime($callout['callout']->callout_time))}}
+                </td>
+                <td align="center" width="15%">
+                    {{$callout['callout']->job_number}}
                 </td>
                 <td align="center">
-                {{$callout['lift']}}
+                    {{$callout['lift']}}
                 </td>
                 <td align="center">
-                {{$callout['callout']->fault_name}}
+                    {{$callout['callout']->fault_name}}
                 </td>
                 <td align="center">
-                {{$callout['callout']->technician_fault_name}}
+                    {{$callout['callout']->technician_fault_name}}
                 </td>
 
                 <td align="center">
-                <div style="margin-left:5px;margin-right:5px">
+                    <div style="margin-left:5px;margin-right:5px">
                         {{$callout['callout']->tech_description}}
                     </div>
                 </td>
                 <td align="center">
-                {{$callout['callout']->order_number}}
+                    {{$callout['callout']->order_number}}
                 </td>
                 <td align="center" width="15%">
-                {{$callout['callout']->technician_name}}
+                    {{$callout['callout']->technician_name}}
                 </td>
             </tr>
             @endforeach
@@ -212,42 +231,48 @@
             color: #000;
             text-decoration: none
         }
-
     </style>
 </div>
 <!--End Print Area!-->
 
 
 <script>
-    $(document).ready(function () {
-        $("#printPdf").click(function () {
+    $(document).ready(function() {
+        $("#printPdf").click(function() {
             $myVar = $("#printArea").html();
             $("#frm_contents").val($myVar);
             $("#printForm").submit();
         });
     });
-
 </script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#maintable').DataTable({
             "order": [
                 [0, "asc"]
             ],
             paging: false,
             searching: false,
+            dom: 'Bfrtip',
             columnDefs: [{
-                type: 'date-uk',
-                targets: 0
-            }]
-
+                type: 'date-dd-mmm-yyyy',
+                targets: 3
+            }],
+            buttons: [{
+                    extend: 'excel',
+                    title: 'Callouts report: ' + $('#startDate').val() + '-' + $('#endDate').val()
+                },
+                {
+                    extend: 'pdf',
+                    title: 'Callouts report: ' + $('#startDate').val() + '-' + $('#endDate').val()
+                }
+            ]
         });
     });
-
 </script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#maintenancetable').DataTable({
             "order": [
                 [0, "asc"]
@@ -255,11 +280,10 @@
             paging: false,
             searching: false,
             columnDefs: [{
-                type: 'date-uk',
-                targets: 0
+                type: 'date-dd-mmm-yyyy',
+                targets: 3
             }]
 
         });
     });
-
 </script>

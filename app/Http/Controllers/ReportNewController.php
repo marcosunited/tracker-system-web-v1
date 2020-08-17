@@ -19,6 +19,11 @@ class ReportNewController extends Controller
     public function selectedJob(Request $request)
     {
         $selectedJob = Job::find($request->message);
+
+        if ($selectedJob == null && $request->message == "-1") {
+            $selectedJob = $request->message;
+        }
+
         Session::put('selectedJob', $selectedJob);
         return back();
     }
@@ -26,10 +31,14 @@ class ReportNewController extends Controller
     public function sitereport()
     {
         $lifts = "";
+
         if (Session::has('selectedJob')) {
             $selectedJob = Session::get('selectedJob');
-            $lifts = Job::findorfail($selectedJob->id)->lifts;
+            if ($selectedJob != null) {
+                //$lifts = Job::findorfail($selectedJob->id)->lifts;
+            }
         }
+
         $jobs = Job::where('status_id', 1)->get();
 
         return view('reportnew.siteReport', compact('jobs', 'lifts'));
@@ -180,7 +189,11 @@ class ReportNewController extends Controller
     {
 
         $job_id = $request->job_id;
-        $job = Job::findorfail($job_id);
+        $job = null;
+
+        if ($job_id != "-1") {
+            $job = Job::findorfail($job_id);
+        }
 
         $start_date = date($request->start_time);
         $end_date = date($request->finish_time);
@@ -189,15 +202,25 @@ class ReportNewController extends Controller
         $final_callouts = [];
         $callouts = DB::table('calloutsnew')
             ->whereBetween('calloutsnew.callout_time', [$start_date, $end_date])
-            ->where('job_id', '=', $job_id)
+            ->where(function ($query) {
+                if ($job_id = !"-1") {
+                    $query->where("job_id", $job_id);
+                }
+            })
             ->join('_faults', 'calloutsnew.fault_id', '=', '_faults.id')
             ->join('_technician_faults', 'calloutsnew.technician_fault_id', '=', '_technician_faults.id')
             ->join('technicians', 'calloutsnew.technician_id', '=', 'technicians.id')
+            ->join('jobs', 'calloutsnew.job_id', '=', 'jobs.id')
             ->select(
                 'calloutsnew.*',
                 '_faults.fault_name as fault_name',
                 '_technician_faults.technician_fault_name as technician_fault_name',
-                'technicians.technician_name as technician_name'
+                'technicians.technician_name as technician_name',
+                'jobs.job_number as job_number',
+                'jobs.job_name as job_name',
+                'jobs.job_address as job_address',
+                'jobs.job_address_number as job_address_number',
+                'jobs.job_suburb as job_suburb'
             )
             ->get();
 
@@ -216,8 +239,12 @@ class ReportNewController extends Controller
             $final_callouts[] = $tp;
         }
 
-        $agent_id = $job->agent_id;
-        $agent = Agent::where('id', $agent_id)->get();
+        $agent = null;
+
+        if ($job != null) {
+            $agent_id = $job->agent_id;
+            $agent = Agent::where('id', $agent_id)->get();
+        }
 
         $faults = array();
         $results = json_decode($callouts, true);
@@ -405,6 +432,6 @@ class ReportNewController extends Controller
         }
         $pdf = PDF::loadView('reportnew.groupReportGenerate', compact('logo', 'callouts', 'faults', 'group_name', 'start_date', 'end_date', 'maintenances', 'final_callouts'))->setPaper('a3', 'landscape');
 
-        return $pdf->download('Group Report-'.$group_name.'.pdf');
+        return $pdf->download('Group Report-' . $group_name . '.pdf');
     }
 }

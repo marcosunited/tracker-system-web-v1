@@ -86,6 +86,7 @@
                             <select class="form-control job_select" name="job_id" required>
 
                                 <option value="">--- Select Job ---</option>
+                                <option value="-1">--- All ---</option>
                                 @foreach ($jobs as $data)
                                 <option value="{{ $data->id }}">{{ $data->job_address_number }} {{
                                     $data->job_address }} {{ $data->job_name }}</option>
