@@ -477,7 +477,7 @@ class MaintenanceController extends Controller
      */
      public function destroy(Request $request)
      {
-        $maintenance = MaintenanceN::findorfail($request->maintenance_id);
+        $maintenance = MaintenanceN::findorfail($request->maintenance);
         $yearmonth  = $maintenance->yearmonth;
         $task_ids = $maintenance->task_ids;
 
