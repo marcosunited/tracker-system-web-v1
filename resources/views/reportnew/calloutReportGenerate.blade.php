@@ -115,11 +115,12 @@
             <tr>
                 <td align="center" width="200px">Date</td>
                 <td align="center" width="200px">Job number</td>
+                <td align="center" width="200px">Job address</td>
                 <td align="center" width="150px">Lifts</td>
                 <td align="center" width="200px">Fault Reported</td>
-                <td align="center" width="200px">Tech Reported Fault</td>
                 <td align="center">Tech Description</td>
                 <td align="center">Order Number</td>
+                <td align="center">is Chargeable</td>
                 <td align="center" width="100px">Technician</td>
             </tr>
         </thead>
@@ -132,6 +133,9 @@
                 <td align="center" width="15%">
                     {{$callout['callout']->job_number}}
                 </td>
+                <td align="center" width="15%">
+                    {{$callout['callout']->job_address}}
+                </td>
                 <td align="center">
                     {{$callout['lift']}}
                 </td>
@@ -139,16 +143,19 @@
                     {{$callout['callout']->fault_name}}
                 </td>
                 <td align="center">
-                    {{$callout['callout']->technician_fault_name}}
-                </td>
-
-                <td align="center">
                     <div style="margin-left:5px;margin-right:5px">
                         {{$callout['callout']->tech_description}}
                     </div>
                 </td>
                 <td align="center">
                     {{$callout['callout']->order_number}}
+                </td>
+                <td align="center">
+                @if($callout['callout']->chargeable_id == 2)         
+                    <div style="margin-left:5px;margin-right:5px">No</div>
+                @else
+                    <div style="margin-left:5px;margin-right:5px">Yes</div>
+                @endif
                 </td>
                 <td align="center" width="15%">
                     {{$callout['callout']->technician_name}}
