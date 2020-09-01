@@ -219,6 +219,7 @@ class ReportNewController extends Controller
                 'jobs.job_number as job_number',
                 'jobs.job_name as job_name',
                 'jobs.job_address as job_address',
+                'jobs.job_suburb as job_suburb',
                 'jobs.job_address_number as job_address_number',
                 'jobs.job_suburb as job_suburb'
             )

@@ -134,7 +134,7 @@
                     {{$callout['callout']->job_number}}
                 </td>
                 <td align="center" width="15%">
-                    {{$callout['callout']->job_address}}
+                    {{$callout['callout']->job_address_number}} {{$callout['callout']->job_address}} {{$callout['callout']->job_suburb}}
                 </td>
                 <td align="center">
                     {{$callout['lift']}}
