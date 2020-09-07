@@ -48,7 +48,8 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th class="text-center" style="width:10%;">Job Number</th>
-										<th class="text-center" style="width:10%;">Contract status</th>
+                                        <th class="text-center" style="width:10%;">Contract status</th>
+                                        <th class="text-center" style="width:6%;">Contract frequency</th>
                                         <th style="width:5%;">Lifts</th>
                                         <th class="d-none d-sm-table-cell" style="width: 20%;">Job name</th>
                                         <th class="d-none d-sm-table-cell" style="width: 10%;">Number</th>
@@ -66,7 +67,10 @@
                                         <td class="text-center">{{$job->job_number}}</td>
 										<td class="text-center">
 											<img style="width:24px" src="../image/images/icons/{{$job->contract_icon}}" />
-										</td>
+                                        </td>
+                                        <td class="font-w600">
+                                            {{$job->frequency_name}}
+                                        </td>
                                         <td class="font-w600">
                                             {{$job->lift_count}}
                                         </td>

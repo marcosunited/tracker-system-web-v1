@@ -26,38 +26,40 @@ class JobController extends Controller
     public function index()
     {
         $jobs = DB::select("select *, 
-							case 
-								when contract_flag = 2 then 'contract_ok.svg'
-								when contract_flag = 1 then 'contract_coming_due.svg'
-								when contract_flag = 0 then 'contract_overdue.svg'
-								else 'no_information.svg'
-							end as contract_icon
-							FROM (
-							select 
-							 jobs.id,
-							 job_suburb,
-							 job_number,
-							 job_name,
-							 job_floors,
-							 job_address,
-							 job_address_number,
-							 job_contact_details,
-							 job_owner_details,
-							 job_group,
-									status_name,
-							 round_name,
-							 round_colour,
-							 (select count(*) from lifts where lifts.job_id= jobs.id) as lift_count,
-							 case 
-							when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) >= NOW() then 2
-							when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) < NOW() AND STR_TO_DATE(finish_time, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 DAY) then 1
-							when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) < NOW() then 0
-							else -1
-							 end as contract_flag
-							from jobs 
-							inner join rounds on jobs.round_id = rounds.id
-								  left join _jobstatus j on jobs.status_id = j.id
-							) as jobs;");
+                            case 
+                                when contract_flag = 2 then 'contract_ok.svg'
+                                when contract_flag = 1 then 'contract_coming_due.svg'
+                                when contract_flag = 0 then 'contract_overdue.svg'
+                                else 'no_information.svg'
+                            end as contract_icon
+                            FROM (
+                            select 
+                                jobs.id,
+                                job_suburb,
+                                job_number,
+                                job_name,
+                                job_floors,
+                                job_address,
+                                job_address_number,
+                                job_contact_details,
+                                job_owner_details,
+                                job_group,
+                                status_name,
+                                round_name,
+                                round_colour,
+                                f.frequency_name,
+                                (select count(*) from lifts where lifts.job_id= jobs.id) as lift_count,
+                                case 
+                                    when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) >= NOW() then 2
+                                    when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) < NOW() AND STR_TO_DATE(finish_time, '%Y-%m-%d') > DATE_SUB(NOW(), INTERVAL 1 DAY) then 1
+                                    when DATE_SUB(STR_TO_DATE(finish_time, '%Y-%m-%d'), INTERVAL 30 DAY) < NOW() then 0
+                                else -1
+                                end as contract_flag
+                            from jobs 
+                            inner join rounds on jobs.round_id = rounds.id
+                            inner join _frequency f on frequency_id = f.id
+                            left join _jobstatus j on jobs.status_id = j.id
+                            ) as jobs;");
 
         return view('jobs.allJobs',compact('jobs'));
     }
