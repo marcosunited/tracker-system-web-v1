@@ -33,11 +33,16 @@
 
 
 <script>
-    $(document).ready(function() { $(".job_select").select2(); });
-    $(document).ready(function() { $(".tech_select").select2(); });
-    $(document).ready(function() { $(".lift_select").select2({
-    }); });
-   
+    $(document).ready(function() {
+        $(".job_select").select2();
+    });
+    $(document).ready(function() {
+        $(".tech_select").select2();
+    });
+    $(document).ready(function() {
+        $(".lift_select").select2({});
+    });
+
 
     function change(month) {
         var jan = document.getElementById("btabs-static-0");
@@ -53,7 +58,7 @@
         var nov = document.getElementById("btabs-static-10");
         var dec = document.getElementById("btabs-static-11");
 
-        if ( month  == 1) {
+        if (month == 1) {
             jan.style.display = "block";
         } else {
             jan.style.display = "none";
@@ -63,17 +68,17 @@
         } else {
             feb.style.display = "none";
         }
-        if ( month == 3) {
+        if (month == 3) {
             mar.style.display = "block";
         } else {
             mar.style.display = "none";
         }
-        if (month  == 4) {
+        if (month == 4) {
             apr.style.display = "block";
         } else {
             apr.style.display = "none";
         }
-        if (month  == 5) {
+        if (month == 5) {
             may.style.display = "block";
         } else {
             may.style.display = "none";
@@ -83,17 +88,17 @@
         } else {
             june.style.display = "none";
         }
-        if ( month == 7) {
+        if (month == 7) {
             july.style.display = "block";
         } else {
             july.style.display = "none";
         }
-        if ( month== 8) {
+        if (month == 8) {
             aug.style.display = "block";
         } else {
             aug.style.display = "none";
         }
-        if ( month == 9) {
+        if (month == 9) {
             sep.style.display = "block";
         } else {
             sep.style.display = "none";
@@ -103,7 +108,7 @@
         } else {
             oct.style.display = "none";
         }
-        if ( month == 11) {
+        if (month == 11) {
             nov.style.display = "block";
         } else {
             nov.style.display = "none";
@@ -114,28 +119,43 @@
             dec.style.display = "none";
         }
 
-    }    
- </script>
+    }
+
+    $(document).ready(function() {
+        var jobGroup = <?php echo '"' . $maintenance->jobs->job_group . '"' ?>;
+
+        if (jobGroup && jobGroup !== '' && jobGroup == 'Facilities First')
+            $('#menu-forms').removeClass('hidden');
+    });
+</script>
 
 
 
 
 <!-- Page JS Helpers (BS Notify Plugin) -->
 
-<script>jQuery(function(){ Dashmix.helpers('notify'); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers('notify');
+    });
+</script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
-<script>jQuery(function(){ Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']); });</script>
 <script>
-$(document).ready(function(){
-    $(document).on('change','.example-cb-custom-square-selectall',function(){
+    jQuery(function() {
+        Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $(document).on('change', '.example-cb-custom-square-selectall', function() {
             //alert();
             if ($(this).is(":checked")) {
                 var active_pan_table = $(this).closest('table');
 
-                        active_pan_table.find('tr').each(function() {
-                        var checkbox = $(this).find('td:eq(1) input');
-                        checkbox.prop('checked', true);
+                active_pan_table.find('tr').each(function() {
+                    var checkbox = $(this).find('td:eq(1) input');
+                    checkbox.prop('checked', true);
                 });
             } else {
                 var active_pan_table = $(this).closest('table');
@@ -144,8 +164,8 @@ $(document).ready(function(){
                     checkbox.prop('checked', false);
                 });
             }
-    })        
-})
+        })
+    })
 </script>
 @endsection
 
@@ -195,7 +215,7 @@ $(document).ready(function(){
                         </div>
                         <div class="form-group" id="there">
                             <label for="example-text-input">Lift</label>
-                                <select class="form-control lift_select" name="lift_id" required>
+                            <select class="form-control lift_select" name="lift_id" required>
                                 @foreach ($lifts as $data)
                                 <option value="{{ $data->id }}" @if($maintenance->lifts->id == $data->id) selected @endif>{{ $data->lift_name }}</option>
                                 @endforeach
@@ -203,8 +223,7 @@ $(document).ready(function(){
                         </div>
                         <div class="form-group">
                             <label for="example-text-input">Maintenance Date</label>
-                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1"
-                                data-autoclose="true" data-today-highlight="true">
+                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1" data-autoclose="true" data-today-highlight="true">
                                 <input type="text" class="form-control" name="maintenance_date" value="{{$maintenance->maintenance_date}}">
                             </div>
                         </div>
@@ -238,8 +257,7 @@ $(document).ready(function(){
                     <div class="col-lg-12">
                         <!-- Block Tabs Default Style -->
                         <div class="block block-rounded block-bordered">
-                        <select id="active_month" name="active_month" class="form-control"
-                                onchange="change(this.value)">
+                            <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
                                 <option value="">Select montly tasks:</option>
                                 <option value="1" {{$selected_task_month==1?'selected':''}}>January</option>
                                 <option value="2" {{$selected_task_month==2?'selected':''}}>February</option>
@@ -252,11 +270,11 @@ $(document).ready(function(){
                                 <option value="9" {{$selected_task_month==9?'selected':''}}>September</option>
                                 <option value="10" {{$selected_task_month==10?'selected':''}}>October</option>
                                 <option value="11" {{$selected_task_month==11?'selected':''}}>November</option>
-                                <option value="12"{{$selected_task_month==12?'selected':''}}>December</option>
-                        </select>
+                                <option value="12" {{$selected_task_month==12?'selected':''}}>December</option>
+                            </select>
                             <div class="block-content tab-content">
                                 @foreach ($selecttasks as $key=>$select_month_task)
-                                @if ($key==$selected_task_month-1) 
+                                @if ($key==$selected_task_month-1)
                                 <div class="tab-pane {{$key==$selected_task_month-1?'active':''}}" id="btabs-static-{{$key}}" role="tabpane{{$key}}">
                                     <h4 class="font-w400">{{$months[$key]}} Tasks</h4>
                                     <table class="table table-bordered table-striped table-vcenter">
@@ -265,34 +283,33 @@ $(document).ready(function(){
                                                 <th class="text-center">Task Name</th>
                                                 <th class="text-left">
                                                     <div class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">
-                                                        <input type="checkbox" class="custom-control-input checkitem1 example-cb-custom-square-selectall" id="example-cb-custom-square-selectall" />                                                    
+                                                        <input type="checkbox" class="custom-control-input checkitem1 example-cb-custom-square-selectall" id="example-cb-custom-square-selectall" />
                                                         <label class="custom-control-label" for="example-cb-custom-square-selectall">Select All</label>
                                                     </div>
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach($select_month_task as $jkey=>$task)
+                                            @foreach($select_month_task as $jkey=>$task)
                                             <tr>
                                                 <td>
                                                     {{$task->task_name}}
                                                 </td>
                                                 <td>
-                                                    <?php 
-                                                        $task_arr = json_decode($maintenance->task_ids);
-                                                        if (in_array($task->task_id, $task_arr->{$keymonth[$key]})) 
-                                                            $checked = 'checked';
-                                                        else
-                                                            $checked = '';
+                                                    <?php
+                                                    $task_arr = json_decode($maintenance->task_ids);
+                                                    if (in_array($task->task_id, $task_arr->{$keymonth[$key]}))
+                                                        $checked = 'checked';
+                                                    else
+                                                        $checked = '';
                                                     ?>
                                                     <div class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">
-                                                        <input type="checkbox" class="custom-control-input checkitem1" id="example-cb-custom-square-lg_{{$key}}_{{$jkey}}"
-                                                            name="task_month{{($key+1)}}[]" value="{{$task->task_id}}" {{$checked}}>
+                                                        <input type="checkbox" class="custom-control-input checkitem1" id="example-cb-custom-square-lg_{{$key}}_{{$jkey}}" name="task_month{{($key+1)}}[]" value="{{$task->task_id}}" {{$checked}}>
                                                         <label class="custom-control-label" for="example-cb-custom-square-lg_{{$key}}_{{$jkey}}"></label>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>

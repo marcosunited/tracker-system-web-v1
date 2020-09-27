@@ -75,6 +75,13 @@ Route::get('/callout_create',array('middleware' => 'cors', 'uses' => 'Api\TechCo
 /**
  * RealTime tracking gps
  */
-
  Route::get('/sendgps',array('middleware' => 'cors', 'uses' => 'Api\LocationtrackerController@start'));
  Route::get('/stopgps',array('middleware' => 'cors', 'uses' => 'Api\LocationtrackerController@stop'));
+
+ /**
+ * Get ChecklistActivities
+ */
+
+Route::get('/maintenance/checklistactivities',array('middleware' => 'cors', 'uses' => 'Api\TechController@getChecklistActivities'));
+Route::get('/maintenance/savechecklist',array('middleware' => 'cors', 'uses' => 'Api\TechController@saveChecklistActivities'));
+

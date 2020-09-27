@@ -476,7 +476,7 @@ class CalloutController extends Controller
                     <p>The cause of the fault was '<b>$technician_fault</b>', and the technicians rectification was <b>'$correction_name'</b> - '<b>$tech_description</b>'.</p>
                     Our technician departed at <b>$tod</b>.</p>
                     <p>We trust our service was satisfactory, however we welcome your feedback to our office<br> via phone 9687 9099 or email info@unitedlifts.com.au.</p>
-                    <p>Thankyou for your continued patronage.</p>
+                    <p>Thank you for your continued patronage.</p>
                     <p>$link</p>
                     <p>United Lift Services</p>               
                 ";

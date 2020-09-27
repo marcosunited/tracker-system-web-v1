@@ -13,6 +13,7 @@ use App\Fault;
 use App\CalloutLift;
 use PDF;
 use App\TechFault;
+use Exception;
 
 class ReportNewController extends Controller
 {
@@ -117,13 +118,48 @@ class ReportNewController extends Controller
         return view('reportnew.groupReport', compact('group_list'));
     }
 
+    public function customReportCompliance(Request $request)
+    {
+
+        try {
+            $orientation = 'portrait';
+
+            $maintenance = DB::table('maintenancenew')
+                ->where('maintenancenew.id', '=', $request->id)
+                ->join('jobs', 'maintenancenew.job_id', '=', 'jobs.id')
+                ->join('technicians', 'maintenancenew.technician_id', '=', 'technicians.id')
+                ->join('lifts', 'maintenancenew.lift_id', '=', 'lifts.id')
+                ->get()
+                ->first();
+
+            $checklist = null;
+
+            if ($request->name == "checklistGenerate") {
+                $orientation = 'landscape';
+
+                $checklist = DB::table('checklist_maintenance')
+                    ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
+                    ->where('maintenancenew.id', '=', $request->id)
+                    ->leftJoin('maintenancenew', 'maintenancenew.id', '=', 'checklist_maintenance.maintenance_id')
+                    ->join('checklist_activities', 'checklist_activities.id', '=', 'checklist_maintenance.activity_id')
+                    ->orderBy('checklist_activities.id', 'asc')
+                    ->get();
+            }
+
+            $report = PDF::loadview('reportnew.custom-reports.' . $request->name, compact('maintenance', 'checklist'))->setPaper('a4', $orientation);
+            return $report->download($request->name . ' - ' . $request->id . '-' . '.pdf');
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
+    }
+
     public function groupreportgenerate(Request $request)
     {
 
         $group_name = $request->job_group;
         $start_date = date($request->start_time);
         $end_date = date($request->finish_time);
-        $logo =  ''; //storage_path().'/logobig.png';
+        $logo =  '';
 
 
         $callouts = DB::table('calloutsnew')
@@ -333,7 +369,7 @@ class ReportNewController extends Controller
 
         $final_callouts = [];
         $callouts = DB::table('calloutsnew')
-            ->whereBetween('calloutsnew.callout_time', [$start_date, $end_date])
+            ->whereBetween('calloutsnew.callout_time', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
             ->join('jobs', 'calloutsnew.job_id', '=', 'jobs.id')
             ->join('_faults', 'calloutsnew.fault_id', '=', '_faults.id')
             ->join('_technician_faults', 'calloutsnew.technician_fault_id', '=', '_technician_faults.id')

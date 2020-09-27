@@ -7,8 +7,7 @@
 <link rel="stylesheet" href="{{ asset('js/plugins/ion-rangeslider/css/ion.rangeSlider.css') }}">
 <link rel="stylesheet" href="{{ asset('js/plugins/ion-rangeslider/css/ion.rangeSlider.skinHTML5.css') }}">
 <link rel="stylesheet" href="{{ asset('js/plugins/dropzone/dist/min/dropzone.min.css') }}">
-<link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" />
 <style>
 
 </style>
@@ -34,147 +33,292 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $(".job_select").select2();
     });
-    $(document).ready(function () {
+    $(document).ready(function() {
         $(".tech_select").select2();
     });
-    $(document).ready(function () {
+    $(document).ready(function() {
         $(".lift_select").select2();
     });
-
 </script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $(".job_select").change(function () {
+        $(".job_select").on('select2:select', function(e) {
+            var selectedJobName = e.params.data.text || '';
+            var selectedJobId = e.params.data.id || 0;
+
             $.ajax({
-                /* the route pointing to the post function */
                 url: '/callouts/selectedJob',
                 type: 'POST',
-                /* send the csrf-token and the input to the controller */
                 data: {
                     _token: CSRF_TOKEN,
-                    message: $(".job_select").select2("val")
+                    message: selectedJobId
                 },
                 dataType: 'JSON',
-                success:function(data) {
-                    $('.lift_select').empty();  
-                    for (var i=0;i<data.length;i++) {     
-                        var html='<option value="'+data[i]['id']+'" data-type="'+data[i]['lift_type']+'">'+data[i]['lift_name']+'('+data[i]['lift_type']+')'+'</option>';           
-                        $(".lift_select").append(html);             
-                    }        
-                    $('.lift_select').select2();  
-                },
-                failure:function() {
+                success: function(data) {
+                    if (data && data.length > 0) {
 
+                        /*Add html template*/
+                        var htmlTemplate = $('#content-select').html();
+                        htmlTemplate = htmlTemplate.replaceAll("{id}", selectedJobId, ).replace('{job_name}', selectedJobName);
+                        $('#lifts').append(htmlTemplate);
+
+                        /*Transform data*/
+                        var lifts = [];
+                        $.map(data, function(obj) {
+                            lifts.push({
+                                id: obj.id,
+                                text: obj.lift_name + '(' + obj.lift_type + ')'
+                            })
+                        });
+
+                        /*Create Lift's control*/
+                        $('#lift-' + selectedJobId).select2({
+                            data: lifts,
+                            multiple: true,
+                            required: true
+                        });
+                    } else {
+                        alert('Lifts not found');
+                    }
+
+                },
+                failure: function(error) {
+                    console.log(error);
                 }
             });
 
         });
 
-        $('#checkall1').change(function () {
+        $('#checkall1').change(function() {
+            $('.checkitem1').prop("checked", $(this).prop("checked"))
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+
+        $("#saveMaintenance").click(function(event) {
+
+            var jobs = $(".job_select").select2('data');
+            var maintenance = {};
+
+            if (jobs.length > 0) {
+                jobs.forEach((job, keyJob) => {
+
+                    maintenance['job_id'] = job.id;
+
+                    var lifts = $("#lift-" + job.id).select2('data');
+                    if (lifts.length > 0) {
+
+                        lifts.forEach((lift, key) => {
+
+                            maintenance['lift_id'] = lift.id;
+                            var tasks = $("[name*='task_month']:checked");
+                            var checkedTasks = [];
+
+                            if (tasks.length > 0) {
+
+                                tasks.each((key, value) => {
+                                    checkedTasks.push({
+                                        id: $(value).val(),
+                                        monthId: $(value).data('month')
+                                    })
+                                });
+                            } else {
+                                alert('Please, select at least one task')
+                            }
+
+                            maintenance['tasks'] = checkedTasks;
+                            var flagRequest = (keyJob == jobs.length - 1);
+                            if (maintenance['tasks'].length > 0) {
+                                postMaintenance(maintenance, flagRequest);
+                            }
+                        });
+                    } else {
+                        alert('Please, select at least one lift');
+                    }
+                });
+            } else {
+                alert('Please, select at least one job');
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
+        $('#checkall1').change(function() {
             $('.checkitem1').prop("checked", $(this).prop("checked"))
         });
     });
 
+    function postMaintenance(maintenance, flagRequest) {
+        var statusId = $("[name='completed_id']").val() || 0;
+        var technicianId = $("[name='technician_id']").val() || 0;
+
+        if (statusId !== 0 && technicianId !== 0) {
+            maintenance['completed_id'] = statusId;
+            maintenance['technician_id'] = technicianId;
+            maintenance['maintenance_date'] = $("[name='maintenance_date']").val();
+            maintenance['active_month'] = $("[name='active_month']").val() || 0;
+
+            var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+                url: '/maintenances/add',
+                type: 'POST',
+                data: {
+                    _token: CSRF_TOKEN,
+                    request: maintenance
+                },
+                dataType: 'JSON',
+                success: function(data) {
+                    if (data && data.status == "success") {
+                        console.log(data);
+
+                        if (flagRequest) {
+                            setTimeout(() => {
+                                location.reload();
+                            }, 0);
+                        }
+                    }
+
+                },
+                failure: function(error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            alert('Please, select a status or technician');
+        }
+    }
 </script>
+
+
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         function getMonthName(i) {
             switch (i) {
-                case 0: return "January"; break;
-                case 1: return "Feburary";break;
-                case 2: return "March";break;
-                case 3: return "April";break;
-                case 4: return "May";break;
-                case 5: return "June";break;
-                case 6: return "July";break;
-                case 7: return "August";break;
-                case 8: return "September";break;
-                case 9: return "October";break;
-                case 10: return "November";break;
-                case 11: return "December";      break;                                          
+                case 0:
+                    return "January";
+                    break;
+                case 1:
+                    return "Feburary";
+                    break;
+                case 2:
+                    return "March";
+                    break;
+                case 3:
+                    return "April";
+                    break;
+                case 4:
+                    return "May";
+                    break;
+                case 5:
+                    return "June";
+                    break;
+                case 6:
+                    return "July";
+                    break;
+                case 7:
+                    return "August";
+                    break;
+                case 8:
+                    return "September";
+                    break;
+                case 9:
+                    return "October";
+                    break;
+                case 10:
+                    return "November";
+                    break;
+                case 11:
+                    return "December";
+                    break;
             }
         }
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $("#liftcheck").click(function () {
+        $("#liftcheck").click(function(event) {
+
             $.ajax({
-                /* the route pointing to the post function */
                 url: '/maintenances/selecttasks',
                 type: 'POST',
-                /* send the csrf-token and the input to the controller */
                 data: {
                     _token: CSRF_TOKEN,
-                    message: $(".lift_select").select2("val")
+                    message: 'L'
                 },
                 dataType: 'JSON',
-                success:function(data) {          
+                success: function(data) {
                     $('#task_info_panel').empty();
-                    for (i=0;i<data.length;i++) {
-                        var html='';
+                    for (i = 0; i < data.length; i++) {
+                        var html = '';
                         var active_pan = '';
-                        if (i==0) active_pan = 'active';
-                        html='<div class="tab-pane' +active_pan+'" id="btabs-static-'+i+'">';
-                            html+='<h4 class="font-w400">' + getMonthName(i) +' Task</h4>';
-                            html+='<table class="table table-bordered table-striped table-vcenter">';
-                                html+='<thead>';
-                                    html+='<tr>';
-                                        html+='<th class="text-center">Task Name</th>';
-                                        html+='<th class="text-left">';
-                                        html+='<div ';
-                                                html+='class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">';
-                                                html+='<input type="checkbox" class="custom-control-input checkitem1 example-cb-custom-square-selectall"';
-                                                    html+='id="example-cb-custom-square-selectall_'+i;
-                                                    html+='">';
-                                                html+='<label class="custom-control-label"';
-                                                    html+='for="example-cb-custom-square-selectall_'+i+'">Select All</label>';
-                                            html+='</div>';                                                                                
-                                        html+='</th>';
-                                    html+='</tr>';
-                                html+'</thead>';
-                                var one_month = data[i];
-                                html+='<tbody>';
-                                for (var j=0;j<one_month.length;j++) {
-                                    html+='<tr>';
-                                        html+='<td>';
-                                            html+=one_month[j]['task_name'];
-                                        html+='</td>';
-                                        html+='<td>';
-                                            html+='<div ';
-                                                html+='class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">';
-                                                html+='<input type="checkbox" class="custom-control-input checkitem1"';
-                                                    html+='id="example-cb-custom-square-lg_'+i+'_'+j+'"';
-                                                    html+='name="task_month'+(i+1)+'[]" value="'+one_month[j]['task_id']+'">';
-                                                html+='<label class="custom-control-label"';
-                                                    html+='for="example-cb-custom-square-lg_'+i+'_'+j+'"></label>';
-                                            html+='</div>';
-                                        html+='</td>';
-                                    html+='</tr>';
-                                }
-                                html+='</tbody>';
-                            html+='</table>';
-                        html+='</div>';
+                        if (i == 0) active_pan = 'active';
+                        html = '<div class="tab-pane' + active_pan + '" id="btabs-static-' + i + '">';
+                        html += '<h4 class="font-w400">' + getMonthName(i) + ' Task</h4>';
+                        html += '<table class="table table-bordered table-striped table-vcenter">';
+                        html += '<thead>';
+                        html += '<tr>';
+                        html += '<th class="text-center">Task Name</th>';
+                        html += '<th class="text-left">';
+                        html += '<div ';
+                        html += 'class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">';
+                        html += '<input type="checkbox" class="custom-control-input checkitem1 example-cb-custom-square-selectall"';
+                        html += 'id="example-cb-custom-square-selectall_' + i;
+                        html += '">';
+                        html += '<label class="custom-control-label"';
+                        html += 'for="example-cb-custom-square-selectall_' + i + '">Select All</label>';
+                        html += '</div>';
+                        html += '</th>';
+                        html += '</tr>';
+                        html + '</thead>';
+                        var one_month = data[i];
+                        html += '<tbody>';
+                        for (var j = 0; j < one_month.length; j++) {
+                            html += '<tr>';
+                            html += '<td>';
+                            html += one_month[j]['task_name'];
+                            html += '</td>';
+                            html += '<td>';
+                            html += '<div ';
+                            html += 'class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">';
+                            html += '<input type="checkbox" class="custom-control-input checkitem1"';
+                            html += 'id="example-cb-custom-square-lg_' + i + '_' + j + '"';
+                            html += 'name="task_month' + (i + 1) + '[]" data-month="' + (i + 1) + '" value="' + one_month[j]['task_id'] + '">';
+                            html += '<label class="custom-control-label"';
+                            html += 'for="example-cb-custom-square-lg_' + i + '_' + j + '"></label>';
+                            html += '</div>';
+                            html += '</td>';
+                            html += '</tr>';
+                        }
+                        html += '</tbody>';
+                        html += '</table>';
+                        html += '</div>';
                         $('#task_info_panel').append(html);
-                    }               
+                    }
                 },
-                failure:function() {
-
+                failure: function(error) {
+                    console.log(error);
                 }
-            });        
+            });
+
+            event.preventDefault();
+            event.stopPropagation();
         });
 
-        $(document).on('change','.example-cb-custom-square-selectall',function(){
-            //alert();
+        $(document).on('change', '.example-cb-custom-square-selectall', function() {
             if ($(this).is(":checked")) {
                 var active_pan_table = $(this).closest('table');
 
-                        active_pan_table.find('tr').each(function() {
-                        var checkbox = $(this).find('td:eq(1) input');
-                        checkbox.prop('checked', true);
+                active_pan_table.find('tr').each(function() {
+                    var checkbox = $(this).find('td:eq(1) input');
+                    checkbox.prop('checked', true);
                 });
             } else {
                 var active_pan_table = $(this).closest('table');
@@ -183,9 +327,8 @@
                     checkbox.prop('checked', false);
                 });
             }
-        })        
+        })
     });
-
 </script>
 <script>
     function change(month) {
@@ -263,7 +406,7 @@
         } else {
             dec.style.display = "none";
         }
-      
+
     }
 </script>
 
@@ -271,18 +414,16 @@
 <!-- Page JS Helpers (BS Notify Plugin) -->
 
 <script>
-    jQuery(function () {
+    jQuery(function() {
         Dashmix.helpers('notify');
     });
-
 </script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
 <script>
-    jQuery(function () {
+    jQuery(function() {
         Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
     });
-
 </script>
 @endsection
 
@@ -291,49 +432,45 @@
 
 <div class="content">
     @include('error.error')
-    <!-- <button type="button" class="js-notify btn btn-info push" data-type="info" data-icon="fa fa-info-circle mr-1" data-message="Hello World">
-     <i class="fa fa-bell mr-1"></i> Launch Notification
-</button> -->
-    <!-- Bootstrap Datepicker (.js-datepicker and .input-daterange classes are initialized in Helpers.datepicker()) -->
-    <!-- For more info and examples you can check out https://github.com/eternicode/bootstrap-datepicker -->
+
     <div class="block block-rounded block-bordered">
         <div class="block-header block-header-default">
             <span class="badge badge-pill badge-success">Add:</span>&nbsp&nbsp<h3 class="block-title">New Maintenance
             </h3>
         </div>
         <div class="block-content">
-            <form action="/maintenances/add" method="POST">
+            <form>
                 @csrf
                 <h2 class="content-heading pt-0">Maintenance Details
                     <div class="input-group-append" style="float:right;">
-                        <button type="submit" class="btn-hero-primary">Add Maintenance</button>
+                        <button id="saveMaintenance" class="btn-hero-primary">Add Maintenance</button>
                     </div>
                 </h2>
                 <div class="row push">
                     <div class="col-lg-4" style="padding-left: 50px;">
                         <div class="form-group">
                             <label for="example-text-input">Job Name</label>
-                            <select class="form-control job_select" name="job_id" required>
-
-                                <option value="">--- Select Job ---</option>
+                            <select class="form-control job_select" name="job_id" required multiple>
                                 @foreach ($jobs as $data)
                                 <option value="{{ $data->id }}">{{ $data->job_address_number }} {{
                                     $data->job_address }} {{ $data->job_name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group" id="there">
-                            <label for="example-text-input">Lift: Click button to getting Task</label>
-                            <select class="form-control lift_select col-md-8" name="lift_id" required>
-                            </select>
-                            <button style="float:right;" type="button" class="btn btn-warning offset-md-1 col-md-3" id="liftcheck">Get Tasks</button>                            
-                        </div>
+                        <fieldset class="content-lifts">
+                            <legend>Lifts</legend>
+                            <div class="form-group" id="lifts" class="selected-lifts">
+
+                            </div>
+                        </fieldset>
                         <div class="form-group">
                             <label for="example-text-input">Maintenance Date</label>
-                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1"
-                                data-autoclose="true" data-today-highlight="true">
+                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1" data-autoclose="true" data-today-highlight="true">
                                 <input type="text" class="form-control" name="maintenance_date">
                             </div>
+                        </div>
+                        <div class="form-group" id="there">
+                            <button style="float:right;" class="btn btn-warning offset-md-1 col-md-3" id="liftcheck">Get Tasks</button>
                         </div>
                         <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
                         </div>
@@ -349,7 +486,6 @@
                         </div>
                         <div class="form-group" id="here">
                             <label for="example-text-input">Technician</label>
-                            <!-- <button style="float:right;" type="button" id="techcheck" class="btn btn-warning">Check Tech</button> -->
                             <select class="form-control tech_select" name="technician_id" required>
                                 <option value="">--- Select Technician ---</option>
                                 @foreach ($technicians as $data)
@@ -379,10 +515,14 @@
                                 <option value="11">November</option>
                                 <option value="12">December</option>
                             </select>
-                        </div>    
+                        </div>
                         <div class="block-content" id="task_info_panel">
-                           
-                        </div>                     
+
+                        </div>
+                        <div id="content-select" class="invisible">
+                            <label>{job_name}</label>
+                            <select id="lift-{id}" name="lift-{id}" class="form-control col-md-8"></select>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -392,4 +532,3 @@
 
 <!-- END Page Content -->
 @endsection
-

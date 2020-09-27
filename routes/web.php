@@ -129,8 +129,6 @@ Route::post('/maintenances/maintenancesendemail','MaintenanceController@maintena
 Route::post('/maintenances/maintenanceprint','MaintenanceController@maintenancePrint')->middleware('auth');
 //Print Repair
 Route::get('/repairs/{repair}/print', 'RepairController@print');
-//Route::post('/repairs/repairsendemail','RepairController@repairsendEmail')->middleware('auth');
-//Route::post('/repairs/calloutprint','RepairController@calloutPrint')->middleware('auth');
 
 //Maintenance
 Route::get('/maintenances/create', 'MaintenanceController@create')->middleware('auth');
@@ -204,6 +202,9 @@ Route::get('/reports/new/period', 'ReportNewController@period')->middleware('aut
 Route::post('/reports/new/period/generate', 'ReportNewController@periodgenerate')->middleware('auth');
 Route::post('/reports/selectedJob', 'ReportNewController@selectedJob')->middleware('auth');
 
+//Custom reports
+Route::get('/reports/new/custom-report', 'ReportNewController@customReportCompliance')->middleware('auth');
+
 Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');;
 Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');;
 
@@ -218,18 +219,4 @@ Route::post('/tasks', 'TaskController@store')->middleware('auth');
 Route::get('/task/{type}/{id}', 'TaskController@show')->middleware('auth');
 Route::post('/task/{type}/{id}', 'TaskController@update')->middleware('auth');
 
-
-/*
-Route::post('/jobs', 'JobController@store')->middleware('auth');
-Route::get('/jobs/{job}', 'JobController@show')->middleware('auth');
-Route::patch('/jobs/{job}', 'JobController@update')->middleware('auth');
-Route::get('/jobs/{job}/callouts', 'JobController@callouts')->middleware('auth');
-Route::get('/jobs/{job}/file', 'JobController@file')->middleware('auth');
-Route::post('/jobs/{job}/file', 'JobController@uploadfile')->middleware('auth');
-Route::delete('/jobs/{job}/file/{file}', 'JobController@deletefile')->middleware('auth');
-Route::get('/jobs/{job}/notes', 'JobController@notes')->middleware('auth');
-Route::post('/jobs/{job}/notes', 'JobController@addnotes')->middleware('auth');
-Route::delete('/jobs/{job}/notes/{note}', 'JobController@deletenote')->middleware('auth');
-Route::get('/jobs/{job}/rounds', 'JobController@round')->middleware('auth');
-*/
 
