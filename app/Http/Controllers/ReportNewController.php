@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Database\Query\Builder;
 use App\Job;
 use Session;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Agent;
-use App\Fault;
 use App\CalloutLift;
+use App\MaintenanceN;
 use PDF;
-use App\TechFault;
 use Exception;
 
 class ReportNewController extends Controller
@@ -124,7 +121,7 @@ class ReportNewController extends Controller
         try {
             $orientation = 'portrait';
 
-            $maintenance = DB::table('maintenancenew')
+            $maintenance = MaintenanceN::select()
                 ->where('maintenancenew.id', '=', $request->id)
                 ->join('jobs', 'maintenancenew.job_id', '=', 'jobs.id')
                 ->join('technicians', 'maintenancenew.technician_id', '=', 'technicians.id')
