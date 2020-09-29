@@ -27377,6 +27377,16 @@ div.bg-white.inner-top-bar {
     text-indent: -16px;
 }
 
-#menu-forms.hidden{
+#menu-forms.hidden {
     display: none;
+}
+
+.blockUI-layout {
+    margin: auto;
+    padding: 16px;
+    display: none;
+}
+
+.blockUI-layout h4 {
+    margin: 0;
 }

@@ -13,9 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth:api')->get('/user', 'UserController@AuthRouteAPI');
 
 Route::apiResource('/jobs','JobApiController');
 // API develop for ionic mobile application 2020-01-14

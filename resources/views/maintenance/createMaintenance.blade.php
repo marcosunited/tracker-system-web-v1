@@ -21,6 +21,7 @@
 <script src="{{ asset('js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('js/plugins/jquery.maskedinput/jquery.maskedinput.min.js') }}"></script>
 <script src="{{ asset('js/plugins/dropzone/dropzone.min.js') }}"></script>
+<script src="{{ asset('js/plugins/jquery-blockUI/jquery.blockUI.min.js') }}"></script>
 
 
 <!-- Page JS Plugins -->
@@ -47,10 +48,16 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <script>
     $(document).ready(function() {
+        $(document).ajaxStop($.unblockUI);
+
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $(".job_select").on('select2:select', function(e) {
-            var selectedJobName = e.params.data.text || '';
-            var selectedJobId = e.params.data.id || 0;
+        $(".job_select").on('select2:select', function(event) {
+            var selectedJobName = event.params.data.text || '';
+            var selectedJobId = event.params.data.id || 0;
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
 
             $.ajax({
                 url: '/callouts/selectedJob',
@@ -85,14 +92,34 @@
                         });
                     } else {
                         alert('Lifts not found');
+                        event.stopImmediatePropagation();
                     }
 
                 },
                 failure: function(error) {
                     console.log(error);
+                    $.unblockUI();
                 }
             });
 
+        });
+
+        $(".job_select").on('select2:unselect', function(e) {
+            var selectedJobName = e.params.data.text || '';
+            var selectedJobId = e.params.data.id || 0;
+
+            $('#label-lift-' + selectedJobId).remove();
+            $('#lift-' + selectedJobId).select2('destroy');
+            $('#lift-' + selectedJobId).remove(); 
+
+        });
+
+        $(".job_select").on('select2:clear', function(e) {
+            if (e) {
+                $("[name*='lift-']").select2('destroy');
+                $("[name*='lift-']").remove();
+                $("[name*='label-lift-']").remove();
+            }
         });
 
         $('#checkall1').change(function() {
@@ -108,6 +135,10 @@
 
             var jobs = $(".job_select").select2('data');
             var maintenance = {};
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
 
             if (jobs.length > 0) {
                 jobs.forEach((job, keyJob) => {
@@ -132,7 +163,10 @@
                                     })
                                 });
                             } else {
-                                alert('Please, select at least one task')
+                                $.unblockUI();
+                                alert('Please, select at least one task');
+                                event.stopImmediatePropagation();
+                                
                             }
 
                             maintenance['tasks'] = checkedTasks;
@@ -142,7 +176,9 @@
                             }
                         });
                     } else {
+                        $.unblockUI();
                         alert('Please, select at least one lift');
+                        event.stopImmediatePropagation();
                     }
                 });
             } else {
@@ -170,6 +206,10 @@
 
             var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
+
             $.ajax({
                 url: '/maintenances/add',
                 type: 'POST',
@@ -192,10 +232,13 @@
                 },
                 failure: function(error) {
                     console.log(error);
+                    $.unblockUI();
                 }
             });
         } else {
+            $.unblockUI();
             alert('Please, select a status or technician');
+            event.stopImmediatePropagation();
         }
     }
 </script>
@@ -245,6 +288,10 @@
         }
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         $("#liftcheck").click(function(event) {
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
 
             $.ajax({
                 url: '/maintenances/selecttasks',
@@ -305,6 +352,7 @@
                 },
                 failure: function(error) {
                     console.log(error);
+                    $.unblockUI();
                 }
             });
 
@@ -433,6 +481,9 @@
 <div class="content">
     @include('error.error')
 
+    <div class="blockUI-layout">
+        <h4>Getting data...</h4>
+    </div>
     <div class="block block-rounded block-bordered">
         <div class="block-header block-header-default">
             <span class="badge badge-pill badge-success">Add:</span>&nbsp&nbsp<h3 class="block-title">New Maintenance
@@ -520,7 +571,7 @@
 
                         </div>
                         <div id="content-select" class="invisible">
-                            <label>{job_name}</label>
+                            <label id="label-lift-{id}" name="label-lift-{id}">{job_name}</label>
                             <select id="lift-{id}" name="lift-{id}" class="form-control col-md-8"></select>
                         </div>
                     </div>
