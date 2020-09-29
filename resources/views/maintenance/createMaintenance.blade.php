@@ -182,7 +182,9 @@
                     }
                 });
             } else {
+                $.unblockUI();
                 alert('Please, select at least one job');
+                event.stopImmediatePropagation();
             }
 
             event.preventDefault();
