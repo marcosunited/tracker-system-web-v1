@@ -407,7 +407,7 @@ class TechController extends Controller
                 ->where('maintenancenew.completed_id', '=', 1)
                 ->where('job_id', $one_job->job_id)
                 ->groupBy('lift_id')->get();
-                
+
             foreach ($lifts as $lift) {
                 $tmp = [];
                 $list_base_job = MaintenanceN::select()->where('technician_id', $technician_id)
@@ -1254,6 +1254,7 @@ class TechController extends Controller
 
             /*Get information*/
             $maintenance = MaintenanceN::select()
+                ->join('jobs', 'jobs.id', '=', 'job_id')
                 ->where('maintenancenew.id', '=', $maintenance_id)
                 ->get()
                 ->first();
@@ -1264,45 +1265,56 @@ class TechController extends Controller
             $month_label = $this->getMonthLabel($month_key);
             $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
 
-            $checklist = DB::table('checklist_maintenance')
-                ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
-                ->where('maintenancenew.id', '=', $maintenance_id)
-                ->leftJoin('maintenancenew', 'maintenancenew.id', '=', 'checklist_maintenance.maintenance_id')
-                ->join('checklist_activities', 'checklist_activities.id', '=', 'checklist_maintenance.activity_id')
-                ->orderBy('checklist_activities.id', 'asc')
-                ->get();
-
-            $settings_email = DB::table('settings')
-                ->select(['value'])
-                ->where(function ($query) {
-                    $query->where('key', '=', 'email_ffa_customer')
-                        ->orWhere('key', '=', 'email_ffa_office');
-                })
-                ->get();
-
             $recipients = array();
+            $files = array();
 
-            foreach ($settings_email as $setting) {
-                array_push($recipients, $setting->value);
-            }
-
-            /*Save PDF's files*/
             $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
-            $complianceReport = PDF::loadView('reportnew.custom-reports.complianceGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
-            $complianceReport->save($complianceFile);
-
             $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
-            $scheduleReport = PDF::loadView('reportnew.custom-reports.maintenanceRecordLogGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
-            $scheduleReport->save($scheduleFile);
-
             $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
-            $checklistReport = PDF::loadView('reportnew.custom-reports.checklistGenerate', compact('maintenance', 'checklist'))->setPaper('a4', 'landscape');
-            $checklistReport->save($checklistFile);
+
+            if ($maintenance->job_group == 'Facilities First') {
+                $checklist = DB::table('checklist_maintenance')
+                    ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
+                    ->where('maintenancenew.id', '=', $maintenance_id)
+                    ->leftJoin('maintenancenew', 'maintenancenew.id', '=', 'checklist_maintenance.maintenance_id')
+                    ->join('checklist_activities', 'checklist_activities.id', '=', 'checklist_maintenance.activity_id')
+                    ->orderBy('checklist_activities.id', 'asc')
+                    ->get();
+
+
+                $settings_email = DB::table('settings')
+                    ->select(['value'])
+                    ->where(function ($query) {
+                        $query->where('key', '=', 'email_ffa_customer')
+                            ->orWhere('key', '=', 'email_ffa_office');
+                    })
+                    ->get();
+
+
+                foreach ($settings_email as $setting) {
+                    array_push($recipients, $setting->value);
+                }
+
+                /*Save PDF's files*/
+                $complianceReport = PDF::loadView('reportnew.custom-reports.complianceGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
+                $complianceReport->save($complianceFile);
+                array_push($files, $complianceFile);
+
+                $scheduleReport = PDF::loadView('reportnew.custom-reports.maintenanceRecordLogGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
+                $scheduleReport->save($scheduleFile);
+                array_push($files, $scheduleFile);
+
+                $checklistReport = PDF::loadView('reportnew.custom-reports.checklistGenerate', compact('maintenance', 'checklist'))->setPaper('a4', 'landscape');
+                $checklistReport->save($checklistFile);
+                array_push($files, $checklistFile);
+            } else {
+                array_push($recipients, $maintenance->job_email);
+            }
 
             $docketFile = $path . 'Docket maintenance - ' . $maintenance_id . '.pdf';
             $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
             $docketReport->save($docketFile);
-
+            array_push($files, $docketFile);
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
@@ -1310,7 +1322,7 @@ class TechController extends Controller
                 $domain  = "unitedlifts.com.au";
                 $subject = "ULS Service - Maintenance finished";
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Please, find attached the forms for further details. <br/><br/> Thanks! <br/><br/> United Lift Services";
-                Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, [$complianceFile, $scheduleFile, $checklistFile, $docketFile]));
+                Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
 
             /*Delete files*/
