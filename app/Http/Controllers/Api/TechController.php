@@ -51,6 +51,7 @@ class TechController extends Controller
 
         $technician = Technician::select()
             ->where('technician_email', $email)
+            ->where('status_id', 1)
             ->where('technician_password', base64_encode($request['password']))->get()->first();
         if ($technician) {
             $locs = Gps::select()->where('user_id', $technician->id);
@@ -1312,9 +1313,9 @@ class TechController extends Controller
             }
 
             $docketFile = $path . 'Docket maintenance - ' . $maintenance_id . '.pdf';
-            $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
-            $docketReport->save($docketFile);
-            array_push($files, $docketFile);
+            //$docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
+            //$docketReport->save($docketFile);
+            //array_push($files, $docketFile);
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
