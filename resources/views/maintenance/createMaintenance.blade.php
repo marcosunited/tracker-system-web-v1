@@ -43,6 +43,8 @@
     $(document).ready(function() {
         $(".lift_select").select2();
     });
+
+    var LIFT_TYPE = 'L';
 </script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -51,6 +53,7 @@
         $(document).ajaxStop($.unblockUI);
 
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+
         $(".job_select").on('select2:select', function(event) {
             var selectedJobName = event.params.data.text || '';
             var selectedJobId = event.params.data.id || 0;
@@ -79,8 +82,9 @@
                         var lifts = [];
                         $.map(data, function(obj) {
                             lifts.push({
-                                id: obj.id,
-                                text: obj.lift_name + '(' + obj.lift_type + ')'
+                                "id": obj.id,
+                                "text": obj.lift_name + '(' + obj.lift_type + ')',
+                                "lift-type": obj.lift_type
                             })
                         });
 
@@ -90,6 +94,9 @@
                             multiple: true,
                             required: true
                         });
+
+                        $('#lift-' + selectedJobId).on('select2:select', onSelectLift);
+
                     } else {
                         alert('Lifts not found');
                         event.stopImmediatePropagation();
@@ -110,7 +117,7 @@
 
             $('#label-lift-' + selectedJobId).remove();
             $('#lift-' + selectedJobId).select2('destroy');
-            $('#lift-' + selectedJobId).remove(); 
+            $('#lift-' + selectedJobId).remove();
 
         });
 
@@ -125,6 +132,14 @@
         $('#checkall1').change(function() {
             $('.checkitem1').prop("checked", $(this).prop("checked"))
         });
+
+        function onSelectLift(event) {
+            var data = event.params.data;
+
+            if (data && LIFT_TYPE) {
+                LIFT_TYPE = data["lift-type"];
+            }
+        }
     });
 </script>
 <script>
@@ -146,6 +161,7 @@
                     maintenance['job_id'] = job.id;
 
                     var lifts = $("#lift-" + job.id).select2('data');
+
                     if (lifts.length > 0) {
 
                         lifts.forEach((lift, key) => {
@@ -166,7 +182,7 @@
                                 $.unblockUI();
                                 alert('Please, select at least one task');
                                 event.stopImmediatePropagation();
-                                
+
                             }
 
                             maintenance['tasks'] = checkedTasks;
@@ -289,6 +305,7 @@
             }
         }
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+
         $("#liftcheck").click(function(event) {
 
             $.blockUI({
@@ -299,8 +316,8 @@
                 url: '/maintenances/selecttasks',
                 type: 'POST',
                 data: {
-                    _token: CSRF_TOKEN,
-                    message: 'L'
+                    "_token": CSRF_TOKEN,
+                    "lift_type": LIFT_TYPE
                 },
                 dataType: 'JSON',
                 success: function(data) {
@@ -500,6 +517,13 @@
                     </div>
                 </h2>
                 <div class="row push">
+                    <div class="col-lg-8" style="padding-left: 50px;">
+                        <p>Take into consideration that only may create maintenances per lift type. Thus may no add Escalators and Elevators simultaneously.
+                        </p>
+                    </div>
+                </div>
+                <div class="row push">
+
                     <div class="col-lg-4" style="padding-left: 50px;">
                         <div class="form-group">
                             <label for="example-text-input">Job Name</label>

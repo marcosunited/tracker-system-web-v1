@@ -336,7 +336,7 @@ class CalloutController extends Controller
     {
         $file->delete();
         unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->error();
+        flash('File Successfully Deleted!')->success();
         return back();
     }
 
@@ -361,7 +361,7 @@ class CalloutController extends Controller
     public function deletenote(Calloutn $callout,Note $note)
     {
         $note->delete();
-        flash('Note Successfully Deleted!')->error();
+        flash('Note Successfully Deleted!')->success();
         return back();
     }
 
@@ -401,7 +401,7 @@ class CalloutController extends Controller
         $callout->lifts()->detach();
         $callout->files()->delete();
         $callout->delete();
-        flash('Callout Successfully Deleted!')->error();
+        flash('Callout Successfully Deleted!')->success();
         return back();
     }
 

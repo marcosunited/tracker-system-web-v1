@@ -263,7 +263,7 @@ class JobController extends Controller
     {
         $file->delete();
         unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->error();
+        flash('File Successfully Deleted!')->success();
         return back();
     }
 
@@ -288,7 +288,7 @@ class JobController extends Controller
     public function deletenote(Job $job,Note $note)
     {
         $note->delete();
-        flash('Note Successfully Deleted!')->error();
+        flash('Note Successfully Deleted!')->success();
         return back();
     }
      

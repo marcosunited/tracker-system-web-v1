@@ -512,7 +512,7 @@ class MaintenanceController extends Controller
     {
         $file->delete();
         unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->error();
+        flash('File Successfully Deleted!')->success();
         return back();
     }
 
@@ -537,7 +537,7 @@ class MaintenanceController extends Controller
     public function deletenote(maintenancen $maintenance, Note $note)
     {
         $note->delete();
-        flash('Note Successfully Deleted!')->error();
+        flash('Note Successfully Deleted!')->success();
         return back();
     }
 
@@ -608,7 +608,7 @@ class MaintenanceController extends Controller
             }
         }
         $maintenance->delete();
-        flash('Maintenance Successfully Deleted!')->error();
+        flash('Maintenance Successfully Deleted!')->success();
         return back();
     }
 

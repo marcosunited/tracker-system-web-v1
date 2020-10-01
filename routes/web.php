@@ -63,6 +63,7 @@ Route::patch('/techs/{tech}', 'TechController@update')->middleware('auth');
 Route::get('/techs/{tech}/jobs', 'TechController@jobs')->middleware('auth');
 Route::get('/techs/{tech}/callouts', 'TechController@callouts')->middleware('auth');
 Route::get('/techs/{tech}/maintenances', 'TechController@maintenances')->middleware('auth');
+Route::delete('/techs/{tech}', 'TechController@delete')->middleware('auth');
 
 
 //Agents

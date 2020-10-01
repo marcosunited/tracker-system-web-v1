@@ -164,7 +164,7 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
-                        <h1>Are you Sure?</h1>
+                        <h5>Are you Sure?</h5>
 
                         <form method="POST" action="/maintenances/{{isset($maintenance)?$maintenance->id:''}}">
                             @method('DELETE')

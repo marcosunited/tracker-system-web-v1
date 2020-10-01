@@ -27390,3 +27390,9 @@ div.bg-white.inner-top-bar {
 .blockUI-layout h4 {
     margin: 0;
 }
+
+.action-buttons{
+    margin-right: 16px;
+    border-top-left-radius: 0.2rem !important;
+    border-bottom-left-radius: 0.2rem !important;
+}
