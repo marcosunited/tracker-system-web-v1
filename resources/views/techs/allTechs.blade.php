@@ -17,6 +17,24 @@
 
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
+
+<script>
+    $(document).ready(function() {
+
+        $('a[data-toggle=modal], button[data-toggle=modal]').click(function() {
+
+            var data_id = 0;
+
+            if ($(this).data('mainid') !== '') {
+
+                data_id = $(this).data('mainid');
+            }
+
+            $('#deleteAction').attr("action", '/techs/' + data_id);
+        })
+    });
+</script>
+
 @endsection
 
 
@@ -111,11 +129,10 @@
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
                         <h5>This action will remove the technician permanently and he won't able to login in the app anymore</h5>
-
-                        <form method="POST" action="/techs/{{isset($tech)?$tech->id:''}}">
+                        <form method="POST" action="/techs/" id="deleteAction">
                             @method('DELETE')
                             @csrf
-                            <input type="hidden" name="maintenance_id" id="maintenance_id" value="">
+                            <input type="hidden" name="tech_id" id="tech_id" value="">
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
 
