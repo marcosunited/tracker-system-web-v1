@@ -1322,7 +1322,7 @@ class TechController extends Controller
                 $from = "call@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
                 $subject = "ULS Service - Maintenance finished";
-                $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Please, find attached the forms for further details. <br/><br/> Thanks! <br/><br/> United Lift Services";
+                $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
                 Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
 
