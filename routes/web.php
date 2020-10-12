@@ -24,7 +24,7 @@ Route::get('/jobs/all', 'JobController@index')->middleware('auth');
 Route::get('/jobs/create', 'JobController@create')->middleware('auth');
 Route::post('/jobs/create', 'JobController@store')->middleware('auth');
 Route::get('/jobs/{job}', 'JobController@show')->middleware('auth');
-Route::patch('/jobs/{job}', 'JobController@update')->middleware('auth');
+Route::patch('/jobs/{job}', 'JobController@edit')->middleware('auth');
 Route::get('/jobs/{job}/callouts', 'JobController@callouts')->middleware('auth');
 Route::get('/jobs/{job}/maintenances', 'JobController@maintenances')->middleware('auth');
 Route::get('/jobs/{job}/repairs', 'JobController@repairs')->middleware('auth');

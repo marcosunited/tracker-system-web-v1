@@ -4821,6 +4821,7 @@ input[type="button"].btn-block {
     color: #74290e;
     background-color: #f9dcd1;
     border-color: #f6cebf;
+    z-index: 99;
 }
 
 .alert-danger hr {

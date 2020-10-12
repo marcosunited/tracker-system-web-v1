@@ -61,28 +61,28 @@ class JobController extends Controller
                             left join _jobstatus j on jobs.status_id = j.id
                             ) as jobs;");
 
-        return view('jobs.allJobs',compact('jobs'));
+        return view('jobs.allJobs', compact('jobs'));
     }
 
     public function callouts(Job $job)
     {
         $callouts = $job->callouts;
 
-        return view('jobs.calloutsTable',compact('callouts','job'));
+        return view('jobs.calloutsTable', compact('callouts', 'job'));
     }
 
     public function maintenances(Job $job)
     {
         $maintenances = $job->maintenances;
 
-        return view('jobs.maintenanceTable',compact('maintenances','job'));
+        return view('jobs.maintenanceTable', compact('maintenances', 'job'));
     }
 
     public function repairs(Job $job)
     {
         $closedrepairs = $job->repairs;
 
-        return view('jobs.repairTable',compact('closedrepairs','job'));
+        return view('jobs.repairTable', compact('closedrepairs', 'job'));
     }
 
     /**
@@ -97,15 +97,15 @@ class JobController extends Controller
         $agents = Agent::all();
         $contract = Contract::all();
         $status = JobStatus::all();
-        return view('jobs.createJob',compact('rounds','frequency','agents','contract','status'));
+        return view('jobs.createJob', compact('rounds', 'frequency', 'agents', 'contract', 'status'));
     }
 
-        /**
-         * Store the incoming Job
-         *
-         * @param  StoreJob  $request
-         * @return Response
-         */
+    /**
+     * Store the incoming Job
+     *
+     * @param  StoreJob  $request
+     * @return Response
+     */
     public function store(StoreJob $request)
     {
         $validated = $request->validated();
@@ -163,9 +163,8 @@ class JobController extends Controller
         $selectedAgent = $job->agents;
         $selectedContract = $job->contract;
         $selectedStatus = $job->status;
-        
-        return view('jobs.jobDetails',compact
-        ('job','selectedRound','rounds','selectedFrequency','frequency','selectedAgent','agents','selectedContract','contract','status','selectedStatus'));
+
+        return view('jobs.jobDetails', compact('job', 'selectedRound', 'rounds', 'selectedFrequency', 'frequency', 'selectedAgent', 'agents', 'selectedContract', 'contract', 'status', 'selectedStatus'));
     }
 
     /**
@@ -174,9 +173,69 @@ class JobController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id,StoreJob $request)
+    public function edit(Request $request, Job $job)
     {
+        try {
 
+            $rules = array(
+                'agent_id' => 'required',
+                'contract_id' => 'required',
+                'status_id' => 'required',
+                'job_number' => 'required',
+                'job_name' => 'required',
+                'job_floors' => 'required',
+                'job_address' => 'required',
+                'job_address_number' => 'required',
+                'job_suburb' => 'required',
+                'job_email' => 'required',
+                'job_group' => 'required',
+                'round_id' => 'required',
+                'job_address_number' => 'required',
+                'job_key_access' => 'required'
+            );
+
+            $request->validate(
+                $rules
+            );
+
+            $job->update([
+
+                'agent_id' => request('agent_id'),
+                'contract_id' => request('contract_id'),
+                'frequency_id' => request('frequency_id'),
+                'start_time' => request('start_time'),
+                'finish_time' => request('finish_time'),
+                'cancel_time' => request('cancel_time'),
+                'status_id' =>  request('status_id'),
+                'active_time' => request('active_time'),
+                'inactive_time' => request('inactive_time'),
+                'job_number' => request('job_number'),
+                'job_name' => request('job_name'),
+                'price' => request('price'),
+                'cpi' => request('cpi'),
+                'job_floors' => request('job_floors'),
+                'job_address' => request('job_address'),
+                'job_address_number' => request('job_address_number'),
+                'job_suburb' => request('job_suburb'),
+                'job_contact_details' => request('job_contact_details'),
+                'job_email' => request('job_email'),
+                'job_owner_details' => request('job_owner_details'),
+                'job_group' => request('job_group'),
+                'round_id' => request('round_id'),
+                'job_agent_contact' => request('job_agent_contact'),
+                'job_key_access' => request('job_key_access'),
+                'notify_instant' => '0',
+                'tel_phone' => request('tel_phone'),
+                'note' => request('note'),
+            ]);
+
+            flash('Job Successfully Updated!')->success();
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $message = json_encode($exception->validator->getMessageBag()->getMessages());
+            flash('Error saving job: ' . $message)->error();
+        }
+
+        return back();
     }
 
     /**
@@ -186,7 +245,7 @@ class JobController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreJob $request,Job $job)
+    public function update(Request $request, Job $job)
     {
         $validated = $request->validated();
         $job->update([
@@ -233,22 +292,22 @@ class JobController extends Controller
 
     public function file(Job $job)
     {
-        return view('jobs.fileupload',compact('job'));
+        return view('jobs.fileupload', compact('job'));
     }
 
     public function round(Job $job)
     {
         $round = $job->rounds;
-        return view('jobs.jobround',compact('job','round'));
+        return view('jobs.jobround', compact('job', 'round'));
     }
 
-    public function uploadfile(Job $job,Request $request)
+    public function uploadfile(Job $job, Request $request)
     {
         $file = $request->file('file');
 
-        if($file){
+        if ($file) {
             $fileName = $file->getClientOriginalName();
-            $file->move('jobs',$fileName);
+            $file->move('jobs', $fileName);
             $filePath = "/jobs/$fileName";
             $job->files()->create([
                 'title' => $fileName,
@@ -259,7 +318,7 @@ class JobController extends Controller
         // return back();
     }
 
-    public function deletefile(Job $job,File $file)
+    public function deletefile(Job $job, File $file)
     {
         $file->delete();
         unlink(public_path($file->path));
@@ -270,10 +329,10 @@ class JobController extends Controller
     public function notes(Job $job)
     {
         $notes = $job->notes;
-        return view('jobs.jobnotes',compact('job','notes'));
+        return view('jobs.jobnotes', compact('job', 'notes'));
     }
 
-    public function addnotes(Job $job,Request $request)
+    public function addnotes(Job $job, Request $request)
     {
         Note::create([
             'description' => request('description'),
@@ -285,13 +344,13 @@ class JobController extends Controller
         return back();
     }
 
-    public function deletenote(Job $job,Note $note)
+    public function deletenote(Job $job, Note $note)
     {
         $note->delete();
         flash('Note Successfully Deleted!')->success();
         return back();
     }
-     
+
     public function destroy($id)
     {
         //
