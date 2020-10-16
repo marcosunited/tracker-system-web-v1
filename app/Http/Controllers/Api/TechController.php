@@ -1269,6 +1269,7 @@ class TechController extends Controller
             $recipients = array();
             $files = array();
 
+            $docketFile = $path . 'Docket maintenance - ' . $maintenance_id . '.pdf';
             $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
             $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
             $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
@@ -1308,14 +1309,14 @@ class TechController extends Controller
                 $checklistReport = PDF::loadView('reportnew.custom-reports.checklistGenerate', compact('maintenance', 'checklist'))->setPaper('a4', 'landscape');
                 $checklistReport->save($checklistFile);
                 array_push($files, $checklistFile);
+
+                $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
+                $docketReport->save($docketFile);
+                array_push($files, $docketFile);
+                
             } else {
                 array_push($recipients, $maintenance->job_email);
             }
-
-            $docketFile = $path . 'Docket maintenance - ' . $maintenance_id . '.pdf';
-            //$docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
-            //$docketReport->save($docketFile);
-            //array_push($files, $docketFile);
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
