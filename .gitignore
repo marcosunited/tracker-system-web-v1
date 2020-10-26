@@ -16,3 +16,4 @@ yarn-error.log
 .vscode/launch.json
 .gitattributes
 *.log
+cloudprint.json
