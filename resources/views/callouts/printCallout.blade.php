@@ -216,7 +216,9 @@ footer {
                         </p>
                         <p>
                             <b>Fault Found (CAUSE):</b>
-                            {{$callout->techfault->technician_fault_name}}
+                            @if (isset($callout->techfault) && isset($callout->techfault->technician_fault_name))
+                                {{ $callout->techfault->technician_fault_name }}
+                            @endif
                         </p>
                         <p>
                             <b>Work Action (CORRECTION):</b>

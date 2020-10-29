@@ -99,7 +99,7 @@
 
                                 setTimeout(() => {
                                     $("#technician").val(technician.id).trigger('change');
-                                }, 10);
+                                }, 400);
                             }
                         }
                     } catch (e) {

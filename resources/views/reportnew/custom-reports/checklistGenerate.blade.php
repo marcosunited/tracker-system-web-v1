@@ -210,7 +210,7 @@
         <p style="position:absolute;top:562px;left:460px;white-space:nowrap" class="ft13"><b>Name:</b> <span style="font-weight:normal"> {{$maintenance->techs->technician_name}}</span></p>
 
         <p style="position:absolute;top:584px;left:460px;white-space:nowrap" class="ft13"><b>Signature:</b> <span style="font-weight:normal"> {{$maintenance->techs->technician_name}}</span></p>
-        <p style="position:absolute;top:606px;left:460px;white-space:nowrap" class="ft13"><b>Date:</b> <span style="font-weight:normal"> {{$maintenance->maintenance_date}}</span></p>
+        <p style="position:absolute;top:606px;left:460px;white-space:nowrap" class="ft13"><b>Date:</b> <span style="font-weight:normal"> {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y')}}</span></p>
 
         <div class="pos" id="_98:1110" style="position:absolute;top:642px;left:50px;white-space:nowrap;font-family: sans-serif;">
             <span id="_11.0" style=" font-size:11.0px; color:#000000">

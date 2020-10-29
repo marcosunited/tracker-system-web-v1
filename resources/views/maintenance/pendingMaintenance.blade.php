@@ -165,7 +165,7 @@
                     <div class="block-content block-content-full text-right bg-light">
                         <h5>Are you Sure?</h5>
 
-                        <form method="POST" action="/maintenances/{{isset($maintenance)?$maintenance->id:''}}">
+                        <form method="POST" action="/maintenances/0">
                             @method('DELETE')
                             @csrf
                             <input type="hidden" name="maintenance_id" id="maintenance_id" value="">

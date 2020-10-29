@@ -89,7 +89,7 @@
             </div>
             <div class="pos" id="_76:586" style="top:400;left:14">
                 <span id="_15.3" style=" font-size:15.3px; color:#000000">
-                    and commissioning of these systems on {{ $maintenance->maintenance_date }}</span>
+                    and commissioning of these systems on {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}</span>
             </div>
             <div class="pos" id="_76:643" style="top:450;left:14">
                 <span id="_15.3" style=" font-size:15.3px; color:#000000">

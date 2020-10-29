@@ -57,6 +57,10 @@
         $(".job_select").on('select2:select', function(event) {
             var selectedJobName = event.params.data.text || '';
             var selectedJobId = event.params.data.id || 0;
+            var groupName = $(event.params.data.element).data('group');
+
+            onSelectJob(groupName);
+
 
             $.blockUI({
                 message: $('.blockUI-layout')
@@ -71,7 +75,7 @@
                 },
                 dataType: 'JSON',
                 success: function(data) {
-                    if (data && data.length > 0) {
+                    if (data['lifts'] && data['lifts'].length > 0) {
 
                         /*Add html template*/
                         var htmlTemplate = $('#content-select').html();
@@ -80,7 +84,7 @@
 
                         /*Transform data*/
                         var lifts = [];
-                        $.map(data, function(obj) {
+                        $.map(data['lifts'], function(obj) {
                             lifts.push({
                                 "id": obj.id,
                                 "text": obj.lift_name + '(' + obj.lift_type + ')',
@@ -114,6 +118,9 @@
         $(".job_select").on('select2:unselect', function(e) {
             var selectedJobName = e.params.data.text || '';
             var selectedJobId = e.params.data.id || 0;
+            var groupName = $(e.params.data.element).data('group');
+
+            onSelectJob(groupName);
 
             $('#label-lift-' + selectedJobId).remove();
             $('#lift-' + selectedJobId).select2('destroy');
@@ -127,20 +134,36 @@
                 $("[name*='lift-']").remove();
                 $("[name*='label-lift-']").remove();
             }
+
+            onSelectJob('');
         });
 
         $('#checkall1').change(function() {
             $('.checkitem1').prop("checked", $(this).prop("checked"))
         });
-
-        function onSelectLift(event) {
-            var data = event.params.data;
-
-            if (data && LIFT_TYPE) {
-                LIFT_TYPE = data["lift-type"];
-            }
-        }
     });
+
+    function onSelectJob(groupName) {
+        if (groupName == 'SOPA' || groupName.toLowerCase() == 'sydney olympic park') {
+            $('#menuSOPATasks').show();
+            $('#menuStandardTasks').hide();
+            $('#menuSOPATasks a').tab('show');
+            $('#liftcheck').hide();
+        } else {
+            $('#menuSOPATasks').hide();
+            $('#menuStandardTasks').show();
+            $('#menuStandardTasks a').tab('show');
+            $('#liftcheck').show();
+        }
+    }
+
+    function onSelectLift(event) {
+        var data = event.params.data;
+
+        if (data && LIFT_TYPE) {
+            LIFT_TYPE = data["lift-type"];
+        }
+    }
 </script>
 <script>
     $(document).ready(function() {
@@ -168,9 +191,11 @@
 
                             maintenance['lift_id'] = lift.id;
                             var tasks = $("[name*='task_month']:checked");
+                            var SOPATasks = $("[name*='task-sopa']:checked");
+
                             var checkedTasks = [];
 
-                            if (tasks.length > 0) {
+                            if (tasks.length > 0 || SOPATasks.length > 0) {
 
                                 tasks.each((key, value) => {
                                     checkedTasks.push({
@@ -187,7 +212,8 @@
 
                             maintenance['tasks'] = checkedTasks;
                             var flagRequest = (keyJob == jobs.length - 1);
-                            if (maintenance['tasks'].length > 0) {
+
+                            if (maintenance['tasks'].length > 0 || SOPATasks.length > 0) {
                                 postMaintenance(maintenance, flagRequest);
                             }
                         });
@@ -238,15 +264,10 @@
                 dataType: 'JSON',
                 success: function(data) {
                     if (data && data.status == "success") {
-                        console.log(data);
-
-                        if (flagRequest) {
-                            setTimeout(() => {
-                                location.reload();
-                            }, 0);
-                        }
+                        onSaveTasksSOPA(data['maintenanceId'], flagRequest);
+                    } else {
+                        alert('Error saving maintenance');
                     }
-
                 },
                 failure: function(error) {
                     console.log(error);
@@ -258,6 +279,59 @@
             alert('Please, select a status or technician');
             event.stopImmediatePropagation();
         }
+    }
+
+    function onSaveTasksSOPA(maintenanceId, flagRequest) {
+
+        var tasks = $("[name*='task-sopa-']");
+        var checkedTasks = [];
+
+        if (tasks.length > 0) {
+
+            tasks.each((key, value) => {
+                checkedTasks.push({
+                    id: $(value).data('taskid'),
+                    value: $(value).is(':checked')
+                });
+            });
+
+            saveTasksSOPA(maintenanceId, checkedTasks, flagRequest);
+        } else {
+            $.unblockUI();
+            alert('Please, select at least one task for Sydney Olimpic Park');
+            event.stopImmediatePropagation();
+        }
+    }
+
+    function saveTasksSOPA(maintenanceId, tasks, flagRequest) {
+
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        maintenance = {};
+        maintenance['tasks'] = tasks;
+        maintenance['id'] = maintenanceId;
+
+        $.ajax({
+            url: '/maintenances/sopa',
+            type: 'POST',
+            data: {
+                _token: CSRF_TOKEN,
+                maintenance: maintenance
+            },
+            dataType: 'JSON',
+            success: function(data) {
+                if (data && data.status == "success") {
+                    if (flagRequest) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 0);
+                    }
+                }
+            },
+            failure: function(error) {
+                console.log(error);
+                $.unblockUI();
+            }
+        });
     }
 </script>
 
@@ -380,21 +454,32 @@
         });
 
         $(document).on('change', '.example-cb-custom-square-selectall', function() {
-            if ($(this).is(":checked")) {
-                var active_pan_table = $(this).closest('table');
+            var active_pan_table = $(this).closest('table');
+            var status = $(this).is(":checked");
 
-                active_pan_table.find('tr').each(function() {
-                    var checkbox = $(this).find('td:eq(1) input');
-                    checkbox.prop('checked', true);
-                });
-            } else {
-                var active_pan_table = $(this).closest('table');
-                active_pan_table.find('tr').each(function() {
-                    var checkbox = $(this).find('td:eq(1) input');
-                    checkbox.prop('checked', false);
-                });
-            }
+            active_pan_table.find('tr').each(function() {
+                var checkbox = $(this).find('td:eq(1) input');
+                checkbox.prop('checked', status);
+            });
         })
+
+        $(document).on('change', '.example-cb-custom-square-selectall-sopa-escalator, .example-cb-custom-square-selectall-sopa-elevator', function() {
+            var typeLift = $(this).data('type');
+            var secondaryTypeLift = typeLift == LIFT_TYPE ? 'E' : LIFT_TYPE;
+
+            var status = $(this).is(":checked");
+
+            toggleCheckbox(typeLift, status);
+            toggleCheckbox(secondaryTypeLift, !status);
+        })
+
+        function toggleCheckbox(typeLift, status) {
+            var checkbox = $('td input[data-tasktype="' + typeLift + '"]');
+
+            checkbox.each(function() {
+                $(this).prop('checked', status);
+            });
+        }
     });
 </script>
 <script>
@@ -501,7 +586,7 @@
     @include('error.error')
 
     <div class="blockUI-layout">
-        <h4>Getting data...</h4>
+        <h4>Please wait...</h4>
     </div>
     <div class="block block-rounded block-bordered">
         <div class="block-header block-header-default">
@@ -518,7 +603,7 @@
                 </h2>
                 <div class="row push">
                     <div class="col-lg-8" style="padding-left: 50px;">
-                        <p>Take into consideration that only may create maintenances per lift type. Thus may no add Escalators and Elevators simultaneously.
+                        <p>Take into consideration that only may create maintenances per lift type. Thus may not add escalators and elevators simultaneously.
                         </p>
                     </div>
                 </div>
@@ -529,7 +614,7 @@
                             <label for="example-text-input">Job Name</label>
                             <select class="form-control job_select" name="job_id" required multiple>
                                 @foreach ($jobs as $data)
-                                <option value="{{ $data->id }}">{{ $data->job_address_number }} {{
+                                <option value="{{ $data->id }}" data-group="{{$data->job_group}}">{{ $data->job_address_number }} {{
                                     $data->job_address }} {{ $data->job_name }}</option>
                                 @endforeach
                             </select>
@@ -575,36 +660,91 @@
                 <div id="where">
 
                     <h2 class="content-heading">Task Info</h2>
-                    <div class="col-lg-12">
-                        <div class="block block-rounded block-bordered">
-                            <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
-                                <option value="">Select montly tasks:</option>
-                                <option value="1">January</option>
-                                <option value="2">February</option>
-                                <option value="3">March</option>
-                                <option value="4">April</option>
-                                <option value="5">May</option>
-                                <option value="6">June</option>
-                                <option value="7">July</option>
-                                <option value="8">August</option>
-                                <option value="9">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                        </div>
-                        <div class="block-content" id="task_info_panel">
 
-                        </div>
-                        <div id="content-select" class="invisible">
-                            <label id="label-lift-{id}" name="label-lift-{id}">{job_name}</label>
-                            <select id="lift-{id}" name="lift-{id}" class="form-control col-md-8"></select>
+                    <div class="block block-rounded">
+                        <ul class="nav nav-tabs nav-tabs-block js-tabs-enabled" role="tablist">
+                            <li class="nav-item" id="menuStandardTasks">
+                                <a class="nav-link active" data-toggle="tab" role="tab" href="#standard">
+                                    <i class="nav-main-link-icon fa fa-check-double"></i>
+                                    <span class="nav-main-link-name">Standard tasks</span>
+                                </a>
+                            </li>
+                            <li class="nav-item" id="menuSOPATasks">
+                                <a class="nav-link" data-toggle="tab" role="tab" href="#sopa">
+                                    <i class="nav-main-link-icon fa fa-tasks"></i>
+                                    <span class="nav-main-link-name">SOPA tasks</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="block-content tab-content">
+                            <div class="tab-pane active" id="standard" role="tabpanel">
+                                <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
+                                    <option value="">Select montly tasks:</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                <div class="block-content" id="task_info_panel">
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="sopa" role="tabpanel">
+                                <table class="table table-bordered table-striped table-vcenter">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Task type</th>
+                                            <th class="text-center">Task name</th>
+                                            <th class="text-left" style="min-width: 124px;">
+                                                <div class="custom-control custom-radio  custom-control-lg custom-control-primary mb-1">
+                                                    <input type="radio" class="custom-control-input checkitem1 example-cb-custom-square-selectall-sopa-escalator" name="tasks-sopa" id="example-cb-custom-square-selectall-sopa-escalator" data-type="E" />
+                                                    <label class="custom-control-label" for="example-cb-custom-square-selectall-sopa-escalator">Select all escalators</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-lg custom-control-primary mb-1">
+                                                    <input type="radio" class="custom-control-input checkitem1 example-cb-custom-square-selectall-sopa-elevator" name="tasks-sopa" id="example-cb-custom-square-selectall-sopa-elevator" data-type="L" />
+                                                    <label class="custom-control-label" for="example-cb-custom-square-selectall-sopa-elevator">Select all elevators</label>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($sopa_tasks as $task)
+                                        <tr>
+                                            <td>
+                                                {{$task->task_type === 'L' ?  'Elevator' : 'Escalator'}}
+                                            </td>
+                                            <td>
+                                                {{$task->task_name}}
+                                            </td>
+                                            <td>
+                                                <div class="custom-control custom-checkbox custom-checkbox-square custom-control-lg custom-control-primary mb-1">
+                                                    <input type="checkbox" class="custom-control-input checkitem" id="checkbox-{{$task->task_id}}" name="task-sopa-{{$task->task_id}}" data-taskid="{{$task->task_id}}" data-tasktype="{{$task->task_type}}">
+                                                    <label class="custom-control-label" for="checkbox-{{$task->task_id}}"></label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </form>
         </div>
+        </form>
     </div>
+</div>
+<div id="content-select" class="invisible">
+    <label id="label-lift-{id}" name="label-lift-{id}">{job_name}</label>
+    <select id="lift-{id}" name="lift-{id}" class="form-control col-md-8"></select>
+</div>
 </div>
 
 <!-- END Page Content -->

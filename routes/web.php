@@ -137,6 +137,7 @@ Route::get('/maintenances/{maintenance}/tasks', 'MaintenanceController@tasks')->
 Route::get('/maintenances/pendingmaintenances', 'MaintenanceController@pending')->middleware('auth');
 Route::get('/maintenances/finishedmaintenances', 'MaintenanceController@finished')->middleware('auth');
 Route::post('/maintenances/add', 'MaintenanceController@store')->middleware('auth');
+Route::post('/maintenances/sopa', 'MaintenanceController@sopaTasks')->middleware('auth');
 Route::post('/maintenances/selecttasks', 'MaintenanceController@selecttasks')->middleware('auth');
 Route::get('/maintenances/{maintenance}', 'MaintenanceController@edit')->middleware('auth');
 Route::patch('/maintenances/{maintenance}', 'MaintenanceController@update')->middleware('auth');

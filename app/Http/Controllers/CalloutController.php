@@ -465,8 +465,17 @@ class CalloutController extends Controller
                 $subject = "United Lifts Call Report";
                 $description = str_replace("\r\n", "<br>", $callout->callout_description);
                 $fault = $fault->fault_name;
-                $technician_fault = $tech_fault->technician_fault_name;
-                $correction_name = $correction->correction_name;
+
+                $technician_fault = '';
+                if (isset($tech_fault)) {
+                    $technician_fault = $tech_fault->technician_fault_name;
+                }
+
+                $correction_name = '';
+                if (isset($correction)) {
+                    $correction_name = $correction->correction_name;
+                }
+
                 $tech_description = str_replace("\r\n", "<br>", $callout->tech_description);
                 $toc = date("d-m-Y G:i:s", strtotime($callout->callout_time));
                 $toa = date("d-m-Y G:i:s", strtotime($callout->time_of_arrival));
@@ -532,7 +541,7 @@ class CalloutController extends Controller
 
         // echo phpinfo();
         //  exit;
-        $printerId = '3b22d027-a4c8-5a61-2172-2580ca942b02';
+        $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
         $calloutid = request('callout_id');
 
         $report = Calloutreport::select()->where('calloutn_id', $calloutid)->get()->first();
