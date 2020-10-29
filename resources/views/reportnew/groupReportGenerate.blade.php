@@ -109,6 +109,7 @@
             <tr>
                 <th>Date</th>
                 <th>Job No</th>
+                <th>Job Name</th>
                 <th>Job Address</th>
                 <th>Lifts</th>
                 <th>Technician</th>
@@ -124,7 +125,9 @@
                 <td>
                     {{$maintenance->job_number}}
                 </td>
-
+                <td>
+                    {{$maintenance->job_name}}
+                </td>
                 <td>
                     {{$maintenance->job_address_number}}
                     {{$maintenance->job_address}}
