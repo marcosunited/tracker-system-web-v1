@@ -716,7 +716,7 @@ class MaintenanceController extends Controller
         $main = MaintenanceN::select()->where('id', $mainid)->get()->first();
         $filename = str_replace(':', ' ', (string)$main->maintenance_date);
         $month_key = (int)substr($main->yearmonth, 4, 2);
-        
+
         $arrayTasks = json_decode($main->task_ids);
         $tasks = [];
 
@@ -830,8 +830,19 @@ class MaintenanceController extends Controller
             $logo =  storage_path() . '/logo.png';
 
             $lift = Lift::select()->where('id', $main->lift_id)->get()->first();
+
+
+            $sopa_tasks = DB::table('tasks_sopa')
+                ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
+                ->leftJoin('tasks_sopa_maintenance', 'tasks_sopa_maintenance.taskId', '=', 'tasks_sopa.id')
+                ->leftJoin('maintenancenew', 'tasks_sopa_maintenance.maintenanceId', '=', 'maintenancenew.id')
+                ->where('tasks_sopa.type', '=', $lift->lift_type)
+                ->where('maintenancenew.id', '=', $maintenance->id)
+                ->orderBy('tasks_sopa.name', 'asc')
+                ->get();
+
             //generate pdf file
-            $pdf = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'logo', 'month_label', 'tasks', 'lift'));
+            $pdf = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'logo', 'month_label', 'tasks', 'lift', 'sopa_tasks'));
             $pdf->save($path . $filename . '.pdf');
 
             GoogleCloudPrint::asPdf()
