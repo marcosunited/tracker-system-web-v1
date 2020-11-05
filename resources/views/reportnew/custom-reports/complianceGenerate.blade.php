@@ -85,11 +85,11 @@
             </div>
             <div class="pos" id="_76:565" style="top:385;left:14;right:20px">
                 <span id="_15.3" style=" font-size:15.3px;">
-                    {{$maintenance->techs->technician_name}}, who is qualified to undertake the relevant assessments, undertook the testing</span>
+                    {{$maintenance->techs->technician_name}}, who is qualified to undertake the relevant assessments, undertook the</span>
             </div>
             <div class="pos" id="_76:586" style="top:400;left:14">
                 <span id="_15.3" style=" font-size:15.3px; color:#000000">
-                    and commissioning of these systems on {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}</span>
+                    testing and commissioning of these systems on {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}</span>
             </div>
             <div class="pos" id="_76:643" style="top:450;left:14">
                 <span id="_15.3" style=" font-size:15.3px; color:#000000">
