@@ -109,13 +109,17 @@
             </div>
             <div class="pos" id="_523:1110" style="top:650;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888">
-                    Unit 6, 38 Raymond Avenue Marraville</span>
+                    ABN: 81 082 447 658</span>
             </div>
             <div class="pos" id="_523:1110" style="top:660;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888">
-                    1300 161 740</span>
+                    Unit 6, 38 Raymond Avenue Marraville</span>
             </div>
             <div class="pos" id="_523:1110" style="top:670;left:180">
+                <span id="_11.0" style=" font-size:11.0px; color:#888888">
+                    1300 161 740</span>
+            </div>
+            <div class="pos" id="_523:1110" style="top:678;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888;text-decoration:underline">
                     sydney@unitedlifts.com.au</span>
             </div>
