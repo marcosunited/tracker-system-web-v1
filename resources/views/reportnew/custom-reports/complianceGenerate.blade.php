@@ -113,6 +113,10 @@
             </div>
             <div class="pos" id="_523:1110" style="top:660;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888">
+                    License number 60398S</span>
+            </div>
+            <div class="pos" id="_523:1110" style="top:660;left:180">
+                <span id="_11.0" style=" font-size:11.0px; color:#888888">
                     Unit 6, 38 Raymond Avenue Marraville</span>
             </div>
             <div class="pos" id="_523:1110" style="top:670;left:180">
