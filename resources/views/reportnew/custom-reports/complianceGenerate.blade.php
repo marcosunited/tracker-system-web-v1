@@ -99,7 +99,7 @@
                 <span id="_15.1" style="font-weight:bold; font-size:15.1px; color:#e17900">
                     Sub-Contractors Details:</span>
             </div>
-            <div class="pos" id="_14:685" style="top:650;left:18">
+            <div class="pos" id="_14:685" style="top:660;left:18">
                 <img src="http://sydney.unitedlifts.com.au/image/logo.png" style="width: 205px; height:49px">
             </div>
 
@@ -115,15 +115,15 @@
                 <span id="_11.0" style=" font-size:11.0px; color:#888888">
                     License number 60398S</span>
             </div>
-            <div class="pos" id="_523:1110" style="top:660;left:180">
-                <span id="_11.0" style=" font-size:11.0px; color:#888888">
-                    Unit 6, 38 Raymond Avenue Marraville</span>
-            </div>
             <div class="pos" id="_523:1110" style="top:670;left:180">
+                <span id="_11.0" style=" font-size:11.0px; color:#888888">
+                    Unit 6, 38 Raymond Avenue Matraville</span>
+            </div>
+            <div class="pos" id="_523:1110" style="top:680;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888">
                     1300 161 740</span>
             </div>
-            <div class="pos" id="_523:1110" style="top:678;left:180">
+            <div class="pos" id="_523:1110" style="top:690;left:180">
                 <span id="_11.0" style=" font-size:11.0px; color:#888888;text-decoration:underline">
                     sydney@unitedlifts.com.au</span>
             </div>
