@@ -69,7 +69,7 @@
             <div class="pos" id="_96:324" style="top:235;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Building:</span>
-                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> {{$maintenance->job_number}} </span>
+                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> </span>
             </div>
             <div class="pos" id="_241:324" style="top:324;left:301">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#000000">
@@ -130,7 +130,7 @@
             <div class="pos" id="_96:386" style="top:280;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Make:</span>
-                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 24px;"> {{\Carbon\Carbon::parse($maintenance->lift_installed_date)->format('d/m/Y')}}</span>
+                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 24px;"></span>
             </div>
             <div class="pos" id="_167:386" style="top:386;left:167">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">

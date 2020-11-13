@@ -857,7 +857,7 @@ class TechController extends Controller
             /*Start integraction FFA*/
 
             if ($exist) {
-                $this->customReportSendEmail($mainID);
+                //$this->customReportSendEmail($mainID);
             }
 
             /*End integration*/
