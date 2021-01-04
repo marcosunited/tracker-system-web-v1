@@ -107,7 +107,7 @@
                             <span class="text-white-75">U</span><span class="text-white">L</span>
                         </span>
                         <span class="smini-hidden">
-                            <span class="text-white-75">Services</span><span class="text-white">Tracker</span>
+                            <span class="text-white-75">Service</span><span class="text-white">Tracker</span>
                         </span>
                     </a>
                     <!-- END Logo -->
@@ -170,7 +170,7 @@
                             </li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="/callouts/followupcallouts">
-                                    <span class="nav-main-link-name">Fllow-up Callouts</span>
+                                    <span class="nav-main-link-name">Follow-up Callouts</span>
                                 </a>
                             </li>
                             <li class="nav-main-item">
@@ -272,14 +272,14 @@
                                 <a class="nav-main-link" href="/tasks/e/all">
                                     <span class="nav-main-link-name">All Escalator Tasks</span>
                                 </a>
-                            </li>                            
+                            </li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="/tasks/create">
                                     <span class="nav-main-link-name">Add a new Task</span>
                                 </a>
                             </li>
                         </ul>
-                    </li>                    
+                    </li>
                     <li class="nav-main-heading">Round</li>
                     <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"

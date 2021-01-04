@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', false),
+    'debug' => env('APP_DEBUG', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -228,7 +228,7 @@ return [
         'AppHelper' => App\Helpers\AppHelper::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'GoogleCloudPrint' => Bnb\GoogleCloudPrint\Facades\GoogleCloudPrint::class,
-        
+
 
     ],
 
