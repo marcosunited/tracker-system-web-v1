@@ -67,9 +67,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de8f14fc-6968-4ec1-bbc6-20500c3a9e4c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/database.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/database.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/backend.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/backend.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/callouts/showCalloutsTechDetails.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/callouts/showCalloutsTechDetails.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -254,7 +253,7 @@
       <workItem from="1608498294565" duration="4302000" />
       <workItem from="1609707290925" duration="16839000" />
       <workItem from="1609802406338" duration="309000" />
-      <workItem from="1609803291645" duration="421000" />
+      <workItem from="1609803291645" duration="5117000" />
     </task>
     <servers />
   </component>
@@ -277,9 +276,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/public/index.php</url>
-          <line>51</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/resources/views/callouts/printCallout.blade.php</url>
+          <line>218</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

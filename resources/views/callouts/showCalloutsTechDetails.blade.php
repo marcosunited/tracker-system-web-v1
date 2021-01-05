@@ -51,21 +51,21 @@
         $('#todecline').datetimepicker({
             format: 'YYYY-MM-DD HH:mm:ss',
             value: new Date()
-        });     
+        });
         $('#mtoa').datetimepicker({
             format: 'YYYY-MM-DD HH:mm:ss',
             value: new Date()
-        }); 
+        });
         $('#mtod').datetimepicker({
             format: 'YYYY-MM-DD HH:mm:ss',
             value: new Date()
-        });            
-    });  
+        });
+    });
 </script>
 <script>
     $(document).ready(function() { $(".tech_fault_select").select2(); });
     $(document).ready(function() { $(".correction_select").select2(); });
-  
+
       var marker;
       let map;
       let markersArray = [];
@@ -78,21 +78,21 @@
         addMarker({lat: -34.297, lng: 150.544}, "Accept","blue");
         addMarker({lat: -34.397, lng: 150.644}, "Decline","red");
         addMarker({lat: -34.197, lng: 150.544}, "Start","green");
-        addMarker({lat: -34.597, lng: 150.644}, "Finish","yellow");        
+        addMarker({lat: -34.597, lng: 150.644}, "Finish","yellow");
         */
-        <?php 
+        <?php
             if ($accept_lat!=0 && $accept_lng!=0) {
-                echo 'addMarker({lat:'.$accept_lat.',lng:'. $accept_lng.'},"Accept","blue");';  
+                echo 'addMarker({lat:'.$accept_lat.',lng:'. $accept_lng.'},"Accept","blue");';
             }
             if ($decline_lat!=0 && $decline_lng!=0) {
-                echo 'addMarker({lat:'.$decline_lat.',lng:'. $decline_lng.'},"Accept","red");';  
+                echo 'addMarker({lat:'.$decline_lat.',lng:'. $decline_lng.'},"Accept","red");';
             }
             if ($start_lat!=0 && $start_lng!=0) {
-                echo 'addMarker({lat:'.$start_lat.',lng:'. $start_lng.'},"Accept","green");';  
+                echo 'addMarker({lat:'.$start_lat.',lng:'. $start_lng.'},"Accept","green");';
             }
             if ($finish_lat!=0 && $finish_lng!=0) {
-                echo 'addMarker({lat:'.$finish_lat.',lng:'. $finish_lng.'},"Accept","yellow");';  
-            }                                    
+                echo 'addMarker({lat:'.$finish_lat.',lng:'. $finish_lng.'},"Accept","yellow");';
+            }
         ?>
       }
       function addMarker(latLng,label, color) {
@@ -104,7 +104,7 @@
             position: latLng,
             icon: {
                 url: url
-            },                      
+            },
         });
 
         //store the marker object drawn in global array
@@ -162,8 +162,12 @@
                     <div class="col-lg-8">
                     <div class="row">
                     <div class="col-lg-4">
-                            <p class="text-muted">
-                                Time of Callout accept and Time of Callout decline
+                            <p class="text-muted" >
+                                Time of Callout accept
+                            </p>
+
+                            <p class="text-muted" style="margin-top: 50px">
+                                Time of Callout decline
                             </p>
                         </div>
                         <div class="col-lg-8 col-xl-6">
@@ -186,10 +190,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>   
+                        </div>
                         <div class="col-lg-4">
-                            <p class="text-muted">
-                                Time of Arrival and Time of Departure of this Callouts
+                            <p class="text-muted" >
+                                Time of Arrival
+                            </p>
+
+                            <p class="text-muted" style="margin-top: 50px">
+                                Time of Departure of this Callouts
                             </p>
                         </div>
                         <div class="col-lg-8 col-xl-6">
@@ -215,8 +223,12 @@
                         </div>
 
                         <div class="col-lg-4">
-                            <p class="text-muted">
-                                Time of Arrival and Time of Departure of this Callouts(Manuly Input by technician)
+                            <p class="text-muted" >
+                                Time of Arrival
+                            </p>
+
+                            <p class="text-muted" style="margin-top: 40px">
+                                Time of Departure of this Callouts(Manuly Input by technician)
                             </p>
                         </div>
                         <div class="col-lg-8 col-xl-6">
@@ -247,11 +259,11 @@
                             <label>Accept</label>
                             <img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"/>
                             <label>Decline</label>
-                            <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png"/>            
+                            <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png"/>
                             <label>Start</label>
                             <img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png"/>
                             <label>Finish</label>
-                            <img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"/>                                                
+                            <img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"/>
                         </div>
                         <div id="callout_map" class="callout_map" ></div>
                     </div>
@@ -294,7 +306,7 @@
                             <option value="1" @if($callout->part_required == 1) selected @endif>YES</option>
                             <option value="0" @if($callout->part_required == 0) selected @endif>NO</option>
                         </select>
-                    </div>                     
+                    </div>
                     </div>
                     <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
                     <!-- <div class="form-group">
@@ -316,17 +328,17 @@
                     </div>
                     <div class="form-group">
                         <label for="example-text-input">Part Replaced?</label>
-                       
+
                         <select class="form-control" name="part_replaced" required>
                             <option value="">--- Select ---</option>
                             <option value="1" {{$callout->part_replaced ==1?'selected':''}}>YES</option>
                             <option value="0" {{$callout->part_replaced ==0?'selected':''}}>NO</option>
                         </select>
-                    </div>                                                            
+                    </div>
                     </div>
                     </div>
                     <div class="col-lg-10" style="padding-left: 50px;">
-                                    
+
                         <div class="form-group">
                             <label for="example-text-input">Parts Description</label>
                             <textarea class="form-control" rows="2" placeholder="" name="part_description">{{$callout->part_description}}</textarea>
@@ -349,7 +361,7 @@
                         </div>
                         @endif
                     @endforeach
-                </div>                
+                </div>
             </form>
     </div>
     @endsection
