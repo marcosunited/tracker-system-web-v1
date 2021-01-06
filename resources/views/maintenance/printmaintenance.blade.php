@@ -116,6 +116,7 @@
       <div id="client">
         <div class="to">Customer Details:</div>
         <h2 class="name">
+          <?php echo $maintenance->jobs->job_number ?> -
           <?php echo $maintenance->jobs->job_name ?>
         </h2>
         <div class="address">

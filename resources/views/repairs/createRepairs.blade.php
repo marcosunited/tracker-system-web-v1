@@ -18,7 +18,7 @@
 <script src="{{ asset('js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('js/plugins/jquery.maskedinput/jquery.maskedinput.min.js') }}"></script>
 <script src="{{ asset('js/plugins/dropzone/dropzone.min.js') }}"></script>
-
+<script src="{{ asset('js/plugins/jquery-blockUI/jquery.blockUI.min.js') }}"></script>
 
 <!-- Page JS Plugins -->
 <script src="{{ asset('js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
@@ -53,11 +53,17 @@
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <script>
     $(document).ready(function() {
+        $(document).ajaxStop($.unblockUI);
         $(".lift_select").select2({
             multiple: true
         });
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         $(".job_select").change(function() {
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
+
             $.ajax({
                 /* the route pointing to the post function */
                 url: '/callouts/selectedJob',
@@ -85,9 +91,12 @@
                             });
                         }
                     }
+
+                    $.unblockUI();
                 },
                 error: function() {
-
+                    console.log(error);
+                    $.unblockUI();
                 }
             });
 
@@ -120,6 +129,11 @@
 <!-- Page Content -->
 
 <div class="content">
+
+    <div class="blockUI-layout">
+        <h4>Please wait...</h4>
+    </div>
+
     @include('error.error')
     <!-- <button type="button" class="js-notify btn btn-info push" data-type="info" data-icon="fa fa-info-circle mr-1" data-message="Hello World">
      <i class="fa fa-bell mr-1"></i> Launch Notification

@@ -26985,7 +26985,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     opacity: 1;
 }
 div.bg-white.inner-top-bar {
-    position: fixed;
     top: 70px;
     width: 100%;
     z-index: 1;
