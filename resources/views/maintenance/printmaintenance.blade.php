@@ -171,8 +171,8 @@
       </tr>
 
       <tr>
-        <td width="20%" style="text-align:center">Lift Name</td>
-        <td width="80%" style="text-align:left">Task Name</td>
+        <td width="30%" style="text-align:center">Lift Name</td>
+        <td width="70%" style="text-align:left">Task Name</td>
       </tr>
       @foreach ($tasks as $task)
       <tr>
@@ -181,6 +181,9 @@
       </tr>
       @endforeach
     </table>
+
+    @if(count($sopa_tasks) > 0)
+    
 
     <table style="width:100%">
       <tr>
@@ -204,6 +207,8 @@
       </tr>
       @endforeach
     </table>
+
+    @endif
 
     <div style="height:1px;width:88%;background-color:#0087C3;margin-bottom:10px;position:center;">
     </div>
