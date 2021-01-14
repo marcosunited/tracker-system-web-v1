@@ -153,16 +153,16 @@ footer {
                 </div>
                 <div class="date">Time of Arrival:
                 @if($callouttime->toa === NULL)
-                {{date('H:i:s',strtotime($callout->time_of_arrival))}}
+                {{date('d-m-yy H:i:s',strtotime($callout->time_of_arrival))}}
                 @else
-                {{date('H:i:s',strtotime($callouttime->toa))}}
+                {{date('d-m-yy H:i:s',strtotime($callouttime->toa))}}
                 @endif
                 </div>
                 <div class="date">Time of Departure:
                 @if($callouttime->tod === NULL)
-                {{date('H:i:s',strtotime($callout->time_of_departure))}}
+                {{date('d-m-yy H:i:s',strtotime($callout->time_of_departure))}}
                 @else
-                {{date('H:i:s',strtotime($callouttime->tod))}}
+                {{date('d-m-yy H:i:s',strtotime($callouttime->tod))}}
                 @endif
                 </div>
             </div>
