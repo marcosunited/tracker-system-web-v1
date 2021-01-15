@@ -394,6 +394,7 @@ class CalloutController extends Controller
         $callouttime = CalloutTime::select()
         ->where('calloutn_id', $callout->id)
         ->where('technician_id', $callout->technician_id)
+        ->orderBy('updated_at', 'desc')
         ->get()->first();
         $files = File::select()->where('calloutn_id', $id)->get();
         return view('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'));
@@ -408,6 +409,7 @@ class CalloutController extends Controller
         $callouttime = CalloutTime::select()
         ->where('calloutn_id', $callout->id)
         ->where('technician_id', $callout->technician_id)
+        ->orderBy('updated_at', 'desc')
         ->get()->first();
         $logo =  storage_path() . '/logo.png';
         $files = File::select()->where('calloutn_id', $id)->get();
