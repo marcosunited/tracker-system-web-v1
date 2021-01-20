@@ -13,9 +13,9 @@ body {
   background: #FFFFFF;
   font-family: sans-serif;
   font-size: 12px;
-  font-family: SourceSansPro;  
+  font-family: SourceSansPro;
   width: 21cm;
-  height: 29.7cm;    
+  height: 29.7cm;
 }
 
 header {
@@ -152,14 +152,14 @@ footer {
                      {{date('d-m-yy',strtotime($callout->callout_time))}}
                 </div>
                 <div class="date">Time of Arrival:
-                @if($callouttime->toa === NULL)
+                @if($callouttime === NULL || $callouttime->toa === NULL)
                 {{date('d-m-yy H:i:s',strtotime($callout->time_of_arrival))}}
                 @else
                 {{date('d-m-yy H:i:s',strtotime($callouttime->toa))}}
                 @endif
                 </div>
                 <div class="date">Time of Departure:
-                @if($callouttime->tod === NULL)
+                @if($callouttime === NULL || $callouttime->tod === NULL)
                 {{date('d-m-yy H:i:s',strtotime($callout->time_of_departure))}}
                 @else
                 {{date('d-m-yy H:i:s',strtotime($callouttime->tod))}}
@@ -198,7 +198,7 @@ footer {
                             @endforeach  {{$callout->faults->fault_name}}
                             We attended to the call at  <b style="color:blue;">{{date('H:i:s',strtotime($callouttime->toa))}} </b> and found <b style="color:red;">{{$callout->correction!=null?$callout->correction->correction_name:''}} </b>.
                             and rectified the fault,
-                            Lift mechanic completed the inspection of the lift, ran and checked all operations. 
+                            Lift mechanic completed the inspection of the lift, ran and checked all operations.
                         </p>
 
                         <p>
@@ -207,7 +207,7 @@ footer {
                         </p>
 
 						  <div style="height:1px;width:100%;background-color:#0087C3;margin-bottom:10px;position:center;">
-						  </div>			
+						  </div>
 
                         <p>
                             <b style="color:#0087C3">
@@ -216,9 +216,7 @@ footer {
                         </p>
                         <p>
                             <b>Fault Found (CAUSE):</b>
-                            @if (isset($callout->techfault) && isset($callout->techfault->technician_fault_name))
-                                {{ $callout->techfault->technician_fault_name }}
-                            @endif
+                            {{$callout->techfault !=null ? $callout->techfault->technician_fault_name : ''}}
                         </p>
                         <p>
                             <b>Work Action (CORRECTION):</b>
@@ -227,16 +225,16 @@ footer {
                         <p>
                             <b>Work Description:</b>
                             <br>
-                            {{$callout->tech_description}}
+                            {{$callout->tech_description != null ? $callout->tech_description: ''}}
                         </p>
                         <p>
                         <p>
                             <b>Part Description:</b>
                             <br>
-                            @if($callout->part_description === NUll) 
-                            <b>No parts used</b>                  
+                            @if($callout->part_description === NUll)
+                            <b>No parts used</b>
                             @else
-                            {{$callout->part_description}}
+                                {{$callout->part_description != null ? $callout->part_description : ''}}
                             @endif
                         </p>
                     </div>
@@ -256,7 +254,7 @@ footer {
                 </td>
                 <td style="width:300px">
                 <b>Part Replaced?</b>
-                            <br>                          
+                            <br>
                             @if($callout->part_replaced == 0)
                             No
                             @else
@@ -286,16 +284,16 @@ footer {
         </table>
 		<table style="margin-top:20px;">
 			@foreach ($files as $file)
-			
+
 				@if(($loop->index + 1) % 2 == 1)
 					<tr>
 				@endif
-				
+
 				<td>
 					<img style="width:290px;height:350px" src="{{ public_path("callouts\\".$file->title) }}" />
 				</td>
-				
-			
+
+
 			@endforeach
 		</table>
     </main>
