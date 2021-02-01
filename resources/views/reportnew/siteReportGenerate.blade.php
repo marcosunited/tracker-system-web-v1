@@ -53,7 +53,7 @@
         <tr>
             <td><strong>Date:</strong></td>
             <td>
-            {{date('d/m/Y h:i:s a', time())}}
+            {{date('d/m/Y H:i:s a', time())}}
             </td>
         </tr>
         <tr>

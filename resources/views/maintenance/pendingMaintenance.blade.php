@@ -86,7 +86,7 @@
                     @foreach($pendingmaintenances as $maintenance)
                     <tr>
                         <td class="text-center">
-                            {{date('d-m-yy',strtotime($maintenance->maintenance_date))}}
+                            {{date('d-m-Y',strtotime($maintenance->maintenance_date))}}
                         </td>
                         <td class="d-none d-sm-table-cell">
                             {{$maintenance->jobs->job_number}}

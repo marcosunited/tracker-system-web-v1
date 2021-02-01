@@ -81,7 +81,7 @@
                     <tr  style="background-color:{{$bgcolor}}">
                         <td class="text-center">
 
-                        {{date('d-m-yy H:i:s',strtotime($callout->callout_time))}}
+                        {{date('d-m-Y H:i:s',strtotime($callout->callout_time))}}
                         </td>
                         <td class="font-w600">
                         <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>

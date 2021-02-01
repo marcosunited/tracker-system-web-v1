@@ -69,10 +69,18 @@
                     {{ date('h:i',strtotime($callout->callout_time)) }}
                 </td>
                 <td>
-                    {{$callout->time_of_arrival}}
+                    @if($callout->toa != NULL)
+                    {{date('H:i:s',strtotime($callout->toa))}}
+                    @else
+                    {{date('H:i:s',strtotime($callout->time_of_arrival))}}
+                    @endif
                 </td>
                 <td>
-                    {{$callout->time_of_departure}}
+                    @if($callout->toa != NULL)
+                    {{date('H:i:s',strtotime($callout->tod))}}
+                    @else
+                    {{date('H:i:s',strtotime($callout->time_of_departure))}}
+                    @endif
                 </td>
                 <td>
                     {{$callout->job_number}}
