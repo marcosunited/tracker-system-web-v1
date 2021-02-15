@@ -60,7 +60,7 @@
             @foreach($final_callouts as $callout)
             <tr>
                 <td>
-                    {{$callout->id}}
+                    <a class="link-callout" data-id="{{$callout->id}}" href="/callouts/{{$callout->id}}" target="_blank">{{$callout->id}}</a>
                 </td>
                 <td>
                     {{date('d-m-Y',strtotime($callout->callout_time))}}
@@ -115,6 +115,7 @@
     <table width="95%" border="1" style="border-collapse:collapse" id="maintable2">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Date</th>
                 <th>Job No</th>
                 <th>Job Name</th>
@@ -127,6 +128,9 @@
         <tbody>
             @foreach($maintenances as $maintenance)
             <tr>
+                <td>
+                    <a class="link-maintenance" data-id="{{$maintenance->id}}" href="/maintenances/{{$maintenance->id}}" target="_blank">{{$maintenance->id}}</a>
+                </td>
                 <td>
                     {{$maintenance->maintenance_date}}
                 </td>
@@ -242,6 +246,13 @@
             color: #000;
             text-decoration: none
         }
+
+        .link-callout,
+        .link-maintenance {
+            text-decoration: underline;
+            cursor: pointer;
+            color: blue;
+        }
     </style>
 </div>
 <!--End Print Area!-->
@@ -275,6 +286,13 @@
         "date-uk-desc": function(a, b) {
             return ((a < b) ? 1 : ((a > b) ? -1 : 0));
         }
+    });
+    $(document).ready(function() {
+        $(".link-maintenance, .link-callout").click(function() {
+            var id = $(this).data('id');
+            var url = $(this).attr('class') == 'link-callout' ? 'callouts' : 'maintenances';
+            window.open("/" + url + "/" + id);
+        });
     });
 </script>
 <script>
