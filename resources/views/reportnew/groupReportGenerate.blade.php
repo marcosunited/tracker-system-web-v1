@@ -4,9 +4,13 @@
 <script src="{{ mix('js/laravel.app.js') }}"></script>
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js">
-</script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js"></script>
 
 <div id="topbar">
     <a href="/reports/new/groupreport/pdf?jg={{$group_name}}&&st={{$start_date}}&&ft={{$end_date}}" id="printPdf">Print As PDF</a>
@@ -38,7 +42,7 @@
         <b><?= date($start_date) ?></b> and <b><?= date($end_date) ?></b>.</p>
     </div>
 
-    <table width="95%" border="1" style="border-collapse:collapse" id="table-g" cellspacing="0">
+    <table width="95%" border="1" style="border-collapse:collapse" id="maintable2" cellspacing="0">
         <thead>
             <tr>
                 <th>ID</th>
@@ -112,7 +116,7 @@
     </table>
 
     <h1 id="maintenance">Maintenance</h1>
-    <table width="95%" border="1" style="border-collapse:collapse" id="maintable2">
+    <table width="95%" border="1" style="border-collapse:collapse" id="table-g" cellspacing="0">
         <thead>
             <tr>
                 <th>ID</th>
@@ -303,7 +307,29 @@
             ],
             paging: false,
             searching: false,
-            info: false,
+            dom: 'Bfrtip',
+            buttons: [{
+                extend: 'excelHtml5',
+                title: 'Export table ULS Tracker'
+            }, ],
+            columnDefs: [{
+                type: 'date-uk',
+                targets: 3
+            }]
+
+        });
+
+        $('#maintable2').DataTable({
+            "order": [
+                [0, "asc"]
+            ],
+            paging: false,
+            searching: false,
+            dom: 'Bfrtip',
+            buttons: [{
+                extend: 'excel',
+                title: 'Export table ULS Tracker'
+            }, ],
             columnDefs: [{
                 type: 'date-uk',
                 targets: 0
@@ -316,19 +342,6 @@
 
 <script>
     $(document).ready(function() {
-        $('#maintable2').DataTable({
-            "order": [
-                [0, "asc"]
-            ],
-            paging: false,
-            searching: false,
-            info: false,
-            columnDefs: [{
-                type: 'date-uk',
-                targets: 0
-            }]
-
-        });
     });
 </script>
 
