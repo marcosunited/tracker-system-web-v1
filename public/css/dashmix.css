@@ -11768,12 +11768,9 @@ small,
     align-items: center;
     width: 100%;
     min-height: 4.375rem;
-<<<<<<< HEAD
     bottom: 0;
     margin: auto;
     left: 240px;
-=======
->>>>>>> parent of 1303d61 (Merge branch 'hotfixes' of https://github.com/it-united-lifts/tracker-system-web-v1 into hotfixes)
 }
 
 #page-footer.footer-static {
