@@ -29,6 +29,8 @@ use Exception;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MaintenanceMail;
+use Yajra\DataTables\DataTables;
+
 
 class MaintenanceController extends Controller
 {
@@ -42,14 +44,57 @@ class MaintenanceController extends Controller
         return view('maintenance.pendingMaintenance', compact('pendingmaintenances'));
     }
 
-    public function finished()
+    public function finished(Request $request)
     {
-        $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
-            ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
-            ->orderby('maintenance_date', 'desc')
-            ->get();
+        if($request->ajax()){
+            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
+                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
+                ->orderby('maintenance_date', 'desc');
+            try {
+                $t = DataTables::of($finishedmaintenances)
+                    ->addColumn('job_number', function(MaintenanceN $maintenance) {
+                        return $maintenance->jobs->job_number;
+                    })
+                    ->addColumn('job_name', function(MaintenanceN $maintenance) {
+                        return $maintenance->jobs->job_name;
+                    })
+                    ->addColumn('job_id', function(MaintenanceN $maintenance) {
+                        return $maintenance->jobs->id;
+                    })
+                    ->addColumn('job_address', function(MaintenanceN $maintenance) {
+                        return $maintenance->jobs->job_address_number ." ". $maintenance->jobs->job_address;
+                    })
+                    ->addColumn('job_group', function(MaintenanceN $maintenance) {
+                        return $maintenance->jobs->job_group;
+                    })
+                    ->addColumn('lift_id', function(MaintenanceN $maintenance) {
+                        return $maintenance->lifts->id;
+                    })
+                    ->addColumn('lift_name', function(MaintenanceN $maintenance) {
+                        return $maintenance->lifts->lift_name;
+                    })
+                    ->addColumn('technician_name', function(MaintenanceN $maintenance) {
+                        return $maintenance->techs->technician_name;
+                    })
+                    ->addColumn('technician_id', function(MaintenanceN $maintenance) {
+                        return $maintenance->techs->id;
+                    })
+                    ->addColumn('report_status', function(MaintenanceN $maintenance) {
+                        return $maintenance->report_status;
+                    })
+                    ->toJson();
+                return $t;
+            } catch (Exception $e) {
+            }
+        }/*else{
+            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
+                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
+                ->orderby('maintenance_date', 'desc')
+                ->get();
 
-        return view('maintenance.finishMaintenance', compact('finishedmaintenances'));
+            return view('maintenance.finishMaintenance', compact('finishedmaintenances'));
+        }*/
+        return view('maintenance.finishMaintenance');
     }
 
     public function selecttasks(Request $request)
@@ -444,12 +489,12 @@ class MaintenanceController extends Controller
         ]);
 
         // $active_week = request('active_week');
-        // $year_month_week = $maintenance->year_month . $active_week;  
+        // $year_month_week = $maintenance->year_month . $active_week;
 
         // MaintenanceNweek::create([
 
         //     'toa_date' => request('toa_date'),
-        //     'tod_date' => request('tod_date'), 
+        //     'tod_date' => request('tod_date'),
         //     'year_month_week' => $year_month_week,
         //     'maintenance_id' => $maintenance->id,
         //     'task_ids' => implode("|",$request->task)
@@ -492,7 +537,7 @@ class MaintenanceController extends Controller
     {
         $file = $request->file('file');
         // $validator = Validator::make($request->all(), [
-        //     'file' => 'max:2060', //2MB 
+        //     'file' => 'max:2060', //2MB
         // ]);
 
         if ($file) {
@@ -652,12 +697,12 @@ class MaintenanceController extends Controller
             $myID = "N/A";
         }
         $message = "
-             
+
              <p>This notification is to advise completion of your Maintenance (Docket Number: $myID, Order Number: $order_number) to Unit('s)<br>&nbsp;<br>
              <b>$lift_names</b> at <b>$address</b>.
              <p>We trust our service was satisfactory, however we welcome your feedback to our office<br> via phone 9687 9099 or email info@unitedlifts.com.au.</p>
              <p>Thankyou for your continued patronage.</p>
-             <p>United Lift Services</p>               
+             <p>United Lift Services</p>
          ";
 
         $from = "call@unitedlifts.com.au";

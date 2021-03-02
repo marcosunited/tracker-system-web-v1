@@ -134,7 +134,7 @@ Route::get('/repairs/{repair}/print', 'RepairController@print');
 Route::get('/maintenances/create', 'MaintenanceController@create')->middleware('auth');
 Route::get('/maintenances/{maintenance}/tasks', 'MaintenanceController@tasks')->middleware('auth');
 Route::get('/maintenances/pendingmaintenances', 'MaintenanceController@pending')->middleware('auth');
-Route::get('/maintenances/finishedmaintenances', 'MaintenanceController@finished')->middleware('auth');
+Route::get('/maintenances/finishedmaintenances', 'MaintenanceController@finished')->name('get_finished_maintenances')->middleware('auth');
 Route::post('/maintenances/add', 'MaintenanceController@store')->middleware('auth');
 Route::post('/maintenances/selecttasks', 'MaintenanceController@selecttasks')->middleware('auth');
 Route::get('/maintenances/{maintenance}', 'MaintenanceController@edit')->middleware('auth');

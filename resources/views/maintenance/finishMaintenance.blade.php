@@ -19,25 +19,106 @@
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
 <script>
  $(document).ready(function() {  $('#delete-modal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget) 
-      var callout_id = button.data('mainid') 
-      var modal = $(this)
-      modal.find('.modal-content #maintenance_id').val(callout_id);
-}) 
+     const button = $(event.relatedTarget);
+     const callout_id = button.data('mainid');
+     const modal = $(this);
+     modal.find('.modal-content #maintenance_id').val(callout_id);
+})
 });
-$(document).ready(function() {  
+$(document).ready(function() {
     $(document).on('click','.act_send',function(event) {
-        var main_id = $(this).data('mainid') 
+        const main_id = $(this).data('mainid');
         $('#main_send_id').val(main_id);
         $('#send_form').trigger('submit');
     });
     $(document).on('click','.act_print',function(event) {
-        var main_id = $(this).data('mainid') 
+        const main_id = $(this).data('mainid');
         $('#main_print_id').val(main_id);
         $('#print_form').trigger('submit');
     });
 
 });
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        let table = $('#mytabla').DataTable({
+            retrieve: true,
+        });
+        table.destroy();
+
+        table = $('#mytabla').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('get_finished_maintenances') }}",
+            columns: [
+                {"data": "maintenance_date"},
+                {"data": "job_number"},
+                {
+                     "data": "job_name",
+                     "render": function(data, type, row){
+                         if(type === 'display'){
+                             data = '<a href="/jobs/' + row.job_id + '">' + data + '</a>';
+                         }
+                         return data;
+                     }
+                },
+                {"data": "id"},
+                {"data": "job_address"},
+                {"data": "job_group"},
+                {"data": "lift_name",
+                 "render": function(data, type, row){
+                     if(type === 'display'){
+                         data = '<a href="/jobs/' + row.job_id + '/lifts/' + row.lift_id + '">' + data + '</a>';
+                     }
+                     return data;
+                 }},
+                {"data": "technician_name",
+                 "render": function(data, type, row){
+                     if(type === 'display'){
+                         data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
+                     }
+                     return data;
+                 }},
+                {"data": "report_status",
+                    "render": function(data, type, row){
+                        if(type === 'display'){
+                            if(data == 'none'){
+                                data = '<a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
+                                data = data  + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
+                            }else if(data == 'sent'){
+                                data = 'Sent Email<br> <a data-mainid=' + row.id + ' class="act_print btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
+                            }else if(data == 'print'){
+                                data = 'Print Reported<br> <a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
+                            }else if(data == 'both'){
+                                data = 'Done';
+                            }else{
+                                data = '<a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
+                                data = data  + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
+                            }
+                            data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
+                        }
+                        return data;
+                    }},
+                {"data": "id",
+                    "render": function(data, type, row){
+                        if(type === 'display'){
+                            data = '<a href="/maintenances/' + data + '"> <div class="btn-group"> <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Edit"> <i class="fa fa-pencil-alt"></i> </button> </div> </a>';
+                        }
+                        return data;
+                    }},
+                {"data": "id",
+                    "render": function(data, type, row){
+                        if(type === 'display'){
+                            data = '<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-mainid=' + data + '> <i class="fa fa-times"></i></button>';
+                        }
+                        return data;
+                    }},
+            ],
+        });
+        console.log(table)
+    });
 </script>
 @endsection
 
@@ -49,10 +130,7 @@ $(document).ready(function() {
         <h1 class="flex-sm-fill font-size-h2" style="padding-left: 50px;">All Finished Maintenance Table</h1>
         <a class="block text-center bg-gd-lake" href="javascript:void(0)">
             <div class="block-content block-content-full aspect-ratio-1-1 d-flex justify-content-center align-items-center">
-                <div>
-                    <div class="font-size-h1 font-w300 text-white">{{count($finishedmaintenances)}}</div>
-                    <div class="font-w600 mt-2 text-uppercase text-white-75">Maintenance</div>
-                </div>
+
             </div>
         </a>
 
@@ -65,7 +143,7 @@ $(document).ready(function() {
     <div class="block block-rounded block-bordered">
         <div class="block-content block-content-full">
             <!-- DataTables init on table by adding .js-dataTable-full class, functionality is initialized in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-            <table class="table table-bordered table-striped table-vcenter js-dataTable-buttons">
+            <table id="mytabla" class="data-table mdl-data-table dataTable table table-bordered table-striped table-vcenter js-dataTable-buttons">
                 <thead>
                     <tr>
                         <th class="text-center" style="width:10%;">Date</th>
@@ -76,76 +154,12 @@ $(document).ready(function() {
                         <th style="width: 15%;">Group</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
-                        <th style="width: 15%;">Report </th>                        
+                        <th style="width: 15%;">Report </th>
                         <th style="width: 15%;">View</th>
                         <th style="width: 15%;">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if($finishedmaintenances)
-                    @foreach($finishedmaintenances as $maintenance)
-                    <tr>
-                        <td class="text-center">
-                        {{date('d-m-yy',strtotime($maintenance->maintenance_date))}}
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            {{$maintenance->jobs->job_number}}
-                        </td>
-                        <td class="font-w600">
-                        <a href="/jobs/{{$maintenance->jobs->id}}">{{$maintenance->jobs->job_name}}</a>
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            {{$maintenance->id}}
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            {{$maintenance->jobs->job_address_number}} {{$maintenance->jobs->job_address}}
-                        </td>
-                        <td>
-                            {{$maintenance->jobs->job_group}}
-                        </td>
-                        </td>
-                        <td>
-                        <a href="/jobs/{{$maintenance->jobs->id}}/lifts/{{$maintenance->lifts->id}}">{{$maintenance->lifts->lift_name}}</a>
-                        </td>
-                        <td>
-                        @if($maintenance->techs)
-                            <a href="/techs/{{$maintenance->techs->id}}">{{$maintenance->techs->technician_name}}</a>
-                        @endif
-                        </td>
-                        <td>
-                            @if ($maintenance->report_status == 'none') 
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
-                            <a data-mainid="{{$maintenance->id}}" class="act_print btn btn-warning btn-sm text-white">Print Report</a>
-                            @elseif ($maintenance->report_status == 'sent')
-                            Sent Email<br>
-                            <a data-mainid="{{$maintenance->id}}"  class="act_print btn btn-warning btn-sm text-white">Print Report</a>
-                            @elseif ($maintenance->report_status == 'print')
-                            Print Reported<br>
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
-                            @elseif ($maintenance->report_status == 'both')
-                            Done                            
-                            @else
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
-                            <a data-mainid="{{$maintenance->id}}" class="act_print btn btn-warning btn-sm text-white">Print Report</a>
-                            @endif
-                            
-                        </td>                        
-                        <td>
-                            <a href="/maintenances/{{$maintenance->id}}">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Edit">
-                                        <i class="fa fa-pencil-alt"></i>
-                                    </button>
-                                </div>
-                            </a>
-                        </td>
-                        <td>
-                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-mainid={{$maintenance->id}}>
-                                <i class="fa fa-times"></i></button>
-                        </td>
-                    </tr>
-                    @endforeach
-                    @endif
                 </tbody>
             </table>
         </div>
@@ -176,16 +190,18 @@ $(document).ready(function() {
                     </div>
                 </div>
             </div>
-        </div>              
+        </div>
     </div>
 
     <form method="POST" action="/maintenances/maintenanceprint" id="print_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_print_id" value=""/>    
+        <input type="hidden" name="main_id" id="main_print_id" value=""/>
     </form>
     <form method="POST" action="{{url('/maintenances/maintenancesendemail')}}" id="send_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_send_id" value=""/>    
-    </form>     
+        <input type="hidden" name="main_id" id="main_send_id" value=""/>
+    </form>
+
+
 <!-- END Page Content -->
 @endsection
