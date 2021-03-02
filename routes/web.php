@@ -24,7 +24,7 @@ Route::get('/jobs/all', 'JobController@index')->middleware('auth');
 Route::get('/jobs/create', 'JobController@create')->middleware('auth');
 Route::post('/jobs/create', 'JobController@store')->middleware('auth');
 Route::get('/jobs/{job}', 'JobController@show')->middleware('auth');
-Route::patch('/jobs/{job}', 'JobController@edit')->middleware('auth');
+Route::patch('/jobs/{job}', 'JobController@update')->middleware('auth');
 Route::get('/jobs/{job}/callouts', 'JobController@callouts')->middleware('auth');
 Route::get('/jobs/{job}/maintenances', 'JobController@maintenances')->middleware('auth');
 Route::get('/jobs/{job}/repairs', 'JobController@repairs')->middleware('auth');
@@ -63,7 +63,6 @@ Route::patch('/techs/{tech}', 'TechController@update')->middleware('auth');
 Route::get('/techs/{tech}/jobs', 'TechController@jobs')->middleware('auth');
 Route::get('/techs/{tech}/callouts', 'TechController@callouts')->middleware('auth');
 Route::get('/techs/{tech}/maintenances', 'TechController@maintenances')->middleware('auth');
-Route::delete('/techs/{tech}', 'TechController@delete')->middleware('auth');
 
 
 //Agents
@@ -137,7 +136,6 @@ Route::get('/maintenances/{maintenance}/tasks', 'MaintenanceController@tasks')->
 Route::get('/maintenances/pendingmaintenances', 'MaintenanceController@pending')->middleware('auth');
 Route::get('/maintenances/finishedmaintenances', 'MaintenanceController@finished')->name('get_finished_maintenances')->middleware('auth');
 Route::post('/maintenances/add', 'MaintenanceController@store')->middleware('auth');
-Route::post('/maintenances/sopa', 'MaintenanceController@sopaTasks')->middleware('auth');
 Route::post('/maintenances/selecttasks', 'MaintenanceController@selecttasks')->middleware('auth');
 Route::get('/maintenances/{maintenance}', 'MaintenanceController@edit')->middleware('auth');
 Route::patch('/maintenances/{maintenance}', 'MaintenanceController@update')->middleware('auth');

@@ -4,13 +4,9 @@
 <script src="{{ mix('js/laravel.app.js') }}"></script>
 
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.13/css/jquery.dataTables.css">
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js">
+</script>
 <div id="topbar">
     <a href="#" id="printPdf">Print As PDF</a>
 </div>
@@ -235,11 +231,6 @@
             ],
             paging: false,
             searching: false,
-            dom: 'Bfrtip',
-            buttons: [{
-                extend: 'excel',
-                title: 'Export table ULS Tracker'
-            }, ],
             columnDefs: [{
                 type: 'date-uk',
                 targets: 0
@@ -258,11 +249,6 @@
             ],
             paging: false,
             searching: false,
-            dom: 'Bfrtip',
-            buttons: [{
-                extend: 'excel',
-                title: 'Export table ULS Tracker'
-            }, ],
             columnDefs: [{
                 type: 'date-uk',
                 targets: 0

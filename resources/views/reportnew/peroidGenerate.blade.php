@@ -33,7 +33,6 @@
                 <td align="center"><strong>Date Of Call</strong></td>
                 <td align="center"><strong>Time Of Call</strong></td>
                 <td align="center"><strong>Lift Number</strong></td>
-                <td align="center"><strong>Callout ID</strong></td>
                 <td align="center"><strong>Docket No</strong></td>
                 <td align="center"><strong>Chargeable</strong></td>
             </tr>
@@ -49,7 +48,6 @@
                 <td>
                     {{$callout['lift']}}
                 </td>
-                <td><a class="link-callout" data-id="{{$callout['callout']->id}}" href="/callouts/{{$callout['callout']->id}}" target="_blank">{{$callout['callout']->id}}</a></td>
                 <td>{{$callout['callout']->docket_number}}</td>
                 <td>
                     @if($callout['callout']->chargeable_id == 1)
@@ -141,12 +139,6 @@
             color: #000;
             text-decoration: none
         }
-
-        .link-callout {
-            text-decoration: underline;
-            cursor: pointer;
-            color: blue;
-        }
     </style>
 </div>
 <!--End Print Area!-->
@@ -158,13 +150,6 @@
             $myVar = $("#printArea").html();
             $("#frm_contents").val($myVar);
             $("#printForm").submit();
-        });
-    });
-
-    $(document).ready(function() {
-        $(".link-callout").click(function() {
-            var id = $(this).data('id');
-            window.open("/callouts/" + id);
         });
     });
 </script>
@@ -181,7 +166,7 @@
                 extend: 'copy'
             }, {
                 extend: 'excel',
-                title: 'Period callout report: ' + $('#startDate').val() + '-' + $('#endDate').val()
+                title:'Period callout report: ' + $('#startDate').val() + '-' + $('#endDate').val()
             }],
             columnDefs: [{
                 type: 'date-dd-mmm-yyyy',

@@ -238,7 +238,7 @@ class RepairController extends Controller
     {
         $file->delete();
         unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->success();
+        flash('File Successfully Deleted!')->error();
         return back();
     }
 
@@ -280,7 +280,7 @@ class RepairController extends Controller
     public function deletenote(Repair $repair,Note $note)
     {
         $note->delete();
-        flash('Note Successfully Deleted!')->success();
+        flash('Note Successfully Deleted!')->error();
         return back();
     }
 
@@ -296,7 +296,7 @@ class RepairController extends Controller
         $repair>lifts()->detach();
         $repair>files()->delete();
         $repair>delete();
-        flash('Repair Successfully Deleted!')->success();
+        flash('Repair Successfully Deleted!')->error();
         return back();
     }
 }

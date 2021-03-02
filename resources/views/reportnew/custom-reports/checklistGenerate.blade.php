@@ -69,7 +69,7 @@
     <div id="page1-div" style="position:relative;width:980px;height:650px;">
         <img width="980" height="640" src="http://sydney.unitedlifts.com.au/image/custom-reports/checklist-001.png" alt="background image" />
         <p style="position:absolute;top:100px;left:50px;white-space:nowrap" class="ft14"><b>Inspection and Test Plan Checklist</b></p>
-        <p style="position:absolute;top:100px;left:600px;white-space:nowrap" class="ft14"><b>2.2.11a – Passenger Lifts</b></p>
+        <p style="position:absolute;top:100px;left:600px;white-space:nowrap" class="ft14"><b>2.2.11a – Stage Lifts</b></p>
         <p style="position:absolute;top:136px;left:400px;white-space:nowrap" class="ft15"><b>Inspection and Test Plan – CHECKLIST</b></p>
         <p style="position:absolute;top:146px;left:300px;white-space:nowrap" class="ft15"><b>(To be completed by the person(s) directly responsible for the work - Supervisor)</b></p>
         <p style="position:absolute;top:166px;left:55px;white-space:nowrap" class="ft17"><b>Contract Name:</b>Whole of Government Facilities Management Services Contract</p>
@@ -210,7 +210,7 @@
         <p style="position:absolute;top:562px;left:460px;white-space:nowrap" class="ft13"><b>Name:</b> <span style="font-weight:normal"> {{$maintenance->techs->technician_name}}</span></p>
 
         <p style="position:absolute;top:584px;left:460px;white-space:nowrap" class="ft13"><b>Signature:</b> <span style="font-weight:normal"> {{$maintenance->techs->technician_name}}</span></p>
-        <p style="position:absolute;top:606px;left:460px;white-space:nowrap" class="ft13"><b>Date:</b> <span style="font-weight:normal"> {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y')}}</span></p>
+        <p style="position:absolute;top:606px;left:460px;white-space:nowrap" class="ft13"><b>Date:</b> <span style="font-weight:normal"> {{$maintenance->maintenance_date}}</span></p>
 
         <div class="pos" id="_98:1110" style="position:absolute;top:642px;left:50px;white-space:nowrap;font-family: sans-serif;">
             <span id="_11.0" style=" font-size:11.0px; color:#000000">

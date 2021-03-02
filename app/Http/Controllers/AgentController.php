@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Agent;
-use Exception;
 
 class AgentController extends Controller
 {
@@ -16,7 +15,7 @@ class AgentController extends Controller
     public function index()
     {
         $agents = Agent::all();
-        return view('agents.allAgents', compact('agents'));
+        return view('agents.allAgents',compact('agents'));
     }
 
     /**
@@ -37,21 +36,16 @@ class AgentController extends Controller
      */
     public function store(Request $request)
     {
-        try {
+        Agent::create([
 
-            Agent::create([
+            'agent_name' => request('agent_name'),
+            'agent_phone' => request('agent_phone'),
+            'agent_address' => request('agent_address'),
+            'agent_fax' => request('agent_fax')
+        ]);
 
-                'agent_name' => request('agent_name'),
-                'agent_phone' => request('agent_phone'),
-                'agent_address' => request('agent_address'),
-                'agent_fax' => request('agent_fax')
-            ]);
-
-            flash('Agent added successfully!')->success();
-            return back();
-        } catch (Exception $e) {
-            flash('Error deleting agent')->error();
-        }
+        flash('Agent Successfully Added!')->success();
+        return back();
     }
 
     /**
@@ -62,7 +56,7 @@ class AgentController extends Controller
      */
     public function show(Agent $agent)
     {
-        return view('agents.showAgents', compact('agent'));
+        return view('agents.showAgents' ,compact('agent'));
     }
 
     /**
@@ -85,20 +79,16 @@ class AgentController extends Controller
      */
     public function update(Request $request, Agent $agent)
     {
-        try {
-            $agent->update([
+        $agent->update([
 
-                'agent_name' => request('agent_name'),
-                'agent_phone' => request('agent_phone'),
-                'agent_address' => request('agent_address'),
-                'agent_fax' => request('agent_fax')
-            ]);
+            'agent_name' => request('agent_name'),
+            'agent_phone' => request('agent_phone'),
+            'agent_address' => request('agent_address'),
+            'agent_fax' => request('agent_fax')
+        ]);
 
-            flash('Agent updated successfully!')->success();
-            return back();
-        } catch (Exception $e) {
-            flash('Error updating agent')->error();
-        }
+        flash('Agent Successfully Updated!')->success();
+        return back();
     }
 
     /**
@@ -109,19 +99,16 @@ class AgentController extends Controller
      */
     public function destroy(Agent $agent)
     {
-        try {
-            $agent->delete();
-            flash('Agent deleted successfully')->success();
-            return back();
-        } catch (Exception $e) {
-            flash('Error deleting agent')->error();
-        }
+        $agent->delete();
+        flash('Agent Successfully Deleted!')->error();
+        return back();
     }
 
     public function jobs(Agent $agent)
     {
         $agentJobs = $agent->jobs;
 
-        return view('agents.agentJob', compact('agentJobs', 'agent'));
+        return view('agents.agentJob' ,compact('agentJobs','agent'));
     }
+
 }

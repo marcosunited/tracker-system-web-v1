@@ -143,7 +143,7 @@
                         </div>
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
-                        <h5>Are you Sure?</h5>
+                        <h1>Are you Sure?</h1>
 
                         <form method="POST" action="/repairs/{{isset($repair)?$repair->id:''}}">
                             @method('DELETE')
