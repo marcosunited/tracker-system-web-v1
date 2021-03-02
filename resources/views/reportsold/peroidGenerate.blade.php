@@ -17,136 +17,155 @@
 
 <div id="printArea" contenteditable="true">
     <div id="logo">
-    <img src="/image/images/logobig.png" align="center" width="400">>
+        <img src="/image/images/logobig.png" align="center" width="400">>
     </div>
 
     <h1>Weekly Callout Report: </h1>
-    
+
     <table width="100%" border="1" style="border-collapse:collapse" cellpadding="0" cellspacing="0" id="maintable">
-    <thead>
-        <tr>
-            <td align="center"><strong>Job No</strong></td>
-			<td align="center"><strong>Job Name</strong></td>
-            <td align="center"><strong>Callout Description</strong></td>
-            <td align="center"><strong>Date Of Call</strong></td>
-            <td align="center"><strong>Time Of Call</strong></td>
-            <td align="center"><strong>Lift Number</strong></td>
-            <td align="center"><strong>Docket No</strong></td>
-            <td align="center"><strong>Chargeable</strong></td>
-            <td align="center"><strong>Verify</strong></td>
-        </tr>
+        <thead>
+            <tr>
+                <td align="center"><strong>Job No</strong></td>
+                <td align="center"><strong>Job Name</strong></td>
+                <td align="center"><strong>Callout Description</strong></td>
+                <td align="center"><strong>Date Of Call</strong></td>
+                <td align="center"><strong>Time Of Call</strong></td>
+                <td align="center"><strong>Lift Number</strong></td>
+                <td align="center"><strong>Docket No</strong></td>
+                <td align="center"><strong>Chargeable</strong></td>
+                <td align="center"><strong>Verify</strong></td>
+            </tr>
         </thead>
         <tbody>
-        @foreach($callouts as $callout)
-        <tr>
-			<td>{{$callout->job_number}}</td>
-            <td>{{$callout->job_name}}</td>
-            <td>{{$callout->callout_description}}</td>
-            <td>{{date("d/m/y",$callout->callout_time)}}</td>
-            <td> {{\AppHelper::instance()->toTime($callout->callout_time)}}</td>
-            <td>
+            @foreach($callouts as $callout)
+            <tr>
+                <td>{{$callout->job_number}}</td>
+                <td>{{$callout->job_name}}</td>
+                <td>{{$callout->callout_description}}</td>
+                <td>{{date("d/m/y",$callout->callout_time)}}</td>
+                <td> {{\AppHelper::instance()->toTime($callout->callout_time)}}</td>
+                <td>
                     {{\AppHelper::instance()->liftNames($callout->lift_ids)}}
-            </td>
-            <td id="{{$callout->id}}" class="classID">{{$callout->docket_number}}</td>
-            <td>{{$callout->chargeable_id}}</td>
-            <td>{{$callout->verify}}</td>
-        </tr>
-        @endforeach
+                </td>
+                <td id="{{$callout->id}}" class="classID">{{$callout->docket_number}}</td>
+                <td>{{$callout->chargeable_id}}</td>
+                <td>{{$callout->verify}}</td>
+            </tr>
+            @endforeach
         </tbody>
     </table>
 
-    <style>   
-        body{
-            margin:0px;
-            font-size:12px;
+    <style>
+        body {
+            margin: 0px;
+            font-size: 12px;
         }
-        td{
-            font-size:12px;
+
+        td {
+            font-size: 12px;
         }
-        *{
-            font-family:sans-serif;
+
+        * {
+            font-family: sans-serif;
 
         }
-        #topbar, #topbar a{
-            background-color:blue;
-            color:#fff;
-            padding:5px;
-            
-            background: #7abcff; /* Old browsers */
-            background: -moz-linear-gradient(top,  #7abcff 0%, #60abf8 44%, #4096ee 100%); /* FF3.6+ */
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7abcff), color-stop(44%,#60abf8), color-stop(100%,#4096ee)); /* Chrome,Safari4+ */
-            background: -webkit-linear-gradient(top,  #7abcff 0%,#60abf8 44%,#4096ee 100%); /* Chrome10+,Safari5.1+ */
-            background: -o-linear-gradient(top,  #7abcff 0%,#60abf8 44%,#4096ee 100%); /* Opera 11.10+ */
-            background: -ms-linear-gradient(top,  #7abcff 0%,#60abf8 44%,#4096ee 100%); /* IE10+ */
-            background: linear-gradient(to bottom,  #7abcff 0%,#60abf8 44%,#4096ee 100%); /* W3C */
-            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); /* IE6-9 */
-                        
+
+        #topbar,
+        #topbar a {
+            background-color: blue;
+            color: #fff;
+            padding: 5px;
+
+            background: #7abcff;
+            /* Old browsers */
+            background: -moz-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7abcff), color-stop(44%, #60abf8), color-stop(100%, #4096ee));
+            /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            /* IE10+ */
+            background: linear-gradient(to bottom, #7abcff 0%, #60abf8 44%, #4096ee 100%);
+            /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7abcff', endColorstr='#4096ee', GradientType=0);
+            /* IE6-9 */
+
         }
-        #logo{
-            text-align:center;
-            padding:10px;
-            
+
+        #logo {
+            text-align: center;
+            padding: 10px;
+
         }
-        #disclaimer{
-            padding-top:10px;
+
+        #disclaimer {
+            padding-top: 10px;
         }
-        #dear{
-            padding-bottom:10px;
-        }        
-        .postal{
-            font-weight:bold;
-            text-align:center;
-            vertical-align:top;
+
+        #dear {
+            padding-bottom: 10px;
         }
-        .address{
-            width:200px;
-            text-align:left;
+
+        .postal {
+            font-weight: bold;
+            text-align: center;
+            vertical-align: top;
         }
-        h1{
-            text-align:center;
-            font-size:28px;
+
+        .address {
+            width: 200px;
+            text-align: left;
         }
-        #disclaimer{
-            margin:10px 0px 10px 0px;
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
         }
-        a{
-            color:#000;
-            text-decoration:none
+
+        #disclaimer {
+            margin: 10px 0px 10px 0px;
+        }
+
+        a {
+            color: #000;
+            text-decoration: none
         }
     </style>
-</div><!--End Print Area!-->
+</div>
+<!--End Print Area!-->
 
 
 <script>
-    $(document).ready(function(){
-        $("#printPdf").click(function(){
+    $(document).ready(function() {
+        $("#printPdf").click(function() {
             $myVar = $("#printArea").html();
             $("#frm_contents").val($myVar);
             $("#printForm").submit();
         });
     });
 </script>
-		<script>
-			$(document).ready(function() {
-				$('#maintable').DataTable( {
-					"order": [[ 0, "asc" ]],
-					paging: false,
-					searching: false,
-                    dom: 'Bfrtip',
-                    buttons: [
-                    'copy', 'excel', 
-                         ],
-					columnDefs: [
-                    { type: 'date-dd-mmm-yyyy', targets: 3 }
-                    ],
+<script>
+    $(document).ready(function() {
+        $('#maintable').DataTable({
+            "order": [
+                [0, "asc"]
+            ],
+            paging: false,
+            searching: false,
+            dom: 'Bfrtip',
+            buttons: [{
+                extend: 'excel',
+                title: 'Export table ULS Tracker'
+            }, ],
+            columnDefs: [{
+                type: 'date-dd-mmm-yyyy',
+                targets: 3
+            }],
 
-					
-				} );
-			} );
-		</script>
-<!-- <script>
-    $(".classID").on('click',function() {   
-    var id = $(this).attr('id');
-    window.open("/callouts/" + id);       
-}); 
-</script> -->
+
+        });
+    });
+</script>

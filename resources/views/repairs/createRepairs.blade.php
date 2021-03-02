@@ -18,7 +18,7 @@
 <script src="{{ asset('js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('js/plugins/jquery.maskedinput/jquery.maskedinput.min.js') }}"></script>
 <script src="{{ asset('js/plugins/dropzone/dropzone.min.js') }}"></script>
-
+<script src="{{ asset('js/plugins/jquery-blockUI/jquery.blockUI.min.js') }}"></script>
 
 <!-- Page JS Plugins -->
 <script src="{{ asset('js/plugins/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
@@ -26,71 +26,114 @@
 <script src="{{ asset('js/plugins/moment/locales.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datetimepicker/datetime.min.js') }}"></script>
 <script>
-    jQuery(function () {
+    jQuery(function() {
         $('#datetimepicker1').datetimepicker({
             format: 'YYYY-MM-DD HH:mm:ss',
             value: new Date()
         });
-});  
+    });
 </script>
 <script>
-    $(document).ready(function() { $(".job_select").select2(); });
-    $(document).ready(function() { $(".tech_select").select2(); });
-    $(document).ready(function() { $(".lift_select").select2({
-        multiple: true,
-    }); });
-    $(document).ready(function() { $(".fault_select").select2(); });
- </script>
+    $(document).ready(function() {
+        $(".job_select").select2();
+    });
+    $(document).ready(function() {
+        $(".tech_select").select2();
+    });
+    $(document).ready(function() {
+        $(".lift_select").select2({
+            multiple: true,
+        });
+    });
+    $(document).ready(function() {
+        $(".fault_select").select2();
+    });
+</script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <script>
-    $(document).ready(function(){
-        $(".lift_select").select2({ multiple:true});
+    $(document).ready(function() {
+        $(document).ajaxStop($.unblockUI);
+        $(".lift_select").select2({
+            multiple: true
+        });
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $(".job_select").change(function(){
+        $(".job_select").change(function() {
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
+
             $.ajax({
                 /* the route pointing to the post function */
                 url: '/callouts/selectedJob',
                 type: 'POST',
                 /* send the csrf-token and the input to the controller */
-                data: {_token: CSRF_TOKEN, 
-                        message:$(".job_select").select2("val")},
-                dataType: 'JSON',
-                success:function(data){
-                    $("#lift_select").select2().empty()                  
-                    
-                    for (var i=0;i<=data.length;i++) {                        
-                        var html='<option value="'+data[i]['id']+'" selected>'+data[i]['lift_name']+'</option>';           
-                        $("#lift_select").append(html);             
-                    }        
-                    $("#lift_select").select2({ multiple:true});                 
+                data: {
+                    _token: CSRF_TOKEN,
+                    message: $(".job_select").select2("val")
                 },
-                error:function() {
+                dataType: 'JSON',
+                success: function(data) {
 
+                    if (data) {
+                        if (data['lifts']) {
+                            var lifts = data['lifts'];
+
+                            $("#lift_select").select2().empty()
+
+                            for (var i = 0; i < lifts.length; i++) {
+                                var html = '<option value="' + lifts[i]['id'] + '" selected>' + lifts[i]['lift_name'] + '</option>';
+                                $("#lift_select").append(html);
+                            }
+                            $("#lift_select").select2({
+                                multiple: true
+                            });
+                        }
+                    }
+
+                    $.unblockUI();
+                },
+                error: function() {
+                    console.log(error);
+                    $.unblockUI();
                 }
-            }); 
-            
+            });
+
             //Session::put('selectedJob',$(".job_select").select2("val"));
             //$selectedJob = Session::get('selectedJob');
             //window.location.reload(true);
-            $( "#here" ).load(window.location.href + " #here" );
+            $("#here").load(window.location.href + " #here");
             //$( "#there" ).load(window.location.href + " #there" );           
         });
-   });    
+    });
 </script>
 
 <!-- Page JS Helpers (BS Notify Plugin) -->
 
-<script>jQuery(function(){ Dashmix.helpers('notify'); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers('notify');
+    });
+</script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
-<script>jQuery(function(){ Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
+    });
+</script>
 @endsection
 
 @section('content')
 <!-- Page Content -->
 
 <div class="content">
+
+    <div class="blockUI-layout">
+        <h4>Please wait...</h4>
+    </div>
+
     @include('error.error')
     <!-- <button type="button" class="js-notify btn btn-info push" data-type="info" data-icon="fa fa-info-circle mr-1" data-message="Hello World">
      <i class="fa fa-bell mr-1"></i> Launch Notification
@@ -111,7 +154,7 @@
                 </h2>
                 <div class="row push">
                     <div class="col-lg-4" style="padding-left: 50px;">
-                    <div class="form-group">
+                        <div class="form-group">
                             <label for="example-text-input">Job Name</label>
                             <select class="form-control job_select" name="job_id" required>
 
@@ -130,8 +173,7 @@
                         <div class="form-group">
                             <label for="example-text-input">Repair Time</label>
                             <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                                <input type="text" name="repair_time" class="form-control datetimepicker-input"
-                                    data-target="#datetimepicker1" />
+                                <input type="text" name="repair_time" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
                                 <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
@@ -142,10 +184,10 @@
                             <input type="text" class="form-control" placeholder="" name="quote_no" required>
                         </div>
                         <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
-                    </div>
+                        </div>
                     </div>
                     <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
-                    <div class="form-group">
+                        <div class="form-group">
                             <label for="example-text-input">Current Status</label>
                             <select class="form-control" name="repair_status_id" required>
                                 <option value="">----------Select Status-----------</option>

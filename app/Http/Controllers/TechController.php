@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Technician;
 use App\Round;
 use Illuminate\Support\Facades\Input;
+use Exception;
 
 class TechController extends Controller
 {
@@ -16,8 +17,8 @@ class TechController extends Controller
      */
     public function index()
     {
-        $techs = Technician::all();
-        return view('techs.allTechs',compact('techs'));
+        $techs = Technician::select()->where('is_deleted', '=', '0')->get();
+        return view('techs.allTechs', compact('techs'));
     }
 
     /**
@@ -28,7 +29,7 @@ class TechController extends Controller
     public function create()
     {
         $rounds = Round::all();
-        return view('techs.createTech',compact('rounds'));
+        return view('techs.createTech', compact('rounds'));
     }
 
     /**
@@ -42,11 +43,11 @@ class TechController extends Controller
         $file = Input::file('technician_photo');
         $avatar = 'default.png';
         if ($file != null) {
-            $imagname = 'profile_'.$file->getClientOriginalName();
-            $file->move(public_path('avatar/'),$imagname);
-            $avatar = 'avatar/'.$imagname;
+            $imagname = 'profile_' . $file->getClientOriginalName();
+            $file->move(public_path('avatar/'), $imagname);
+            $avatar = 'avatar/' . $imagname;
         }
-        
+
         Technician::create([
 
             'status_id' => request('status_id'),
@@ -54,8 +55,8 @@ class TechController extends Controller
             'technician_phone' => request('technician_phone'),
             'technician_email' => request('technician_email'),
             'round_id' => request('round_id'),
-            'technician_password'=> base64_encode(request('technician_password')),
-            'photo'=>$avatar,
+            'technician_password' => base64_encode(request('technician_password')),
+            'photo' => $avatar,
         ]);
 
         flash('Technician Successfully Created!')->success();
@@ -72,7 +73,7 @@ class TechController extends Controller
     {
         $rounds = Round::all();
         $selectedRound = $tech->rounds;
-        return view('techs.showTech' ,compact('tech','selectedRound','rounds'));
+        return view('techs.showTech', compact('tech', 'selectedRound', 'rounds'));
     }
 
     /**
@@ -83,7 +84,6 @@ class TechController extends Controller
      */
     public function edit()
     {
-
     }
 
     /**
@@ -93,15 +93,15 @@ class TechController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,Technician $tech)
+    public function update(Request $request, Technician $tech)
     {
         //dd($request);
         $file = Input::file('technician_photo');
         $avatar = $tech->photo;
         if ($file != null) {
-            $imagname = 'profile_'.$file->getClientOriginalName();
-            $file->move(public_path('avatar/'),$imagname);
-            $avatar = 'avatar/'.$imagname;
+            $imagname = 'profile_' . $file->getClientOriginalName();
+            $file->move(public_path('avatar/'), $imagname);
+            $avatar = 'avatar/' . $imagname;
         }
 
         $tech->update([
@@ -111,8 +111,8 @@ class TechController extends Controller
             'technician_phone' => request('technician_phone'),
             'technician_email' => request('technician_email'),
             'round_id' => request('round_id'),
-            'technician_password'=>base64_encode(request('technician_password')),
-            'photo'=>$avatar,
+            'technician_password' => base64_encode(request('technician_password')),
+            'photo' => $avatar,
         ]);
 
         flash('Technician Successfully Updated!')->success();
@@ -122,19 +122,19 @@ class TechController extends Controller
     public function jobs(Technician $tech)
     {
         $techJob = $tech->rounds->jobs;
-        return view('techs.techJob',compact('techJob','tech'));
+        return view('techs.techJob', compact('techJob', 'tech'));
     }
 
     public function callouts(Technician $tech)
     {
         $techcallouts = $tech->callouts;
-        return view('techs.techcallouts',compact('techcallouts','tech'));
+        return view('techs.techcallouts', compact('techcallouts', 'tech'));
     }
 
     public function maintenances(Technician $tech)
     {
         $techmaintenances = $tech->maintenances;
-        return view('techs.techmaintenanceTable',compact('techmaintenances','tech'));
+        return view('techs.techmaintenanceTable', compact('techmaintenances', 'tech'));
     }
 
     /**
@@ -143,8 +143,22 @@ class TechController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        try {
+            $technician = Technician::findorfail($id);
+            if (isset($technician)) {
+                $technician->update([
+
+                    'is_deleted' => 1,
+                    'status_id' => 2
+                ]);
+            }
+            flash('Technician deleted successfully')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error deleting technician')->error();
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
     }
 }
