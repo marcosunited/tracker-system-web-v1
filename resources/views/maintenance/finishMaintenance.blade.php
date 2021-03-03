@@ -226,7 +226,5 @@
         @csrf
         <input type="hidden" name="main_id" id="main_send_id" value="" />
     </form>
-
-
     <!-- END Page Content -->
     @endsection

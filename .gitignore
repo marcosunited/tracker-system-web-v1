@@ -6,6 +6,7 @@
 /storage/framework
 /storage/logs
 /vendor
+/.idea
 .env
 .phpunit.result.cache
 Homestead.json

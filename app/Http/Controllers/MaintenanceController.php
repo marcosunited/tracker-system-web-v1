@@ -50,11 +50,12 @@ class MaintenanceController extends Controller
     public function finished(Request $request)
     {
         if ($request->ajax()) {
-            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
+            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')
+                ->where('maintenancenew.completed_id', '2')
                 ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
                 ->orderby('maintenance_date', 'desc');
             try {
-                $t = DataTables::of($finishedmaintenances)
+                return DataTables::of($finishedmaintenances)
                     ->addColumn('job_number', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_number;
                     })
@@ -86,17 +87,10 @@ class MaintenanceController extends Controller
                         return $maintenance->report_status;
                     })
                     ->toJson();
-                return $t;
             } catch (Exception $e) {
+                echo($e);
             }
-        }/*else{
-            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
-                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
-                ->orderby('maintenance_date', 'desc')
-                ->get();
-
-            return view('maintenance.finishMaintenance', compact('finishedmaintenances'));
-        }*/
+        }
         return view('maintenance.finishMaintenance');
     }
 
@@ -812,12 +806,12 @@ class MaintenanceController extends Controller
             $myID = "N/A";
         }
         $message = "
-             
+
              <p>This notification is to advise completion of your Maintenance (Docket Number: $myID, Order Number: $order_number) to Unit('s)<br>&nbsp;<br>
              <b>$lift_names</b> at <b>$address</b>.
              <p>We trust our service was satisfactory, however we welcome your feedback to our office<br> via phone 9687 9099 or email info@unitedlifts.com.au.</p>
              <p>Thankyou for your continued patronage.</p>
-             <p>United Lift Services</p>               
+             <p>United Lift Services</p>
          ";
 
         $from = "call@unitedlifts.com.au";
