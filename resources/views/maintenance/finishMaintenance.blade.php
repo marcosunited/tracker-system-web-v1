@@ -69,6 +69,10 @@
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",
+            dom: 'Bfrtip',
+            buttons: [
+                'copy','csv','print'
+            ],
             columns: [
                 {"data": "maintenance_date"},
                 {"data": "job_number",
@@ -164,7 +168,7 @@
     <div class="block block-rounded block-bordered">
         <div class="block-content block-content-full">
             <!-- DataTables init on table by adding .js-dataTable-full class, functionality is initialized in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-            <table id="mytabla" class="data-table mdl-data-table dataTable table table-bordered table-striped table-vcenter js-dataTable-buttons">
+            <table id="mytabla" class="table table-bordered table-striped table-vcenter js-dataTable-buttons">
                 <thead>
                     <tr>
                         <th class="text-center" style="width:10%;">Date</th>
