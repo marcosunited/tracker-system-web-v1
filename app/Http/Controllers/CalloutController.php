@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CalloutMail;
 use PDF;
 use GoogleCloudPrint;
+
 class CalloutController extends Controller
 {
     /**
@@ -39,60 +40,60 @@ class CalloutController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
     public function index()
     {
-        
     }
 
     public function open()
     {
-        $openCallouts = Calloutn::where('callout_status_id','1')
-        ->orderby('callout_time','desc')
-        ->get();
+        $openCallouts = Calloutn::where('callout_status_id', '1')
+            ->orderby('callout_time', 'desc')
+            ->get();
 
-        return view('callouts.openCallouts',compact('openCallouts'));
+        return view('callouts.openCallouts', compact('openCallouts'));
     }
 
     public function closed()
     {
-        $closedCallouts = Calloutn::select('calloutsnew.*','callout_reports.status as report_status')->where('callout_status_id','2')
-        ->leftjoin('callout_reports','callout_reports.calloutn_id','=','calloutsnew.id')
-        ->orderby('calloutsnew.callout_time','desc')        
-        ->limit(1000)
-        ->get();
- 
-        return view('callouts.closedCallouts',compact('closedCallouts'));
+        $closedCallouts = Calloutn::select('calloutsnew.*', 'callout_reports.status as report_status')->where('callout_status_id', '2')
+            ->leftjoin('callout_reports', 'callout_reports.calloutn_id', '=', 'calloutsnew.id')
+            ->orderby('calloutsnew.callout_time', 'desc')
+            ->limit(1000)
+            ->get();
+
+        return view('callouts.closedCallouts', compact('closedCallouts'));
     }
-    
+
     public function followup()
     {
-        $followupCallouts = Calloutn::where('callout_status_id','4')
-        ->orderby('callout_time','desc')
-        ->get();
- 
-        return view('callouts.followupCallouts',compact('followupCallouts'));
+        $followupCallouts = Calloutn::where('callout_status_id', '4')
+            ->orderby('callout_time', 'desc')
+            ->get();
+
+        return view('callouts.followupCallouts', compact('followupCallouts'));
     }
 
     public function shutdown()
     {
-        $shutdownCallouts = Calloutn::where('callout_status_id','3')
-        ->orderby('callout_time','desc')
-        ->get();
- 
-        return view('callouts.shutdownCallouts',compact('shutdownCallouts'));
+        $shutdownCallouts = Calloutn::where('callout_status_id', '3')
+            ->orderby('callout_time', 'desc')
+            ->get();
+
+        return view('callouts.shutdownCallouts', compact('shutdownCallouts'));
     }
 
     public function underrepair()
     {
-        $underrepairCallouts = Calloutn::where('callout_status_id','5')
-        ->orderby('callout_time','desc')
-        ->get();
- 
-        return view('callouts.underrepairCallouts',compact('underrepairCallouts'));
+        $underrepairCallouts = Calloutn::where('callout_status_id', '5')
+            ->orderby('callout_time', 'desc')
+            ->get();
+
+        return view('callouts.underrepairCallouts', compact('underrepairCallouts'));
     }
 
 
@@ -101,8 +102,8 @@ class CalloutController extends Controller
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
-     */    
-    
+     */
+
 
     /**
      * Store a newly created resource in storage.
@@ -114,12 +115,23 @@ class CalloutController extends Controller
     public function selectedJob(Request $request)
     {
         $selectedJob = Job::find($request->message);
-        Session::put('selectedJob',$selectedJob);
-        //return back();
-        $lifts = LIft::select()->where('job_id',$selectedJob->id)->get();
-        echo json_encode($lifts);
+
+        Session::put('selectedJob', $selectedJob);
+        $response = [];
+
+        $response['lifts'] = LIft::select()->where('job_id', $selectedJob->id)->get();
+        $response['technician'] =  DB::table('technicians')
+            ->select(['technicians.id', 'technicians.technician_name'])
+            ->leftJoin('jobs', 'jobs.round_id', '=', 'technicians.round_id')
+            ->where('jobs.id', '=', $selectedJob->id)
+            ->where('technicians.status_id', '=', 1)
+            ->where('technicians.id', '>', 0)
+            ->orderBy('technicians.updated_at', 'DESC')
+            ->get()->first();
+
+        echo json_encode($response);
     }
-    
+
     public function create()
     {
         $faults = Fault::all();
@@ -127,14 +139,14 @@ class CalloutController extends Controller
         $lifts = "";
         $technicians = Technician::where('status_id', 1)->get();
         $selectedTech = array();
-        if(Session::has('selectedJob')){
-        $selectedJob = Session::get('selectedJob');
-        $lifts = Job::findorfail($selectedJob->id)->lifts;
-        $selectedTech = Job::findorfail($selectedJob->id)->rounds->techs;
+        if (Session::has('selectedJob')) {
+            $selectedJob = Session::get('selectedJob');
+            $lifts = Job::findorfail($selectedJob->id)->lifts;
+            $selectedTech = Job::findorfail($selectedJob->id)->rounds->techs;
         }
-        return view('callouts.createCallouts',compact('faults','jobs','technicians','lifts','selectedTech'));
+        return view('callouts.createCallouts', compact('faults', 'jobs', 'technicians', 'lifts', 'selectedTech'));
     }
-    
+
     public function store(Request $request)
     {
         $callout = Calloutn::create([
@@ -153,8 +165,8 @@ class CalloutController extends Controller
             'reported_customer' => request('reported_customer'),
 
         ]);
-        
-        $callout->lifts()->sync($request->lift_id,false);
+
+        $callout->lifts()->sync($request->lift_id, false);
 
         $callouttime = CalloutTime::create([
 
@@ -180,57 +192,68 @@ class CalloutController extends Controller
         $faults = Fault::all();
         $lifts = $selectedjob->lifts;
         $technicians = Technician::all();
-        
-        return view('callouts.showCallouts',compact('callout','jobs','lifts','faults',
-        'technicians','selectedjob'));
+
+        return view('callouts.showCallouts', compact('callout', 'jobs', 'lifts', 'faults', 'technicians', 'selectedjob'));
     }
 
     public function techdetails(Calloutn $callout)
     {
         $techfaults = TechFault::all();
         $corrections = Correction::all();
-        $callouttime = CalloutTime::select()->where('calloutn_id',$callout->id)->get()->first();
+        $callouttime = CalloutTime::select()->where('calloutn_id', $callout->id)->get()->first();
 
-        $accept_lat = $callouttime!=null&& ($callouttime->accept_location!=null||$callouttime->accept_location!='')?json_decode($callouttime->accept_location)->lat:'';
-        $accept_lng = $callouttime!=null&& ($callouttime->accept_location!=null||$callouttime->accept_location!='')?json_decode($callouttime->accept_location)->lng:'';
-        $decline_lat = $callouttime!=null&& ($callouttime->decline_location!=null||$callouttime->decline_location!='')?json_decode($callouttime->decline_location)->lat:'';
-        $decline_lng = $callouttime!=null&& ($callouttime->decline_location!=null||$callouttime->decline_location!='')?json_decode($callouttime->decline_location)->lng:'';
+        $accept_lat = $callouttime != null && ($callouttime->accept_location != null || $callouttime->accept_location != '') ? json_decode($callouttime->accept_location)->lat : '';
+        $accept_lng = $callouttime != null && ($callouttime->accept_location != null || $callouttime->accept_location != '') ? json_decode($callouttime->accept_location)->lng : '';
+        $decline_lat = $callouttime != null && ($callouttime->decline_location != null || $callouttime->decline_location != '') ? json_decode($callouttime->decline_location)->lat : '';
+        $decline_lng = $callouttime != null && ($callouttime->decline_location != null || $callouttime->decline_location != '') ? json_decode($callouttime->decline_location)->lng : '';
 
-        $start_lat = $callouttime!=null&& ($callouttime->start_location!=null||$callouttime->start_location!='')?json_decode($callouttime->start_location)->lat:'';
-        $start_lng = $callouttime!=null&& ($callouttime->start_location!=null||$callouttime->start_location!='')?json_decode($callouttime->start_location)->lng:'';
-        $finish_lat = $callouttime!=null&& ($callouttime->finish_location!=null||$callouttime->finish_location!='')?json_decode($callouttime->finish_location)->lat:'';
-        $finish_lng = $callouttime!=null&& ($callouttime->finish_location!=null||$callouttime->finish_location!='')?json_decode($callouttime->finish_location)->lng:'';
+        $start_lat = $callouttime != null && ($callouttime->start_location != null || $callouttime->start_location != '') ? json_decode($callouttime->start_location)->lat : '';
+        $start_lng = $callouttime != null && ($callouttime->start_location != null || $callouttime->start_location != '') ? json_decode($callouttime->start_location)->lng : '';
+        $finish_lat = $callouttime != null && ($callouttime->finish_location != null || $callouttime->finish_location != '') ? json_decode($callouttime->finish_location)->lat : '';
+        $finish_lng = $callouttime != null && ($callouttime->finish_location != null || $callouttime->finish_location != '') ? json_decode($callouttime->finish_location)->lng : '';
 
 
         //dd($callout);;;
-        return view('callouts.showCalloutsTechDetails',compact('callout','techfaults','corrections','callouttime',
-                                        'accept_lat','accept_lng','decline_lat','decline_lng','start_lat','start_lng','finish_lat','finish_lng'));
+        return view('callouts.showCalloutsTechDetails', compact(
+            'callout',
+            'techfaults',
+            'corrections',
+            'callouttime',
+            'accept_lat',
+            'accept_lng',
+            'decline_lat',
+            'decline_lng',
+            'start_lat',
+            'start_lng',
+            'finish_lat',
+            'finish_lng'
+        ));
     }
 
     public function techupdate(Request $request, Calloutn $callout)
-    {       
+    {
         $callout->update([
-            'time_of_arrival' => request('time_of_arrival')?date('Y-m-d H:i:s', strtotime(request('time_of_arrival'))):NULL,
-            'time_of_departure' =>   request('time_of_departure')?date('Y-m-d H:i:s', strtotime(request('time_of_departure'))):NULL,
-            'rectification_time' =>  request('rectification_time')? date('Y-m-d H:i:s', strtotime(request('rectification_time'))):NULL,
+            'time_of_arrival' => request('time_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('time_of_arrival'))) : NULL,
+            'time_of_departure' =>   request('time_of_departure') ? date('Y-m-d H:i:s', strtotime(request('time_of_departure'))) : NULL,
+            'rectification_time' =>  request('rectification_time') ? date('Y-m-d H:i:s', strtotime(request('rectification_time'))) : NULL,
             'technician_fault_id' => request('technician_fault_id'),
             'correction_id' => request('correction_id'),
             'tech_description' => request('tech_description'),
-            'attributable_id' => request('attributable_id'), 
-            'chargeable_id' => request('chargeable_id'),    
+            'attributable_id' => request('attributable_id'),
+            'chargeable_id' => request('chargeable_id'),
             'part_description' => request('part_description'),
             'part_required' => request('part_required'),
-            'part_replaced' => request("part_replaced"),  
+            'part_replaced' => request("part_replaced"),
 
         ]);
 
-        $callouttime = CalloutTime::select()->where('calloutn_id',$callout->id)->get()->first();
+        $callouttime = CalloutTime::select()->where('calloutn_id', $callout->id)->get()->first();
 
         $callouttime->update([
 
-            'accept_time' =>  request('time_of_callout_start')? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))):NULL,
-            'toa' =>  request('mtime_of_arrival')? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))):NULL,
-            'tod' =>  request('mtime_of_departure')? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))):NULL,
+            'accept_time' =>  request('time_of_callout_start') ? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))) : NULL,
+            'toa' =>  request('mtime_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))) : NULL,
+            'tod' =>  request('mtime_of_departure') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))) : NULL,
         ]);
 
         flash('Callout Tech Details Successfully Updated!')->success();
@@ -276,8 +299,8 @@ class CalloutController extends Controller
             'reported_customer' => request('reported_customer'),
 
         ]);
-        
-        $callout->lifts()->sync($request->lift_id,true);
+
+        $callout->lifts()->sync($request->lift_id, true);
 
         flash('Callout Successfully Updated!')->success();
         return back();
@@ -296,57 +319,56 @@ class CalloutController extends Controller
         $selectedAgent = $job->agents;
         $selectedContract = $job->contract;
         $selectedStatus = $job->status;
-        
-        return view('callouts.showCalloutJob',compact
-        ('callout','job','selectedRound','rounds','selectedFrequency','frequency','selectedAgent','agents','selectedContract','contract','status','selectedStatus'));
+
+        return view('callouts.showCalloutJob', compact('callout', 'job', 'selectedRound', 'rounds', 'selectedFrequency', 'frequency', 'selectedAgent', 'agents', 'selectedContract', 'contract', 'status', 'selectedStatus'));
     }
 
     public function round(Calloutn $callout)
     {
         $round = $callout->jobs->rounds;
-        return view('callouts.roundtable',compact('callout','round'));
+        return view('callouts.roundtable', compact('callout', 'round'));
     }
 
     public function file(Calloutn $callout)
     {
-        return view('callouts.fileupload',compact('callout'));
+        return view('callouts.fileupload', compact('callout'));
     }
 
-    public function uploadfile(Calloutn $callout,Request $request)
+    public function uploadfile(Calloutn $callout, Request $request)
     {
         $file = $request->file('file');
         // $validator = Validator::make($request->all(), [
         //     'file' => 'max:2060', //2MB 
         // ]);
 
-        if($file){
+        if ($file) {
             $fileName = $file->getClientOriginalName();
-            $file->move('callouts',$fileName);
+            $file->move('callouts', $fileName);
             $filePath = "/callouts/$fileName";
             $callout->files()->create([
                 'title' => $fileName,
                 'path' => $filePath
             ]);
         }
-         flash('File Successfully Uploaded!')->success();
-         return back();
+        flash('File Successfully Uploaded!')->success();
+        return back();
     }
 
-    public function deletefile(Calloutn $callout,File $file)
+    public function deletefile(Calloutn $callout, File $file)
     {
         $file->delete();
         unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->error();
+        flash('File Successfully Deleted!')->success();
         return back();
     }
 
     public function notes(Calloutn $callout)
     {
         $notes = $callout->notes;
-        return view('callouts.calloutNotes',compact('callout','notes'));
+        return view('callouts.calloutNotes', compact('callout', 'notes'));
     }
 
-    public function addnotes(Calloutn $callout,Request $request)
+    public function addnotes(Calloutn $callout, Request $request)
     {
         Note::create([
             'description' => request('description'),
@@ -358,34 +380,42 @@ class CalloutController extends Controller
         return back();
     }
 
-    public function deletenote(Calloutn $callout,Note $note)
+    public function deletenote(Calloutn $callout, Note $note)
     {
         $note->delete();
-        flash('Note Successfully Deleted!')->error();
+        flash('Note Successfully Deleted!')->success();
         return back();
     }
 
     public function print($id)
     {
-        $logo =  storage_path().'/logo.png';
-        $callout = Calloutn::select()->where('id',$id)->get()->first();      
-        $callouttime = CalloutTime::select()->where('calloutn_id',$callout->id)->get()->first();
-		$files = File::select()->where('calloutn_id',$id)->get();
-        return view('callouts.printCallout',compact('callout','logo','callouttime','files'));
+        $logo =  storage_path() . '/logo.png';
+        $callout = Calloutn::select()->where('id', $id)->get()->first();
+        $callouttime = CalloutTime::select()
+        ->where('calloutn_id', $callout->id)
+        ->where('technician_id', $callout->technician_id)
+        ->orderBy('updated_at', 'desc')
+        ->get()->first();
+        $files = File::select()->where('calloutn_id', $id)->get();
+        return view('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'));
     }
 
     public function pdf($id)
     {
-        $callout = Calloutn::select()->where('id',$id)->get()->first();
+        $callout = Calloutn::select()->where('id', $id)->get()->first();
         $job = $callout->jobs->job_name;
         $callout_time = $callout->callout_time;
         $job_address = $callout->jobs->job_address;
-        $callouttime = CalloutTime::select()->where('calloutn_id',$callout->id)->where('technician_id', $callout->technician_id)->get()->first();
-        $logo =  storage_path().'/logo.png';
-		$files = File::select()->where('calloutn_id',$id)->get();
-        $pdf = PDF::loadView('callouts.printCallout',compact('callout','logo','callouttime','files'))->setPaper('a4', 'portrait');;
+        $callouttime = CalloutTime::select()
+        ->where('calloutn_id', $callout->id)
+        ->where('technician_id', $callout->technician_id)
+        ->orderBy('updated_at', 'desc')
+        ->get()->first();
+        $logo =  storage_path() . '/logo.png';
+        $files = File::select()->where('calloutn_id', $id)->get();
+        $pdf = PDF::loadView('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'))->setPaper('a4', 'portrait');;
 
-        return $pdf->download($id."-".$job."-".$callout_time.".pdf");
+        return $pdf->download($id . "-" . $job . "-" . $callout_time . ".pdf");
     }
 
 
@@ -401,7 +431,7 @@ class CalloutController extends Controller
         $callout->lifts()->detach();
         $callout->files()->delete();
         $callout->delete();
-        flash('Callout Successfully Deleted!')->error();
+        flash('Callout Successfully Deleted!')->success();
         return back();
     }
 
@@ -414,61 +444,70 @@ class CalloutController extends Controller
 
     public function calloutSendEmail(Request $request)
     {
-        $path = storage_path().'/pdf/callout/';            
+        $path = storage_path() . '/pdf/callout/';
         $calloutid = $request['callout_id'];
-        $callout = Calloutn::select()->where('id',$calloutid)->get()->first();
-        $callouttime = CalloutTime::select()->where('calloutn_id',$calloutid)->get()->first();
-		$files = File::select()->where('calloutn_id',$calloutid)->get();
-        
-        $filename = str_replace(':',' ',(string)$callout->callout_time);
-        $logo =  storage_path().'/logo.png';
+        $callout = Calloutn::select()->where('id', $calloutid)->get()->first();
+        $callouttime = CalloutTime::select()->where('calloutn_id', $calloutid)->get()->first();
+        $files = File::select()->where('calloutn_id', $calloutid)->get();
+
+        $filename = str_replace(':', ' ', (string)$callout->callout_time);
+        $logo =  storage_path() . '/logo.png';
 
         //generate pdf file
-        $pdf = PDF::loadView('callouts.printCallout',compact('callout','logo','callouttime','files'));
-        $pdf->save($path.$filename.'.pdf');
+        $pdf = PDF::loadView('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'));
+        $pdf->save($path . $filename . '.pdf');
 
-        $technician = Technician::select()->where('id',$callout->technician_id)->get()->first();
-        $fault = Fault::select()->where('id',$callout->fault_id)->get()->first();
-        $tech_fault = TechFault::select()->where('id',$callout->technician_fault_id)->get()->first();
-        $correction = Correction::select()->where('id',$callout->correction_id)->get()->first();
+        $technician = Technician::select()->where('id', $callout->technician_id)->get()->first();
+        $fault = Fault::select()->where('id', $callout->fault_id)->get()->first();
+        $tech_fault = TechFault::select()->where('id', $callout->technician_fault_id)->get()->first();
+        $correction = Correction::select()->where('id', $callout->correction_id)->get()->first();
         //Send email to job creator with attachments
         //Generate Pdf file
-        $job = Job::select()->where('id',$callout->job_id)->get()->first();
-		
-        if ($job) {
-            $email = explode(';',$job->job_email);     
+        $job = Job::select()->where('id', $callout->job_id)->get()->first();
 
-            if (count($email) >0 ) {           
+        if ($job) {
+            $email = explode(';', $job->job_email);
+
+            if (count($email) > 0) {
                 $address = $job->job_address_number . " " . $job->job_address;
                 $subject = "United Lifts Call Report";
-                $description = str_replace("\r\n","<br>",$callout->callout_description);
+                $description = str_replace("\r\n", "<br>", $callout->callout_description);
                 $fault = $fault->fault_name;
-                $technician_fault = $tech_fault->technician_fault_name;
-                $correction_name = $correction->correction_name;
-                $tech_description = str_replace("\r\n","<br>",$callout->tech_description);
-                $toc = date("d-m-Y G:i:s",strtotime($callout->callout_time));
-                $toa = date("d-m-Y G:i:s",strtotime($callout->time_of_arrival));
-                $tod = date("d-m-Y G:i:s",strtotime($callout->time_of_departure));
+
+                $technician_fault = '';
+                if (isset($tech_fault)) {
+                    $technician_fault = $tech_fault->technician_fault_name;
+                }
+
+                $correction_name = '';
+                if (isset($correction)) {
+                    $correction_name = $correction->correction_name;
+                }
+
+                $tech_description = str_replace("\r\n", "<br>", $callout->tech_description);
+                $toc = date("d-m-Y G:i:s", strtotime($callout->callout_time));
+                $toa = date("d-m-Y G:i:s", strtotime($callout->time_of_arrival));
+                $tod = date("d-m-Y G:i:s", strtotime($callout->time_of_departure));
                 $order_number = $callout->order_number;
 
                 $lift_names = '';
-                $lifts = CalloutLift::select('lifts.lift_name as lift_name')->leftjoin('lifts', 'lifts.id','=','callout_lift.lift_id')
-                            ->where('callout_lift.calloutn_id',$callout->id)->get();
+                $lifts = CalloutLift::select('lifts.lift_name as lift_name')->leftjoin('lifts', 'lifts.id', '=', 'callout_lift.lift_id')
+                    ->where('callout_lift.calloutn_id', $callout->id)->get();
                 foreach ($lifts as $lift) {
-                    $lift_names.= $lift->lift_name . ', ';
+                    $lift_names .= $lift->lift_name . ', ';
                 }
-                $lift_names = substr($lift_names, 0, strlen($lift_names)-2);
+                $lift_names = substr($lift_names, 0, strlen($lift_names) - 2);
 
-				$user_email = $technician->technician_email;
-                if($order_number == ""){
+                $user_email = $technician->technician_email;
+                if ($order_number == "") {
                     $order_number = "N/A";
                 }
 
-                $link = url("/callouts/".$calloutid."/print");
-                
+                $link = url("/callouts/" . $calloutid . "/print");
+
                 $myID = $callout->docket_number;
-              
-                        
+
+
                 $message = "                  
                     <p>This notification is to advise completion of your call out (Docket Number: $myID, Order Number: $order_number) to Unit('s)<br>&nbsp;<br>
                     <b>$lift_names</b> at <b>$address</b> on <b>$toc</b>.</p>
@@ -485,18 +524,18 @@ class CalloutController extends Controller
 
                 $from = "call@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
-                Mail::to($email)->send( new CalloutMail($from, $domain, $subject, $message,$filename));
-                
+                Mail::to($email)->send(new CalloutMail($from, $domain, $subject, $message, $filename));
 
-                $report = Calloutreport::select()->where('calloutn_id',$callout->id)->get()->first();
+
+                $report = Calloutreport::select()->where('calloutn_id', $callout->id)->get()->first();
 
                 if ($report) {
                     $report->status = 'both';
                     $report->save();
                 } else {
                     Calloutreport::create([
-                        'calloutn_id'=>$callout->id,
-                        'status'=>'sent'
+                        'calloutn_id' => $callout->id,
+                        'status' => 'sent'
                     ]);
                 }
                 flash('Callout Successfully Emailed!')->success();
@@ -508,50 +547,49 @@ class CalloutController extends Controller
     public function calloutPrint(Request $request)
     {
 
-       // echo phpinfo();
-      //  exit;
-        $printerId = '3b22d027-a4c8-5a61-2172-2580ca942b02';
+        // echo phpinfo();
+        //  exit;
+        $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
         $calloutid = request('callout_id');
 
-        $report = Calloutreport::select()->where('calloutn_id',$calloutid)->get()->first();
+        $report = Calloutreport::select()->where('calloutn_id', $calloutid)->get()->first();
 
         if ($report) {
             if ($report->status == 'sent') {
-                $callout = Calloutn::select()->where('id',$calloutid)->get()->first();
-                $path = storage_path().'/pdf/callout/';          
-                $filename = str_replace(':',' ',(string)$callout->callout_time);
-        
+                $callout = Calloutn::select()->where('id', $calloutid)->get()->first();
+                $path = storage_path() . '/pdf/callout/';
+                $filename = str_replace(':', ' ', (string)$callout->callout_time);
+
 
                 GoogleCloudPrint::asPdf()
-                            ->file($path.$filename.'.pdf')
-                            ->printer($printerId)
-                            ->send();
+                    ->file($path . $filename . '.pdf')
+                    ->printer($printerId)
+                    ->send();
                 $report->status = 'both';
                 $report->save();
-
             }
         } else {
 
-            $callout = Calloutn::select()->where('id',$calloutid)->get()->first();
+            $callout = Calloutn::select()->where('id', $calloutid)->get()->first();
 
-            $path = storage_path().'/pdf/callout/';            
-            $filename = str_replace(':',' ',(string)$callout->callout_time);
-            $logo =  storage_path().'/logo.png';
-    
+            $path = storage_path() . '/pdf/callout/';
+            $filename = str_replace(':', ' ', (string)$callout->callout_time);
+            $logo =  storage_path() . '/logo.png';
+
             //generate pdf file
-            $pdf = PDF::loadView('callouts.printCallout',compact('callout','logo'));
-            $pdf->save($path.$filename.'.pdf');
+            $pdf = PDF::loadView('callouts.printCallout', compact('callout', 'logo'));
+            $pdf->save($path . $filename . '.pdf');
 
             GoogleCloudPrint::asPdf()
-                    ->file($path.$filename.'.pdf')
-                    ->printer($printerId)
-                    ->send();
+                ->file($path . $filename . '.pdf')
+                ->printer($printerId)
+                ->send();
 
             Calloutreport::create([
-                'calloutn_id'=>$callout->id,
-                'status'=>'print'
-            ]); 
-        }      
+                'calloutn_id' => $callout->id,
+                'status' => 'print'
+            ]);
+        }
         flash('Callout Successfully Printed!')->success();
         return redirect('/callouts/closedcallouts');
     }

@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Cookie\Middleware\EncryptCookies as Middleware;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Request;
 
 class EncryptCookies extends Middleware
 {
@@ -12,6 +15,6 @@ class EncryptCookies extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        'XDEBUG_SESSION'
     ];
 }

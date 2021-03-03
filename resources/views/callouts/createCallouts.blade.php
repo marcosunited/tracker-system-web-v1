@@ -18,6 +18,7 @@
 <script src="{{ asset('js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js') }}"></script>
 <script src="{{ asset('js/plugins/jquery.maskedinput/jquery.maskedinput.min.js') }}"></script>
 <script src="{{ asset('js/plugins/dropzone/dropzone.min.js') }}"></script>
+<script src="{{ asset('js/plugins/jquery-blockUI/jquery.blockUI.min.js') }}"></script>
 
 
 <!-- Page JS Plugins -->
@@ -26,66 +27,113 @@
 <script src="{{ asset('js/plugins/moment/locales.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datetimepicker/datetime.min.js') }}"></script>
 <script>
-    jQuery(function () {
+    jQuery(function() {
         $('#datetimepicker1').datetimepicker({
             format: 'YYYY-MM-DD HH:mm:ss',
             value: new Date()
         });
 
-        $( "#techcheck" ).click(function() {
+        $("#techcheck").click(function() {
             $("#contents").load('techDropdown.blade.php');
         });
-});  
+    });
 </script>
 <script>
-    $(document).ready(function() { $(".job_select").select2(); });
-    $(document).ready(function() { $(".tech_select").select2(); });  
-    $(document).ready(function() { $(".fault_select").select2(); });
- </script>
+    $(document).ready(function() {
+        $(".job_select").select2();
+    });
+    $(document).ready(function() {
+        $(".tech_select").select2();
+    });
+    $(document).ready(function() {
+        $(".fault_select").select2();
+    });
+</script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <script>
-    $(document).ready(function(){
-        $(".lift_select").select2({ multiple:true});
+    $(document).ready(function() {
+
+        $(".lift_select").select2({
+            multiple: true
+        });
+
+        $(document).ajaxStop($.unblockUI);
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $(".job_select").change(function(){
+
+        $(".job_select").change(function() {
+
+            $.blockUI({
+                message: $('.blockUI-layout')
+            });
+
             $.ajax({
                 /* the route pointing to the post function */
                 url: '/callouts/selectedJob',
                 type: 'POST',
                 /* send the csrf-token and the input to the controller */
-                data: {_token: CSRF_TOKEN, 
-                        message:$(".job_select").select2("val")},
-                dataType: 'JSON',
-                success:function(data){
-                    $("#lift_select").select2().empty()                  
-                    
-                    for (var i=0;i<=data.length;i++) {                        
-                        var html='<option value="'+data[i]['id']+'">'+data[i]['lift_name']+'</option>';           
-                        $("#lift_select").append(html);             
-                    }        
-                    $("#lift_select").select2({ multiple:true});                 
+                data: {
+                    _token: CSRF_TOKEN,
+                    message: $(".job_select").select2("val")
                 },
-                error:function() {
+                dataType: 'JSON',
+                success: function(data) {
+                    try {
+                        if (data) {
+                            if (data['lifts']) {
+                                var lifts = data['lifts'];
 
+                                $("#lift_select").select2().empty();
+
+                                for (var i = 0; i < lifts.length; i++) {
+                                    var html = '<option value="' + lifts[i]['id'] + '">' + lifts[i]['lift_name'] + '</option>';
+                                    $("#lift_select").append(html);
+                                }
+                                $("#lift_select").select2({
+                                    multiple: true
+                                });
+                            }
+
+                            if (data['technician']) {
+                                var technician = data['technician'];
+
+                                setTimeout(() => {
+                                    $("#technician").val(technician.id).trigger('change');
+                                }, 400);
+                            }
+                        }
+                    } catch (e) {
+                        $.unblockUI();
+                    }
+                },
+                error: function() {
+                    $.unblockUI();
                 }
-            }); 
-            
+            });
+
             //Session::put('selectedJob',$(".job_select").select2("val"));
             //$selectedJob = Session::get('selectedJob');
             //window.location.reload(true);
-            $( "#here" ).load(window.location.href + " #here" );
+            $("#here").load(window.location.href + " #here");
             //$( "#there" ).load(window.location.href + " #there" );           
         });
-   });    
+    });
 </script>
 
 <!-- Page JS Helpers (BS Notify Plugin) -->
 
-<script>jQuery(function(){ Dashmix.helpers('notify'); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers('notify');
+    });
+</script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
-<script>jQuery(function(){ Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
+    });
+</script>
 @endsection
 
 @section('content')
@@ -98,6 +146,10 @@
 </button> -->
     <!-- Bootstrap Datepicker (.js-datepicker and .input-daterange classes are initialized in Helpers.datepicker()) -->
     <!-- For more info and examples you can check out https://github.com/eternicode/bootstrap-datepicker -->
+    <div class="blockUI-layout">
+        <h4>Getting data...</h4>
+    </div>
+
     <div class="block block-rounded block-bordered">
         <div class="block-header block-header-default">
             <span class="badge badge-pill badge-success">Add:</span>&nbsp&nbsp<h3 class="block-title">New Callouts</h3>
@@ -112,7 +164,7 @@
                 </h2>
                 <div class="row push">
                     <div class="col-lg-4" style="padding-left: 50px;">
-                    <div class="form-group">
+                        <div class="form-group">
                             <label for="example-text-input">Job Name</label>
                             <select class="form-control job_select" name="job_id" required>
 
@@ -131,8 +183,7 @@
                         <div class="form-group">
                             <label for="example-text-input">Time of Call</label>
                             <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                                <input type="text" name="callout_time" class="form-control datetimepicker-input"
-                                    data-target="#datetimepicker1" />
+                                <input type="text" name="callout_time" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
                                 <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
@@ -147,10 +198,10 @@
                             <input class="form-control" rows="2" placeholder="" name="contact_details" required>
                         </div>
                         <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
-                    </div>
+                        </div>
                     </div>
                     <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
-                    <div class="form-group">
+                        <div class="form-group">
                             <label for="example-text-input">Current Status</label>
                             <select class="form-control" name="callout_status_id" required>
                                 <option value="">----------Select Status-----------</option>
@@ -164,13 +215,10 @@
                         <div class="form-group" id="here">
                             <label for="example-text-input">Technician</label>
                             <!-- <button style="float:right;" type="button" id="techcheck" class="btn btn-warning">Check Tech</button> -->
-                            <select class="form-control tech_select" name="technician_id" required>
+                            <select class="form-control tech_select" id="technician" name="technician_id" required>
                                 <option value="">--- Select Technician ---</option>
                                 @foreach ($technicians as $data)
-                                @if(Session::has('selectedJob'))
-                                <option value="{{ $data->id }}" @if($selectedTech->first()->id == $data->id) selected @endif>{{ $data->technician_name }}</option>
-                                @else <option value="{{ $data->id }}">{{ $data->technician_name }}</option>
-                                @endif
+                                <option value="{{ $data->id }}"> {{ $data->technician_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -213,8 +261,8 @@
                 </div>
 
                 <div class="input-group-append" style="float:right;">
-                        <button type="submit" class="btn-hero-primary">Add Callouts</button>
-                    </div>
+                    <button type="submit" class="btn-hero-primary">Add Callouts</button>
+                </div>
             </form>
         </div>
     </div>

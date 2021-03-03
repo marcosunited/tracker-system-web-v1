@@ -3,16 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Database\Query\Builder;
 use App\Job;
 use Session;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Agent;
-use App\Fault;
 use App\CalloutLift;
+use App\MaintenanceN;
 use PDF;
-use App\TechFault;
 use Exception;
 
 class ReportNewController extends Controller
@@ -124,7 +121,7 @@ class ReportNewController extends Controller
         try {
             $orientation = 'portrait';
 
-            $maintenance = DB::table('maintenancenew')
+            $maintenance = MaintenanceN::select()
                 ->where('maintenancenew.id', '=', $request->id)
                 ->join('jobs', 'maintenancenew.job_id', '=', 'jobs.id')
                 ->join('technicians', 'maintenancenew.technician_id', '=', 'technicians.id')
@@ -169,13 +166,16 @@ class ReportNewController extends Controller
             ->join('_faults', 'calloutsnew.fault_id', '=', '_faults.id')
             ->join('_technician_faults', 'calloutsnew.technician_fault_id', '=', '_technician_faults.id')
             ->join('technicians', 'calloutsnew.technician_id', '=', 'technicians.id')
+            ->join('callout_times', 'calloutsnew.id', '=', 'callout_times.calloutn_id')
             ->select(
                 'calloutsnew.*',
                 '_faults.fault_name as fault_name',
                 '_technician_faults.technician_fault_name as technician_fault_name',
                 'technicians.technician_name as technician_name',
                 'jobs.job_name as job_name',
-                'jobs.job_number as job_number'
+                'jobs.job_number as job_number',
+                'callout_times.toa',
+                'callout_times.tod',
             )
             ->get();
 

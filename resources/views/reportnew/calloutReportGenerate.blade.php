@@ -12,7 +12,6 @@
 <script type="text/javascript" charset="utf8" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.13/sorting/date-dd-MMM-yyyy.js"></script>
-</script>
 <div id="topbar">
     <a href="#" id="printPdf">Print As PDF</a>
 </div>
@@ -260,11 +259,11 @@
             ],
             paging: false,
             searching: false,
-            dom: 'Bfrtip',
             columnDefs: [{
                 type: 'date-dd-mmm-yyyy',
                 targets: 3
             }],
+            dom: 'Bfrtip',
             buttons: [{
                     extend: 'excel',
                     title: 'Callouts report: ' + $('#startDate').val() + '-' + $('#endDate').val()

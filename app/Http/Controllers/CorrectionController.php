@@ -51,7 +51,7 @@ class CorrectionController extends Controller
     {
         $correction = Correction::findorfail($request->correction_id);
         $correction->delete();
-        flash('Correction Successfully Deleted!')->error();
+        flash('Correction Successfully Deleted!')->success();
         return back();
     }
 
