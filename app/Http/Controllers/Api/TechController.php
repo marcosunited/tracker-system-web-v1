@@ -51,6 +51,7 @@ class TechController extends Controller
 
         $technician = Technician::select()
             ->where('technician_email', $email)
+            ->where('status_id', 1)
             ->where('technician_password', base64_encode($request['password']))->get()->first();
         if ($technician) {
             $locs = Gps::select()->where('user_id', $technician->id);
@@ -407,7 +408,7 @@ class TechController extends Controller
                 ->where('maintenancenew.completed_id', '=', 1)
                 ->where('job_id', $one_job->job_id)
                 ->groupBy('lift_id')->get();
-                
+
             foreach ($lifts as $lift) {
                 $tmp = [];
                 $list_base_job = MaintenanceN::select()->where('technician_id', $technician_id)
@@ -577,7 +578,12 @@ class TechController extends Controller
             $tp['mainId'] = $main->id;
             $yearmonth = $main->yearmonth;
             $month_key = (int)substr($yearmonth, 4, 2);
-            $tp['tasks'] = count(json_decode($main->task_ids)->{$this->getMonthKey($month_key)});
+            $arrayTasks = json_decode($main->task_ids);
+
+            if (!is_array($arrayTasks)) {
+                $tp['tasks'] = count($arrayTasks->{$this->getMonthKey($month_key)});
+            }
+
             $tp['start_flag'] = $main->maintenance_toa != '' ? true : false;
             $tp['finish_flag'] = $main->maintenance_tod != '' ? true : false;
             $tp['date'] = $main->maintenance_date;
@@ -702,8 +708,24 @@ class TechController extends Controller
         $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
         $yearmonth = $maintenance->yearmonth;
         $month_key = (int)substr($yearmonth, 4, 2);
-        $task_ids = json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)};
-        $tasks = $this->getTasksById($task_ids, $maintenance->lift_id);
+
+        $arrayTasks = json_decode($maintenance->task_ids);
+        $tasks = [];
+
+        if (!is_array($arrayTasks)) {
+            $task_ids = $arrayTasks->{$this->getMonthKey($month_key)};
+            $tasks = $this->getTasksById($task_ids,  $maintenance->lift_id);
+        }
+
+        $sopa_tasks = DB::table('tasks_sopa')
+            ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
+            ->leftJoin('tasks_sopa_maintenance', 'tasks_sopa_maintenance.taskId', '=', 'tasks_sopa.id')
+            ->leftJoin('maintenancenew', 'tasks_sopa_maintenance.maintenanceId', '=', 'maintenancenew.id')
+            ->where('tasks_sopa.type', '=', $lift->lift_type)
+            ->where('maintenancenew.id', '=', $maintenance->id)
+            ->orderBy('tasks_sopa.name', 'asc')
+            ->get();
+
         $files = File::select()->where('maintenance_n_id', $request['maintenance_id'])->where('status', 'verified')->get();
 
         echo json_encode([
@@ -712,6 +734,7 @@ class TechController extends Controller
             'job' => $job,
             'lift' => $lift,
             'tasks' => $tasks,
+            'SOPATasks' => $sopa_tasks,
             'files' => $files
         ]);
     }
@@ -738,7 +761,13 @@ class TechController extends Controller
         $liftid = $maintenance->lift_id;
         $yearmonth = $maintenance->yearmonth;
         $month_key = (int)substr($yearmonth, 4, 2);
-        $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
+
+        $arrayTasks = json_decode($maintenance->task_ids);
+        $completed_tasks = 0;
+
+        if (!is_array($arrayTasks)) {
+            $completed_tasks = count($arrayTasks->{$this->getMonthKey($month_key)});
+        }
 
         $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
 
@@ -831,7 +860,7 @@ class TechController extends Controller
             /*Start integraction FFA*/
 
             if ($exist) {
-                $this->customReportSendEmail($mainID);
+                //$this->customReportSendEmail($mainID);
             }
 
             /*End integration*/
@@ -1195,7 +1224,7 @@ class TechController extends Controller
     }
     public function calloutSendPrint(Request $request)
     {
-        $printerId = '3b22d027-a4c8-5a61-2172-2580ca942b02';
+        $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
         $calloutid = request('id');
 
 
@@ -1257,63 +1286,91 @@ class TechController extends Controller
 
             /*Get information*/
             $maintenance = MaintenanceN::select()
+                ->join('jobs', 'jobs.id', '=', 'job_id')
                 ->where('maintenancenew.id', '=', $maintenance_id)
                 ->get()
                 ->first();
 
             $month_key = (int)substr($maintenance->yearmonth, 4, 2);
-            $task_ids = json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)};
-            $tasks = $this->getTasksById($task_ids, $maintenance->lift_id);
+
+            $arrayTasks = json_decode($maintenance->task_ids);
+            $tasks = [];
+
+            if (!is_array($arrayTasks) > 0) {
+                $task_ids = $arrayTasks->{$this->getMonthKey($month_key)};
+                $tasks = $this->getTasksById($task_ids, $maintenance->lift_id);
+            }
+
             $month_label = $this->getMonthLabel($month_key);
             $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
 
-            $checklist = DB::table('checklist_maintenance')
-                ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
-                ->where('maintenancenew.id', '=', $maintenance_id)
-                ->leftJoin('maintenancenew', 'maintenancenew.id', '=', 'checklist_maintenance.maintenance_id')
-                ->join('checklist_activities', 'checklist_activities.id', '=', 'checklist_maintenance.activity_id')
-                ->orderBy('checklist_activities.id', 'asc')
-                ->get();
-
-            $settings_email = DB::table('settings')
-                ->select(['value'])
-                ->where(function ($query) {
-                    $query->where('key', '=', 'email_ffa_customer')
-                        ->orWhere('key', '=', 'email_ffa_office');
-                })
+            $sopa_tasks = DB::table('tasks_sopa')
+                ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
+                ->join('tasks_sopa_maintenance', 'tasks_sopa_maintenance.taskId', '=', 'tasks_sopa.id')
+                ->leftJoin('maintenancenew', 'tasks_sopa_maintenance.maintenanceId', '=', 'maintenancenew.id')
+                ->where('tasks_sopa.type', '=', $lift->lift_type)
+                ->where('maintenancenew.id', '=', $maintenance->id)
+                ->orderBy('tasks_sopa.name', 'asc')
                 ->get();
 
             $recipients = array();
-
-            foreach ($settings_email as $setting) {
-                array_push($recipients, $setting->value);
-            }
-
-            /*Save PDF's files*/
-            $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
-            $complianceReport = PDF::loadView('reportnew.custom-reports.complianceGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
-            $complianceReport->save($complianceFile);
-
-            $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
-            $scheduleReport = PDF::loadView('reportnew.custom-reports.maintenanceRecordLogGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
-            $scheduleReport->save($scheduleFile);
-
-            $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
-            $checklistReport = PDF::loadView('reportnew.custom-reports.checklistGenerate', compact('maintenance', 'checklist'))->setPaper('a4', 'landscape');
-            $checklistReport->save($checklistFile);
+            $files = array();
 
             $docketFile = $path . 'Docket maintenance - ' . $maintenance_id . '.pdf';
-            $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'))->setPaper('a4', 'portrait');;
-            $docketReport->save($docketFile);
+            $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
+            $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
+            $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
 
+            if ($maintenance->job_group == 'Facilities First') {
+                $checklist = DB::table('checklist_maintenance')
+                    ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
+                    ->where('maintenancenew.id', '=', $maintenance_id)
+                    ->leftJoin('maintenancenew', 'maintenancenew.id', '=', 'checklist_maintenance.maintenance_id')
+                    ->join('checklist_activities', 'checklist_activities.id', '=', 'checklist_maintenance.activity_id')
+                    ->orderBy('checklist_activities.id', 'asc')
+                    ->get();
+
+
+                $settings_email = DB::table('settings')
+                    ->select(['value'])
+                    ->where(function ($query) {
+                        $query->where('key', '=', 'email_ffa_customer')
+                            ->orWhere('key', '=', 'email_ffa_office');
+                    })
+                    ->get();
+
+
+                foreach ($settings_email as $setting) {
+                    array_push($recipients, $setting->value);
+                }
+
+                /*Save PDF's files*/
+                $complianceReport = PDF::loadView('reportnew.custom-reports.complianceGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
+                $complianceReport->save($complianceFile);
+                array_push($files, $complianceFile);
+
+                $scheduleReport = PDF::loadView('reportnew.custom-reports.maintenanceRecordLogGenerate', compact('maintenance'))->setPaper('a4', 'portrait');
+                $scheduleReport->save($scheduleFile);
+                array_push($files, $scheduleFile);
+
+                $checklistReport = PDF::loadView('reportnew.custom-reports.checklistGenerate', compact('maintenance', 'checklist'))->setPaper('a4', 'landscape');
+                $checklistReport->save($checklistFile);
+                array_push($files, $checklistFile);
+
+                $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
+                $docketReport->save($docketFile);
+                array_push($files, $docketFile);
+            } else {
+                array_push($recipients, $maintenance->job_email);
+            }
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
                 $from = "call@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
                 $subject = "ULS Service - Maintenance finished";
-                $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Please, find attached the forms for further details. <br/><br/> Thanks! <br/><br/> United Lift Services";
-                Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, [$complianceFile, $scheduleFile, $checklistFile, $docketFile]));
+                $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
+                Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
 
             /*Delete files*/
@@ -1349,12 +1406,27 @@ class TechController extends Controller
             $main = MaintenanceN::select()->where('id', $mainid)->get()->first();
             $filename = str_replace(':', ' ', (string)$main->maintenance_date);
             $month_key = (int)substr($main->yearmonth, 4, 2);
-            $task_ids = json_decode($main->task_ids)->{$this->getMonthKey($month_key)};
-            $tasks = $this->getTasksById($task_ids, $main->lift_id);
+
+            $arrayTasks = json_decode($main->task_ids);
+            $tasks = [];
+
+            if (!is_array($arrayTasks)) {
+                $task_ids = $arrayTasks->{$this->getMonthKey($month_key)};
+                $tasks = $this->getTasksById($task_ids, $main->lift_id);
+            }
+
             $month_label = $this->getMonthLabel($month_key);
             $lift = Lift::select()->where('id', $main->lift_id)->get()->first();
             $maintenance = $main;
-            $pdf = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift'));
+            $sopa_tasks = DB::table('tasks_sopa')
+                ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
+                ->join('tasks_sopa_maintenance', 'tasks_sopa_maintenance.taskId', '=', 'tasks_sopa.id')
+                ->leftJoin('maintenancenew', 'tasks_sopa_maintenance.maintenanceId', '=', 'maintenancenew.id')
+                ->where('tasks_sopa.type', '=', $lift->lift_type)
+                ->where('maintenancenew.id', '=', $maintenance->id)
+                ->orderBy('tasks_sopa.name', 'asc')
+                ->get();
+            $pdf = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'));
             $pdf->save($path . $filename . '.pdf');
 
             $job = Job::select()->where('id', $main->job_id)->get()->first();
@@ -1407,7 +1479,7 @@ class TechController extends Controller
 
     public function maintenanceSendPrint(Request $request)
     {
-        $printerId = '3b22d027-a4c8-5a61-2172-2580ca942b02';
+        $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
         $mainid = $request['id'];
 
         $report = Maintenancereport::select()->where('main_id', $mainid)->get()->first();
@@ -1553,6 +1625,43 @@ class TechController extends Controller
             echo json_encode(
                 ['status' => 'success', 'msg' => 'Get Maintenance detail', 'result' => $activity]
             );
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
+    }
+
+    public function getSOPATasks(Request $request)
+    {
+        try {
+            $liftType = $request['type'];
+
+            $sopa_tasks = DB::table('tasks_sopa')
+                ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'tasks_sopa.type as task_type'])
+                ->leftJoin('tasks_sopa_maintenance', 'tasks_sopa_maintenance.taskId', '=', 'tasks_sopa.id')
+                ->where('tasks_sopa.type', '=', $liftType)
+                ->orderBy('tasks_sopa.name', 'asc')
+                ->get();
+
+            echo json_encode(['status' => 'success', 'result' => $sopa_tasks]);
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
+    }
+
+    public function saveSOPATasks(Request $request)
+    {
+        try {
+
+            $module =  new MaintenanceController();
+
+            if (isset($module)) {
+                $request['isFromMobile'] = true;
+                $result = $module->sopaTasks($request);
+            }
+
+            if (isset($result)) {
+                echo json_encode(['status' => 'success', 'result' => 'true']);
+            }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
         }

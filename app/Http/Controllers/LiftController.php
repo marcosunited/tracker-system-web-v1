@@ -113,7 +113,7 @@ class LiftController extends Controller
     public function destroy(Job $job,Lift $lift)
     {
         $lift->delete();
-        flash('Lift Successfully Deleted!')->error();
+        flash('Lift Successfully Deleted!')->success();
         return back();
     }
 }

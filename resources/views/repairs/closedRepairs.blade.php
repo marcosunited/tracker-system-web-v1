@@ -132,7 +132,7 @@
                         </div>
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
-                        <h1>Are you Sure?</h1>
+                        <h5>Are you Sure?</h5>
 
                         <form method="POST" action="/repairs/{{isset($repair)?$repair->id:''}}">
                             @method('DELETE')
