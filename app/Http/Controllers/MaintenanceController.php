@@ -47,10 +47,11 @@ class MaintenanceController extends Controller
     public function finished(Request $request)
     {
         if($request->ajax()){
-            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
+            $finishedmaintenances = MaintenanceN::with('jobs', 'techs', 'lifts')->select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
                 ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
                 ->orderby('maintenance_date', 'desc');
             try {
+                //MaintenanceN::with('jobs', 'techs', 'lifts')::
                 $t = DataTables::of($finishedmaintenances)
                     ->addColumn('job_number', function(MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_number;
@@ -86,14 +87,7 @@ class MaintenanceController extends Controller
                 return $t;
             } catch (Exception $e) {
             }
-        }/*else{
-            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')->where('maintenancenew.completed_id', '2')
-                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
-                ->orderby('maintenance_date', 'desc')
-                ->get();
-
-            return view('maintenance.finishMaintenance', compact('finishedmaintenances'));
-        }*/
+        }
         return view('maintenance.finishMaintenance');
     }
 

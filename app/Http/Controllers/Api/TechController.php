@@ -370,8 +370,8 @@ class TechController extends Controller
     }
 
     /**
-     *  Maintenance Functions 
-     * 
+     *  Maintenance Functions
+     *
      * */
     public function getMaintenanceList(Request $request)
     {
@@ -481,6 +481,7 @@ class TechController extends Controller
             ->limit(20)
             ->get();
 
+
         $loop = [];
         foreach ($related_jobs as $one_job) {
             $tp_loop = [];
@@ -492,7 +493,9 @@ class TechController extends Controller
 
         $retval = [];
         foreach ($related_jobs as $one_job) {
-            $lifts = MaintenanceN::select('lift_id')->where('technician_id', $technician_id)->where('job_id', $one_job->job_id)->groupBy('lift_id')->get();
+            $lifts = MaintenanceN::select('lift_id')->where('technician_id', $technician_id)
+                ->where('job_id', $one_job->job_id)->groupBy('lift_id')->get();
+
             foreach ($lifts as $lift) {
                 $tmp = [];
                 $list_base_job = MaintenanceN::select()->where('technician_id', $technician_id)
@@ -1186,7 +1189,7 @@ class TechController extends Controller
                     $myID = $callout->docket_number;
 
 
-                    $message = "                  
+                    $message = "
                         <p>This notification is to advise completion of your call out (Docket Number: $myID, Order Number: $order_number) to Unit('s)<br>&nbsp;<br>
                         <b>$lift_names</b> at <b>$address</b> on <b>$toc</b>.</p>
                         <p>The fault as reported to us was '<b>$fault</b>' - '<b>$description</b>'. Our technician attended at <b>$toa</b>.</p>
@@ -1195,7 +1198,7 @@ class TechController extends Controller
                         <p>We trust our service was satisfactory, however we welcome your feedback to our office<br> via phone 9687 9099 or email info@unitedlifts.com.au.</p>
                         <p>Thankyou for your continued patronage.</p>
                         <p>$link</p>
-                        <p>United Lift Services</p>               
+                        <p>United Lift Services</p>
                     ";
 
 
@@ -1449,14 +1452,14 @@ class TechController extends Controller
                 $myID = "N/A";
             }
             $message = "
-                
+
                 <p>This notification is to advise completion of your Maintenance (Docket Number: $myID, Order Number: $order_number) to Unit('s)<br>&nbsp;<br>
                 <b>$lift_names</b> at <b>$address</b> on <b>$toc</b>.</p>
-                
+
                 Our technician departed at <b>$tod</b>.</p> .
                 <p>We trust our service was satisfactory, however we welcome your feedback to our office<br> via phone 9687 9099 or email info@unitedlifts.com.au.</p>
                 <p>Thankyou for your continued patronage.</p>
-                <p>United Lift Services</p>               
+                <p>United Lift Services</p>
             ";
 
             $from = "call@unitedlifts.com.au";
@@ -1545,7 +1548,7 @@ class TechController extends Controller
             $target_path = $destination_path . $imageName;
             move_uploaded_file($image, $target_path);
 
-            //updated Database 
+            //updated Database
             $file = File::create([
                 'calloutn_id' => $folder == 'callouts' ? $id : null,
                 'maintenance_n_id' => $folder != 'callouts' ? $id : null,

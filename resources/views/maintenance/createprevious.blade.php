@@ -50,22 +50,22 @@
                 url: '/callouts/selectedJob',
                 type: 'POST',
                 /* send the csrf-token and the input to the controller */
-                data: {_token: CSRF_TOKEN, 
+                data: {_token: CSRF_TOKEN,
                         message:$(".job_select").select2("val")},
                 dataType: 'JSON',
-            }); 
-            
+            });
+
             //Session::put('selectedJob',$(".job_select").select2("val"));
             //$selectedJob = Session::get('selectedJob');
             //window.location.reload(true);
             $( "#here" ).load(window.location.href + " #here" );
-            $( "#there" ).load(window.location.href + " #there" );           
+            $( "#there" ).load(window.location.href + " #there" );
         });
 
         $('#checkall1').change(function(){
             $('.checkitem1').prop("checked", $(this).prop("checked"))
         });
-   });    
+   });
 </script>
 
 <script>
@@ -77,17 +77,17 @@
                 url: '/maintenances/selecttasks',
                 type: 'POST',
                 /* send the csrf-token and the input to the controller */
-                data: {_token: CSRF_TOKEN, 
+                data: {_token: CSRF_TOKEN,
                         message:$(".lift_select").select2("val")},
                 dataType: 'JSON',
-            }); 
-            
+            });
+
             //Session::put('selectedJob',$(".job_select").select2("val"));
             //$selectedJob = Session::get('selectedJob');
             //window.location.reload(true);
-            $( "#where" ).load(window.location.href + " #where" ); 
+            $( "#where" ).load(window.location.href + " #where" );
         });
-   });    
+   });
 </script>
 
 
@@ -115,7 +115,7 @@
             <span class="badge badge-pill badge-success">Add:</span>&nbsp&nbsp<h3 class="block-title">New Maintenance</h3>
         </div>
         <div class="block-content">
-            <form action="/maintenances/add" method="POST">
+            <form action="/Fmaintenances/add" method="POST">
                 @csrf
                 <h2 class="content-heading pt-0">Maintenance Details
                     <div class="input-group-append" style="float:right;">

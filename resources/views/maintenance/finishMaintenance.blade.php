@@ -54,9 +54,11 @@ $(document).ready(function() {
             ajax: "{{ route('get_finished_maintenances') }}",
             columns: [
                 {"data": "maintenance_date"},
-                {"data": "job_number"},
+                {"data": "job_number",
+                 "name": "jobs.job_number"},
                 {
                      "data": "job_name",
+                     "name": "jobs.job_name",
                      "render": function(data, type, row){
                          if(type === 'display'){
                              data = '<a href="/jobs/' + row.job_id + '">' + data + '</a>';
@@ -65,9 +67,12 @@ $(document).ready(function() {
                      }
                 },
                 {"data": "id"},
-                {"data": "job_address"},
-                {"data": "job_group"},
+                {"data": "job_address",
+                 "name": "jobs.job_address"},
+                {"data": "job_group",
+                 "name": "jobs.job_group"},
                 {"data": "lift_name",
+                 "name": "lifts.lift_name",
                  "render": function(data, type, row){
                      if(type === 'display'){
                          data = '<a href="/jobs/' + row.job_id + '/lifts/' + row.lift_id + '">' + data + '</a>';
@@ -75,6 +80,7 @@ $(document).ready(function() {
                      return data;
                  }},
                 {"data": "technician_name",
+                 "name": "techs.technician_name",
                  "render": function(data, type, row){
                      if(type === 'display'){
                          data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
