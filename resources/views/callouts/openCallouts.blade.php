@@ -81,7 +81,7 @@
                     <tr  style="background-color:{{$bgcolor}}">
                         <td class="text-center">
 
-                        {{date('d-m-Y H:i:s',strtotime($callout->callout_time))}}
+                        {{date('d-m-yy H:i:s',strtotime($callout->callout_time))}}
                         </td>
                         <td class="font-w600">
                         <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>
@@ -180,7 +180,7 @@
                         </div>
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
-                        <h5>Are you Sure?</h5>
+                        <h1>Are you Sure?</h1>
 
                         <form method="POST" action="/callouts/0">
                             @method('DELETE')

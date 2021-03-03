@@ -60,7 +60,7 @@
             </div>
             <div class="pos" id="_421:276" style="top:205;left:260">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
-                    Report Date: <span style="font-weight:normal"> {{\Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y')}} </span></span>
+                    Report Date: <span style="font-weight:normal"> {{$maintenance->maintenance_date}} </span></span>
             </div>
             <div class="pos" id="_383:299" style="top:220;left:220">
                 <span id="_15.7" style="font-weight:bold; font-size:15.7px; color:#e17900">
@@ -69,7 +69,7 @@
             <div class="pos" id="_96:324" style="top:235;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Building:</span>
-                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> </span>
+                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> {{$maintenance->job_number}} </span>
             </div>
             <div class="pos" id="_241:324" style="top:324;left:301">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#000000">
@@ -130,7 +130,7 @@
             <div class="pos" id="_96:386" style="top:280;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Make:</span>
-                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 24px;"></span>
+                <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 24px;"> {{$maintenance->lift_installed_date}}</span>
             </div>
             <div class="pos" id="_167:386" style="top:386;left:167">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
@@ -314,7 +314,7 @@
             </div>
             <div class="pos" id="_341:1008" style="top:718;left:210">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#000000">
-                    Date: <span style="font-weight:normal"> {{\Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y')}}</span></span>
+                    Date: <span style="font-weight:normal"> {{$maintenance->maintenance_date}}</span></span>
             </div>
 
 

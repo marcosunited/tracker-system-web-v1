@@ -14,41 +14,50 @@
 <script src="{{asset('js/plugins/datatables/buttons/buttons.html5.min.js')}}"></script>
 <script src="{{asset('js/plugins/datatables/buttons/buttons.flash.min.js')}}"></script>
 <script src="{{asset('js/plugins/datatables/buttons/buttons.colVis.min.js')}}"></script>
+<script src="{{ asset('js/plugins/jquery-blockUI/jquery.blockUI.min.js') }}"></script>
 
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
 <script>
- $(document).ready(function() {  $('#delete-modal').on('show.bs.modal', function (event) {
-     const button = $(event.relatedTarget);
-     const callout_id = button.data('mainid');
-     const modal = $(this);
-     modal.find('.modal-content #maintenance_id').val(callout_id);
-})
-});
-$(document).ready(function() {
-    $(document).on('click','.act_send',function(event) {
-        const main_id = $(this).data('mainid');
-        $('#main_send_id').val(main_id);
-        $('#send_form').trigger('submit');
+    $(document).ready(function() {
+        $('#delete-modal').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const callout_id = button.data('mainid');
+            const modal = $(this);
+            modal.find('.modal-content #maintenance_id').val(callout_id);
+        })
     });
-    $(document).on('click','.act_print',function(event) {
-        const main_id = $(this).data('mainid');
-        $('#main_print_id').val(main_id);
-        $('#print_form').trigger('submit');
-    });
+    $(document).ready(function() {
+        $(document).on('click', '.act_send', function(event) {
+            const main_id = $(this).data('mainid');
+            $('#main_send_id').val(main_id);
+            $('#send_form').trigger('submit');
+        });
+        $(document).on('click', '.act_print', function(event) {
+            const main_id = $(this).data('mainid');
+            $('#main_print_id').val(main_id);
+            $('#print_form').trigger('submit');
+        });
 
-});
+    });
 </script>
 
 <script type="text/javascript">
-
     $(document).ready(function() {
+
+        $(document).ajaxStop($.unblockUI);
+
         let table = $('#mytabla').DataTable({
             retrieve: true,
         });
         table.destroy();
 
-        table = $('#mytabla').DataTable({
+        table = $('#mytabla').on('preXhr.dt',
+            function(e, settings, data) {
+                $.blockUI({
+                    message: $('.blockUI-layout')
+                });
+            }).DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",
@@ -92,38 +101,42 @@ $(document).ready(function() {
                         if(type === 'display'){
                             if(data == 'none'){
                                 data = '<a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
-                                data = data  + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
-                            }else if(data == 'sent'){
+                                data = data + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
+                            } else if (data == 'sent') {
                                 data = 'Sent Email<br> <a data-mainid=' + row.id + ' class="act_print btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
-                            }else if(data == 'print'){
+                            } else if (data == 'print') {
                                 data = 'Print Reported<br> <a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
-                            }else if(data == 'both'){
+                            } else if (data == 'both') {
                                 data = 'Done';
-                            }else{
+                            } else {
                                 data = '<a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
-                                data = data  + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
+                                data = data + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
                             }
                             data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
                         }
                         return data;
-                    }},
-                {"data": "id",
-                    "render": function(data, type, row){
-                        if(type === 'display'){
+                    }
+                },
+                {
+                    "data": "id",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
                             data = '<a href="/maintenances/' + data + '"> <div class="btn-group"> <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Edit"> <i class="fa fa-pencil-alt"></i> </button> </div> </a>';
                         }
                         return data;
-                    }},
-                {"data": "id",
-                    "render": function(data, type, row){
-                        if(type === 'display'){
+                    }
+                },
+                {
+                    "data": "id",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
                             data = '<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-mainid=' + data + '> <i class="fa fa-times"></i></button>';
                         }
                         return data;
-                    }},
+                    }
+                },
             ],
         });
-        console.log(table)
     });
 </script>
 @endsection
@@ -133,13 +146,7 @@ $(document).ready(function() {
 <div class="bg-body-light">
 
     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
-        <h1 class="flex-sm-fill font-size-h2" style="padding-left: 50px;">All Finished Maintenance Table</h1>
-        <a class="block text-center bg-gd-lake" href="javascript:void(0)">
-            <div class="block-content block-content-full aspect-ratio-1-1 d-flex justify-content-center align-items-center">
-
-            </div>
-        </a>
-
+        <h1 class="flex-sm-fill font-size-h2" style="padding-left: 50px;margin:revert">All Finished Maintenance Table</h1>
     </div>
 </div>
 <!-- END Hero -->
@@ -199,15 +206,19 @@ $(document).ready(function() {
         </div>
     </div>
 
+    <div class="blockUI-layout">
+        <h4>Getting data...</h4>
+    </div>
+
     <form method="POST" action="/maintenances/maintenanceprint" id="print_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_print_id" value=""/>
+        <input type="hidden" name="main_id" id="main_print_id" value="" />
     </form>
     <form method="POST" action="{{url('/maintenances/maintenancesendemail')}}" id="send_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_send_id" value=""/>
+        <input type="hidden" name="main_id" id="main_send_id" value="" />
     </form>
 
 
-<!-- END Page Content -->
-@endsection
+    <!-- END Page Content -->
+    @endsection

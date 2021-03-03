@@ -18,27 +18,26 @@
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
 <script>
-    $(document).ready(function() {
-        $('#delete-modal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget)
-            var callout_id = button.data('mainid')
-            var modal = $(this)
-            modal.find('.modal-content #maintenance_id').val(callout_id);
-        })
+ $(document).ready(function() {  $('#delete-modal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) 
+      var callout_id = button.data('mainid') 
+      var modal = $(this)
+      modal.find('.modal-content #maintenance_id').val(callout_id);
+}) 
+});
+$(document).ready(function() {  
+    $(document).on('click','.act_send',function(event) {
+        var main_id = $(this).data('mainid') 
+        $('#main_send_id').val(main_id);
+        $('#send_form').trigger('submit');
     });
-    $(document).ready(function() {
-        $(document).on('click', '.act_send', function(event) {
-            var main_id = $(this).data('mainid')
-            $('#main_send_id').val(main_id);
-            $('#send_form').trigger('submit');
-        });
-        $(document).on('click', '.act_print', function(event) {
-            var main_id = $(this).data('mainid')
-            $('#main_print_id').val(main_id);
-            $('#print_form').trigger('submit');
-        });
+    $(document).on('click','.act_print',function(event) {
+        var main_id = $(this).data('mainid') 
+        $('#main_print_id').val(main_id);
+        $('#print_form').trigger('submit');
+    });
 
-    });
+});
 </script>
 @endsection
 
@@ -77,7 +76,7 @@
                         <th style="width: 15%;">Group</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
-                        <th style="width: 15%;">Report </th>
+                        <th style="width: 15%;">Report </th>     
                         <th style="width: 15%;">View</th>
                         <th style="width: 15%;">Delete</th>
                     </tr>
@@ -86,13 +85,13 @@
                     @foreach($pendingmaintenances as $maintenance)
                     <tr>
                         <td class="text-center">
-                            {{date('d-m-Y',strtotime($maintenance->maintenance_date))}}
+                        {{date('d-m-yy',strtotime($maintenance->maintenance_date))}}
                         </td>
                         <td class="d-none d-sm-table-cell">
                             {{$maintenance->jobs->job_number}}
                         </td>
                         <td class="font-w600">
-                            <a href="/jobs/{{$maintenance->jobs->id}}">{{$maintenance->jobs->job_name}}</a>
+                        <a href="/jobs/{{$maintenance->jobs->id}}">{{$maintenance->jobs->job_name}}</a>
                         </td>
                         <td class="d-none d-sm-table-cell">
                             {{$maintenance->id}}
@@ -108,27 +107,27 @@
                             <a href="/jobs/{{$maintenance->jobs->id}}/lifts/{{$maintenance->lifts->id}}">{{$maintenance->lifts->lift_name}}</a>
                         </td>
                         <td>
-                            @if($maintenance->techs)
+                        @if($maintenance->techs)
                             <a href="/techs/{{$maintenance->techs->id}}">{{$maintenance->techs->technician_name}}</a>
-                            @endif
+                        @endif
                         </td>
                         <td>
-                            @if ($maintenance->report_status == 'none')
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send &nbsp; Email</a>
+                            @if ($maintenance->report_status == 'none') 
+                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
                             <a data-mainid="{{$maintenance->id}}" class="act_print btn btn-warning btn-sm text-white">Print Report</a>
                             @elseif ($maintenance->report_status == 'sent')
                             Sent Email<br>
-                            <a data-mainid="{{$maintenance->id}}" class="act_print btn btn-warning btn-sm text-white">Print Report</a>
+                            <a data-mainid="{{$maintenance->id}}"  class="act_print btn btn-warning btn-sm text-white">Print Report</a>
                             @elseif ($maintenance->report_status == 'print')
                             Print Reported<br>
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send &nbsp; Email</a>
+                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
                             @elseif ($maintenance->report_status == 'both')
-                            Done
+                            Done                            
                             @else
-                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send &nbsp; Email</a>
+                            <a data-mainid="{{$maintenance->id}}" class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>
                             <a data-mainid="{{$maintenance->id}}" class="act_print btn btn-warning btn-sm text-white">Print Report</a>
-                            @endif
-                        </td>
+                            @endif                            
+                        </td>                         
                         <td>
                             <a href="/maintenances/{{$maintenance->id}}">
                                 <div class="btn-group">
@@ -139,7 +138,7 @@
                             </a>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-mainid={{$maintenance->id}}>
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-mainid={{$maintenance->id}}>
                                 <i class="fa fa-times"></i></button>
                         </td>
                     </tr>
@@ -151,39 +150,39 @@
     <!-- END Dynamic Table Full -->
 
     <div class="modal" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="delete-modal" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="block block-themed block-transparent mb-0">
-                    <div class="block-header bg-primary-dark">
-                        <h3 class="block-title">Delete Confirmation</h3>
-                        <div class="block-options">
-                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-fw fa-times"></i>
-                            </button>
-                        </div>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Delete Confirmation</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-fw fa-times"></i>
+                        </button>
                     </div>
-                    <div class="block-content block-content-full text-right bg-light">
-                        <h5>Are you Sure?</h5>
+                </div>
+                <div class="block-content block-content-full text-right bg-light">
+                    <h1>Are you Sure?</h1>
 
-                        <form method="POST" action="/maintenances/0">
-                            @method('DELETE')
-                            @csrf
-                            <input type="hidden" name="maintenance_id" id="maintenance_id" value="">
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
+                    <form method="POST" action="/maintenances/{{isset($maintenance)?$maintenance->id:''}}">
+                        @method('DELETE')
+                        @csrf
+                        <input type="hidden" name="maintenance_id" id="maintenance_id" value="">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
 
-                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <form method="POST" action="/maintenances/maintenanceprint" id="print_form">
+    </div>    
+</div>
+<form method="POST" action="/maintenances/maintenanceprint" id="print_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_print_id" value="" />
+        <input type="hidden" name="main_id" id="main_print_id" value=""/>    
     </form>
     <form method="POST" action="{{url('/maintenances/maintenancesendemail')}}" id="send_form">
         @csrf
-        <input type="hidden" name="main_id" id="main_send_id" value="" />
-    </form>
-    <!-- END Page Content -->
-    @endsection
+        <input type="hidden" name="main_id" id="main_send_id" value=""/>    
+</form>   
+<!-- END Page Content -->
+@endsection

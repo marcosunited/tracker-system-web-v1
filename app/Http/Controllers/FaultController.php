@@ -51,7 +51,7 @@ class FaultController extends Controller
     {
         $fault = Fault::findorfail($request->fault_id);
         $fault->delete();
-        flash('Fault Successfully Deleted!')->success();
+        flash('Fault Successfully Deleted!')->error();
         return back();
     }
 }

@@ -108,13 +108,7 @@
                             <select class="form-control" name="agent_id" id="agent_id">
                                 <option value="">--- Select Agent ---</option>
                                 @foreach ($agents as $data)
-                                <option value="{{ $data->id }}" 
-                                    @if(isset($selectedAgent)){ 
-                                        @if($selectedAgent->id == $data->id) {
-                                            selected
-                                        }@endif
-                                    }
-                                    @endif>{{
+                                <option value="{{ $data->id }}" @if($selectedAgent->id == $data->id) selected @endif>{{
                                     $data->agent_name }}</option>
                                 @endforeach
                             </select>
