@@ -58,6 +58,14 @@
                     message: $('.blockUI-layout')
                 });
             }).DataTable({
+            initComplete: function(settings, json) {
+                $('#mytabla_filter input').unbind();
+                $('#mytabla_filter input').bind('keyup', function(e) {
+                    if(e.keyCode == 13) {
+                        table.search( this.value ).draw();
+                    }
+                });
+            },
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",

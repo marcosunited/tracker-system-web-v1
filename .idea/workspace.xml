@@ -67,13 +67,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de8f14fc-6968-4ec1-bbc6-20500c3a9e4c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/tracker-system-web-v1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/tracker-system-web-v1.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/TechController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/TechController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/MaintenanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/MaintenanceController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/maintenance/createprevious.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/maintenance/createprevious.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/maintenance/finishMaintenance.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/maintenance/finishMaintenance.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -298,7 +292,7 @@
       <workItem from="1614562882213" duration="17031000" />
       <workItem from="1614638283337" duration="24197000" />
       <workItem from="1614666707357" duration="4192000" />
-      <workItem from="1614727117426" duration="5884000" />
+      <workItem from="1614727117426" duration="8541000" />
     </task>
     <servers />
   </component>
