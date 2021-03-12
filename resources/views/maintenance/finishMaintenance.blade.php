@@ -66,6 +66,7 @@
                     }
                 });
             },
+            order: [[0, "desc"]],
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",

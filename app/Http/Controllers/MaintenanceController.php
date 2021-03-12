@@ -50,10 +50,9 @@ class MaintenanceController extends Controller
     public function finished(Request $request)
     {
         if ($request->ajax()) {
-            $finishedmaintenances = MaintenanceN::select('maintenancenew.*', 'maintenance_reports.status as report_status')
+            $finishedmaintenances = MaintenanceN::with('jobs', 'techs', 'lifts')->select('maintenancenew.*', 'maintenance_reports.status as report_status')
                 ->where('maintenancenew.completed_id', '2')
-                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id')
-                ->orderby('maintenance_date', 'desc');
+                ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id');
             try {
                 return DataTables::of($finishedmaintenances)
                     ->addColumn('job_number', function (MaintenanceN $maintenance) {

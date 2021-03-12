@@ -37,7 +37,6 @@
             $('#main_print_id').val(main_id);
             $('#print_form').trigger('submit');
         });
-
     });
 </script>
 @endsection
