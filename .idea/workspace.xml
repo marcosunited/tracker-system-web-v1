@@ -69,8 +69,6 @@
     <list default="true" id="de8f14fc-6968-4ec1-bbc6-20500c3a9e4c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/MaintenanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/MaintenanceController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/maintenance/finishMaintenance.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/maintenance/finishMaintenance.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/maintenance/pendingMaintenance.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/maintenance/pendingMaintenance.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -304,7 +302,8 @@
       <workItem from="1615429731909" duration="1429000" />
       <workItem from="1615436248957" duration="8270000" />
       <workItem from="1615520593669" duration="1216000" />
-      <workItem from="1615522966459" duration="1909000" />
+      <workItem from="1615522966459" duration="2622000" />
+      <workItem from="1615765749630" duration="6588000" />
     </task>
     <servers />
   </component>
@@ -322,5 +321,16 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Http/JsonResponse.php</url>
+          <line>53</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

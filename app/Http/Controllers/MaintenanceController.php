@@ -84,7 +84,7 @@ class MaintenanceController extends Controller
                     })
                     ->addColumn('report_status', function (MaintenanceN $maintenance) {
                         return $maintenance->report_status;
-                    })
+                    })->blacklist(['report_status'])
                     ->toJson();
             } catch (Exception $e) {
                 echo($e);
