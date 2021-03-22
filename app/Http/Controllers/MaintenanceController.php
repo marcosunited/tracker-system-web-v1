@@ -409,36 +409,8 @@ class MaintenanceController extends Controller
                 //SaveChecklistActivities for FFA
                 $this->saveChecklistActivities($maintenance->id, $maintenance->technician_id);
 
-                //Update invoice name 
-                if ($maintenance->invoice_number <= 0) {
-
-                    DB::beginTransaction();
-
-                    try {
-
-                        $settings = DB::table('settings')
-                            ->select(['value'])
-                            ->where('key', '=', 'ffa_invoice_number')
-                            ->get()
-                            ->first();
-
-                        if ($settings) {
-                            $new_invoice_id = ($settings->value + 1);
-                            $maintenance->update([
-                                'invoice_number' => $new_invoice_id,
-                            ]);
-
-                            $new_setting = DB::table('settings')
-                                ->where('key', '=', 'ffa_invoice_number')
-                                ->update([
-                                    'value' => $new_invoice_id
-                                ]);
-                        }
-                        DB::commit();
-                    } catch (Exception $e) {
-                        DB::rollback();
-                    }
-                }
+                //Invoice number
+                $this->setInvoiceNumber($maintenance);
 
                 try {
                     //Send reports FFA
@@ -452,6 +424,40 @@ class MaintenanceController extends Controller
 
         flash('Maintenance Successfully Updated!')->success();
         return back();
+    }
+
+    public function setInvoiceNumber($maintenance)
+    {
+        //Update invoice name 
+        if ($maintenance->invoice_number <= 0) {
+
+            DB::beginTransaction();
+
+            try {
+
+                $settings = DB::table('settings')
+                    ->select(['value'])
+                    ->where('key', '=', 'ffa_invoice_number')
+                    ->get()
+                    ->first();
+
+                if ($settings) {
+                    $new_invoice_id = ($settings->value + 1);
+                    $maintenance->update([
+                        'invoice_number' => $new_invoice_id,
+                    ]);
+
+                    $new_setting = DB::table('settings')
+                        ->where('key', '=', 'ffa_invoice_number')
+                        ->update([
+                            'value' => $new_invoice_id
+                        ]);
+                }
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollback();
+            }
+        }
     }
 
     private function saveChecklistActivities($maintenance_id, $user_id)

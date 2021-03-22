@@ -856,13 +856,10 @@ class TechController extends Controller
                 'status' => 'verified'
             ]);
 
-            /*Start integraction FFA*/
-
+            /*Integraction FFA*/
             if ($exist) {
                 $this->customReportSendEmail($mainID);
             }
-
-            /*End integration*/
         }
 
         echo json_encode(
@@ -1332,6 +1329,10 @@ class TechController extends Controller
             $invoiceFile = $path . 'Invoice - Docket No ' . $maintenance_id . '.pdf';
 
             if ($maintenance->job_group == 'Facilities First') {
+
+                //Set invoice number
+                $module =  new MaintenanceController();
+                $module->setInvoiceNumber($maintenance);
 
                 $checklist = DB::table('checklist_maintenance')
                     ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
