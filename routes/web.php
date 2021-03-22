@@ -205,7 +205,7 @@ Route::post('/reports/new/period/generate', 'ReportNewController@periodgenerate'
 Route::post('/reports/selectedJob', 'ReportNewController@selectedJob')->middleware('auth');
 
 //Custom reports
-Route::get('/reports/new/custom-report', 'ReportNewController@customReportCompliance')->middleware('auth');
+Route::get('/reports/new/custom-report', 'ReportNewController@customReport')->middleware('auth');
 
 Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');;
 Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');;

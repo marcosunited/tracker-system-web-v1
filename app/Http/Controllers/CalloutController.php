@@ -249,15 +249,19 @@ class CalloutController extends Controller
 
         $callouttime = CalloutTime::select()->where('calloutn_id', $callout->id)->get()->first();
 
-        $callouttime->update([
+        if (isset($callouttime)) {
+            $callouttime->update([
 
-            'accept_time' =>  request('time_of_callout_start') ? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))) : NULL,
-            'toa' =>  request('mtime_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))) : NULL,
-            'tod' =>  request('mtime_of_departure') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))) : NULL,
-        ]);
-
-        flash('Callout Tech Details Successfully Updated!')->success();
-        return back();
+                'accept_time' =>  request('time_of_callout_start') ? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))) : NULL,
+                'toa' =>  request('mtime_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))) : NULL,
+                'tod' =>  request('mtime_of_departure') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))) : NULL,
+            ]);
+            flash('Callout Tech Details Successfully Updated!')->success();
+            return back();
+        } else {
+            flash('Error updating callout')->error();
+            return back();
+        }
     }
 
 
@@ -392,10 +396,10 @@ class CalloutController extends Controller
         $logo =  storage_path() . '/logo.png';
         $callout = Calloutn::select()->where('id', $id)->get()->first();
         $callouttime = CalloutTime::select()
-        ->where('calloutn_id', $callout->id)
-        ->where('technician_id', $callout->technician_id)
-        ->orderBy('updated_at', 'desc')
-        ->get()->first();
+            ->where('calloutn_id', $callout->id)
+            ->where('technician_id', $callout->technician_id)
+            ->orderBy('updated_at', 'desc')
+            ->get()->first();
         $files = File::select()->where('calloutn_id', $id)->get();
         return view('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'));
     }
@@ -407,10 +411,10 @@ class CalloutController extends Controller
         $callout_time = $callout->callout_time;
         $job_address = $callout->jobs->job_address;
         $callouttime = CalloutTime::select()
-        ->where('calloutn_id', $callout->id)
-        ->where('technician_id', $callout->technician_id)
-        ->orderBy('updated_at', 'desc')
-        ->get()->first();
+            ->where('calloutn_id', $callout->id)
+            ->where('technician_id', $callout->technician_id)
+            ->orderBy('updated_at', 'desc')
+            ->get()->first();
         $logo =  storage_path() . '/logo.png';
         $files = File::select()->where('calloutn_id', $id)->get();
         $pdf = PDF::loadView('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'))->setPaper('a4', 'portrait');;

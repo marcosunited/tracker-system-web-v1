@@ -26,7 +26,6 @@ use App\Gps;
 use App\Calloutreport;
 use App\ChecklistActivities;
 use App\ChecklistMaintenance;
-use App\ChecklistMaintenances;
 use App\Maintenancereport;
 
 use PDF;
@@ -860,7 +859,7 @@ class TechController extends Controller
             /*Start integraction FFA*/
 
             if ($exist) {
-                //$this->customReportSendEmail($mainID);
+                $this->customReportSendEmail($mainID);
             }
 
             /*End integration*/
@@ -1281,11 +1280,20 @@ class TechController extends Controller
     public function customReportSendEmail($maintenance_id)
     {
         $path = storage_path() . '/pdf/maintenance/';
+        $public_path = getcwd();
 
         try {
 
             /*Get information*/
-            $maintenance = MaintenanceN::select()
+            $maintenance = MaintenanceN::select([
+                'maintenancenew.id as id', 'maintenance_date', 'technician_id', 'job_id', 'lift_id',
+                'maintenance_note', 'completed_id', 'maintenance_toa', 'maintenance_tod', 'order_no',
+                'docket_no', 'invoice_number', 'user_id', 'notify_email', 'yearmonth', 'customer_name',
+                'maintenancenew.created_at', 'maintenancenew.updated_at', 'task_ids', 'start_pos', 'finish_pos',
+                'toa', 'tod', 'part_description', 'part_required', 'part_replaced', 'job_number', 'job_name',
+                'job_address', 'job_address_number', 'job_suburb', 'job_contact_details', 'job_email',
+                'job_owner_details', 'job_group'
+            ])
                 ->join('jobs', 'jobs.id', '=', 'job_id')
                 ->where('maintenancenew.id', '=', $maintenance_id)
                 ->get()
@@ -1303,6 +1311,7 @@ class TechController extends Controller
 
             $month_label = $this->getMonthLabel($month_key);
             $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
+            $maintenanceFiles = File::select()->where('maintenance_n_id', $maintenance->id)->get();
 
             $sopa_tasks = DB::table('tasks_sopa')
                 ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
@@ -1320,8 +1329,10 @@ class TechController extends Controller
             $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
             $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
             $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
+            $invoiceFile = $path . 'Invoice - Docket No ' . $maintenance_id . '.pdf';
 
             if ($maintenance->job_group == 'Facilities First') {
+
                 $checklist = DB::table('checklist_maintenance')
                     ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
                     ->where('maintenancenew.id', '=', $maintenance_id)
@@ -1330,18 +1341,31 @@ class TechController extends Controller
                     ->orderBy('checklist_activities.id', 'asc')
                     ->get();
 
-
                 $settings_email = DB::table('settings')
                     ->select(['value'])
                     ->where(function ($query) {
                         $query->where('key', '=', 'email_ffa_customer')
-                            ->orWhere('key', '=', 'email_ffa_office');
+                            ->orWhere('key', '=', 'email_ffa_office')
+                            ->orWhere('key', '=', 'email_accounts_uls');
                     })
                     ->get();
 
-
+                //Recipients emails
                 foreach ($settings_email as $setting) {
-                    array_push($recipients, $setting->value);
+                    $emails = explode(',', $setting->value);
+
+                    if (count($emails) > 1) {
+                        foreach ($emails as $email) {
+                            array_push($recipients, $email);
+                        }
+                    } else {
+                        array_push($recipients, $setting->value);
+                    }
+                }
+
+                //Attachments
+                foreach ($maintenanceFiles as $file) {
+                    array_push($files, $public_path . $file->path);
                 }
 
                 /*Save PDF's files*/
@@ -1360,15 +1384,19 @@ class TechController extends Controller
                 $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
                 $docketReport->save($docketFile);
                 array_push($files, $docketFile);
+
+                $checklistReport = PDF::loadView('reportnew.custom-reports.invoice', compact('maintenance'))->setPaper('a4', 'portrait');
+                $checklistReport->save($invoiceFile);
+                array_push($files, $invoiceFile);
             } else {
                 array_push($recipients, $maintenance->job_email);
             }
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
-                $from = "call@unitedlifts.com.au";
+                $from = "accounts@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
-                $subject = "ULS Service - Maintenance finished";
+                $subject = "ULS Invoice # FFA" . $maintenance->invoice_number() . ' - Purchase order ' . $maintenance->order_no;
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
                 Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
@@ -1385,6 +1413,9 @@ class TechController extends Controller
             }
             if (File::exists($docketFile)) {
                 \Illuminate\Support\Facades\File::delete($docketFile);
+            }
+            if (File::exists($invoiceFile)) {
+                \Illuminate\Support\Facades\File::delete($invoiceFile);
             }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);

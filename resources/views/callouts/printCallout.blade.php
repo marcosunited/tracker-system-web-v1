@@ -113,7 +113,7 @@ footer {
 <body>
     <header class="clearfix">
         <div id="logo">
-            <img src="http://sydney.unitedlifts.com.au/image/logo.png">
+            <img src="http://cloud.unitedlifts.com.au:8070/image/logo.png">
         </div>
         <div id="company">
             <h2 class="name">United Lift Services</h2>
@@ -131,7 +131,7 @@ footer {
             <div id="client">
                 <div class="to">Customer Details:</div>
                 <h2 class="name">
-                    {{$callout->jobs->job_name}}
+                    {{$callout->jobs->job_number . ' ' . $callout->jobs->job_name}}
                 </h2>
                 <div class="address">
                     {{$callout->jobs->job_address_number}}
@@ -153,16 +153,16 @@ footer {
                 </div>
                 <div class="date">Time of Arrival:
                 @if($callouttime === NULL || $callouttime->toa === NULL)
-                {{date('H:i:s',strtotime($callout->time_of_arrival))}}
+                {{date('d-m-yy H:i:s',strtotime($callout->time_of_arrival))}}
                 @else
-                {{date('H:i:s',strtotime($callouttime->toa))}}
+                {{date('d-m-yy H:i:s',strtotime($callouttime->toa))}}
                 @endif
                 </div>
                 <div class="date">Time of Departure:
                 @if($callouttime === NULL || $callouttime->tod === NULL)
-                {{date('H:i:s',strtotime($callout->time_of_departure))}}
+                {{date('d-m-yy H:i:s',strtotime($callout->time_of_departure))}}
                 @else
-                {{date('H:i:s',strtotime($callouttime->tod))}}
+                {{date('d-m-yy H:i:s',strtotime($callouttime->tod))}}
                 @endif
                 </div>
             </div>

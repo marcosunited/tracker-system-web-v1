@@ -98,7 +98,7 @@
   <a href="/maintenances/{{$maintenance->id}}/pdf">Print As PDF</a>
   <header class="clearfix">
     <div id="logo">
-      <img src="http://sydney.unitedlifts.com.au/image/logo.png">
+      <img src="http://cloud.unitedlifts.com.au:8070/image/logo.png">
     </div>
     <div id="company">
       <h2 class="name">United Lift Services</h2>

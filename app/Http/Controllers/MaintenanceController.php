@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\MaintenanceN;
-use App\MaintenanceNWeek;
-use App\Maintenance;
 use App\SopaTasks;
+use App\Http\Controllers\Api\TechController;
 use App\Maintenancereport;
 use App\Job;
 use App\Technician;
@@ -23,7 +22,8 @@ use App\Note;
 use App\MaintenanceComplete;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Session;
+use App\ChecklistActivities;
+use App\ChecklistMaintenance;
 use PDF;
 use GoogleCloudPrint;
 use DateTime;
@@ -31,8 +31,7 @@ use Exception;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MaintenanceMail;
-use phpDocumentor\Reflection\Types\Boolean;
-use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class MaintenanceController extends Controller
@@ -54,7 +53,7 @@ class MaintenanceController extends Controller
                 ->where('maintenancenew.completed_id', '2')
                 ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id');
             try {
-                return DataTables::of($finishedmaintenances)
+                return DataTables::eloquent($finishedmaintenances)
                     ->addColumn('job_number', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_number;
                     })
@@ -87,7 +86,7 @@ class MaintenanceController extends Controller
                     })->blacklist(['report_status'])
                     ->toJson();
             } catch (Exception $e) {
-                echo($e);
+                echo ($e);
             }
         }
         return view('maintenance.finishMaintenance');
@@ -172,7 +171,7 @@ class MaintenanceController extends Controller
                 'lift_id' => $maintenance['lift_id'],
                 'maintenance_date' => $maintenance['maintenance_date'],
                 'task_ids' => json_encode($finalTask),
-                'yearmonth' => ($maintenanceDate->format("Y") . $maintenanceDate->format("m"))
+                'yearmonth' => ($maintenanceDate->format("Y") . $maintenance['active_month'])
             ]);
 
             flash('Maintenance Successfully Created!')->success();
@@ -289,8 +288,8 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, MaintenanceN $maintenance)
     {
-
         $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
         if (isset($request['task_month1'])) {
             foreach ($request['task_month1'] as $one_task) {
                 $task['jan'][] = $one_task;
@@ -361,8 +360,9 @@ class MaintenanceController extends Controller
             'maintenance_tod' => date('Y-m-d H:i:s'),
         ]);
 
+        //Complete maintenance
         if (request('completed_id') == 2) {
-            //completion table update
+
             $yearmonth = $maintenance->yearmonth;
             $month_key = (int)substr($yearmonth, 4, 2);
             $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
@@ -374,6 +374,7 @@ class MaintenanceController extends Controller
 
             $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
             $status = $tasks_monthly == $completed_tasks ? 'complete' : 'working';
+
             $exist = MaintenanceComplete::select()
                 ->where('technician_id', $maintenance->technician_id)
                 ->where('job_id', $maintenance->job_id)
@@ -381,6 +382,7 @@ class MaintenanceController extends Controller
                 ->where('yearmonth', $maintenance->yearmonth)
                 ->get()
                 ->first();
+
             if ($exist) {
                 $exist->completed_tasks += $completed_tasks;
                 $exist->status = $status;
@@ -396,10 +398,96 @@ class MaintenanceController extends Controller
                     'status' => $status
                 ]);
             }
+
+            $job = Job::select()
+                ->where('id', $maintenance->job_id)
+                ->get()
+                ->first();
+
+            if ($job && $job->job_group == 'Facilities First') {
+
+                //SaveChecklistActivities for FFA
+                $this->saveChecklistActivities($maintenance->id, $maintenance->technician_id);
+
+                //Update invoice name 
+                if ($maintenance->invoice_number <= 0) {
+
+                    DB::beginTransaction();
+
+                    try {
+
+                        $settings = DB::table('settings')
+                            ->select(['value'])
+                            ->where('key', '=', 'ffa_invoice_number')
+                            ->get()
+                            ->first();
+
+                        if ($settings) {
+                            $new_invoice_id = ($settings->value + 1);
+                            $maintenance->update([
+                                'invoice_number' => $new_invoice_id,
+                            ]);
+
+                            $new_setting = DB::table('settings')
+                                ->where('key', '=', 'ffa_invoice_number')
+                                ->update([
+                                    'value' => $new_invoice_id
+                                ]);
+                        }
+                        DB::commit();
+                    } catch (Exception $e) {
+                        DB::rollback();
+                    }
+                }
+
+                try {
+                    //Send reports FFA
+                    $api_module =  new TechController();
+                    $api_module->customReportSendEmail($maintenance->id);
+                } catch (Exception $e) {
+                    echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+                }
+            }
         }
 
         flash('Maintenance Successfully Updated!')->success();
         return back();
+    }
+
+    private function saveChecklistActivities($maintenance_id, $user_id)
+    {
+        try {
+
+            $hasActivities = ChecklistMaintenance::select('id')
+                ->where('maintenance_id', '=', $maintenance_id)
+                ->get();
+
+            if (isset($hasActivities) && count($hasActivities) == 0) {
+
+                $activities = ChecklistActivities::select(
+                    'checklist_activities.id as id'
+                )
+                    ->join('checklist_categories', 'checklist_categories.id', '=', 'checklist_activities.category_id')
+                    ->leftjoin('checklist_maintenance', function ($leftJoin) use ($maintenance_id) {
+                        $leftJoin->on('checklist_activities.id', '=', 'checklist_maintenance.activity_id')
+                            ->where('checklist_maintenance.maintenance_id', '=', $maintenance_id);
+                    })
+                    ->get();
+
+                foreach ($activities as $item) {
+                    $activity = ChecklistMaintenance::create(
+                        [
+                            'activity_id' => $item->id,
+                            'maintenance_id' => $maintenance_id,
+                            'user_id' => $user_id,
+                            'value' =>  1,
+                        ]
+                    );
+                }
+            }
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
     }
 
     public function getMonthTaskIDs($taskids, $key)
@@ -550,19 +638,6 @@ class MaintenanceController extends Controller
             'docket_no' => request('docket_no'),
         ]);
 
-        // $active_week = request('active_week');
-        // $year_month_week = $maintenance->year_month . $active_week;
-
-        // MaintenanceNweek::create([
-
-        //     'toa_date' => request('toa_date'),
-        //     'tod_date' => request('tod_date'),
-        //     'year_month_week' => $year_month_week,
-        //     'maintenance_id' => $maintenance->id,
-        //     'task_ids' => implode("|",$request->task)
-
-        // ]);
-
         flash('Maintenance Tech Details Successfully Updated!')->success();
         return back();
     }
@@ -598,9 +673,6 @@ class MaintenanceController extends Controller
     public function uploadfile(maintenancen $maintenance, Request $request)
     {
         $file = $request->file('file');
-        // $validator = Validator::make($request->all(), [
-        //     'file' => 'max:2060', //2MB
-        // ]);
 
         if ($file) {
             $fileName = $file->getClientOriginalName();
@@ -611,8 +683,6 @@ class MaintenanceController extends Controller
                 'path' => $filePath
             ]);
         }
-        // flash('File Successfully Uploaded!')->success();
-        // return back();
     }
 
     public function deletefile(maintenancen $maintenance, File $file)
@@ -693,12 +763,6 @@ class MaintenanceController extends Controller
         return $pdf->download($id . "-" . $job . "-" . $maintenancedate . ".pdf");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request)
     {
         try {
@@ -748,7 +812,6 @@ class MaintenanceController extends Controller
 
         return back();
     }
-
 
     public function maintenanceSendEmail(Request $request)
     {

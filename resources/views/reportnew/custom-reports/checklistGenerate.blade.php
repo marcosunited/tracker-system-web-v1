@@ -67,13 +67,13 @@
 
 <body>
     <div id="page1-div" style="position:relative;width:980px;height:650px;">
-        <img width="980" height="640" src="http://sydney.unitedlifts.com.au/image/custom-reports/checklist-001.png" alt="background image" />
+        <img width="980" height="640" src="http://cloud.unitedlifts.com.au:8070/image/custom-reports/checklist-001.png" alt="background image" />
         <p style="position:absolute;top:100px;left:50px;white-space:nowrap" class="ft14"><b>Inspection and Test Plan Checklist</b></p>
-        <p style="position:absolute;top:100px;left:600px;white-space:nowrap" class="ft14"><b>2.2.11a – Passenger Lifts</b></p>
+        <p style="position:absolute;top:100px;left:600px;white-space:nowrap" class="ft14"><b>2.2.10 – Passenger Lifts</b></p>
         <p style="position:absolute;top:136px;left:400px;white-space:nowrap" class="ft15"><b>Inspection and Test Plan – CHECKLIST</b></p>
         <p style="position:absolute;top:146px;left:300px;white-space:nowrap" class="ft15"><b>(To be completed by the person(s) directly responsible for the work - Supervisor)</b></p>
         <p style="position:absolute;top:166px;left:55px;white-space:nowrap" class="ft17"><b>Contract Name:</b>Whole of Government Facilities Management Services Contract</p>
-        <p style="position:absolute;top:166px;left:555px;white-space:nowrap" class="ft17"><b>ContractNo.: </b>7061007</p>
+        <p style="position:absolute;top:166px;left:555px;white-space:nowrap" class="ft17"><b>ContractNo.: </b>{{$maintenance->lifts->location == 'North' ? '7061005' : '7061007' }}</p>
         <p style="position:absolute;top:190px;left:55px;white-space:nowrap" class="ft17"><b>Facility/Site:</b><span style="font-weight:normal"> {{$maintenance->job_name}} </span></p>
         <p style="position:absolute;top:190px;left:555px;white-space:nowrap" class="ft17"><b>Category of Work:</b></p>
         <p style="position:absolute;top:212px;left:55px;white-space:nowrap" class="ft17"><b>Contractor:</b> United Lift Services</p>
@@ -158,7 +158,7 @@
     </div>
 
     <div id="page2-div" style="position:relative;width:980px;height:640px;">
-        <img width="980" height="640" src="http://sydney.unitedlifts.com.au/image/custom-reports/checklist-002.png" alt="background image" />
+        <img width="980" height="640" src="http://cloud.unitedlifts.com.au:8070/image/custom-reports/checklist-002.png" alt="background image" />
         <p style="position:absolute;top:460px;left:54px;white-space:nowrap" class="ft18">PRE-HANDOVER</p>
         <p style="position:absolute;top:476px;left:70px;white-space:nowrap" class="ft18">ACTIVITIES</p>
 

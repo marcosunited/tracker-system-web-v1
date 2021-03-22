@@ -36,7 +36,7 @@ class MaintenanceMail extends Mailable
      */
     public function build()
     {
-        $email = $this->subject($this->subject)->from($this->from_email)->view('emails.maintenance');
+        $email = $this->subject($this->subject)->from($this->from_email, 'Notifications ULS')->view('emails.maintenance');
 
         if (is_array($this->filename_file)) {
 

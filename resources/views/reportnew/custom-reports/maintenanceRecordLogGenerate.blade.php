@@ -29,7 +29,8 @@
     <nobr>
         <nowrap>
             <div class="pos" id="_0:0" style="top:0">
-                <img name="_1170:827" src="http://sydney.unitedlifts.com.au/image/custom-reports/maintenance_record_log.png" height="980" width="680" border="0" usemap="#Map"></div>
+                <img name="_1170:827" src="http://cloud.unitedlifts.com.au:8070/image/custom-reports/maintenance_record_log.png" height="980" width="680" border="0" usemap="#Map">
+            </div>
             <div class="pos" id="_98:141" style="top:100;left:30">
                 <span id="_21.5" style="font-weight:bold; font-size:21.5px; color:#003490">
                     Maintenance Schedule Record Log </span>
@@ -71,16 +72,18 @@
                     Building:</span>
                 <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> </span>
             </div>
-            <div class="pos" id="_241:324" style="top:324;left:301">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#000000">
+            <div class="pos" id="_241:324" style="top:238;left:86">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->building_code}}
                 </span>
             </div>
             <div class="pos" id="_334:324" style="top:237;left:200">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Room No.</span>
             </div>
-            <div class="pos" id="_445:324" style="top:324;left:445">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_445:324" style="top:237;left:298">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->room_code}}
                 </span>
             </div>
             <div class="pos" id="_498:324" style="top:324;left:498">
@@ -95,8 +98,9 @@
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Location:</span>
             </div>
-            <div class="pos" id="_714:324" style="top:324;left:714">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_714:324" style="top:237;left:444">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->location}}
                 </span>
             </div>
             <div class="pos" id="_96:345" style="top:255;left:30">
@@ -117,23 +121,25 @@
             </div>
             <div class="pos" id="_334:355" style="top:260;left:200">
                 <span id="_14.3" style="font-weight:normal; font-size:14.3px; color:#e17900">
-                    Remaining Estimated Life (years)</span>
+                    Equipment Identification Number:</span>
             </div>
-            <div class="pos" id="_668:355" style="top:355;left:668">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_668:355" style="top:260;left:390">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->equipment_number}}
                 </span>
             </div>
             <div class="pos" id="_96:364" style="top:265;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Asset:</span>
             </div>
-            <div class="pos" id="_96:386" style="top:280;left:30">
+            <div class="pos" id="_96:386" style="top:278;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Make:</span>
                 <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 24px;"></span>
             </div>
-            <div class="pos" id="_167:386" style="top:386;left:167">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_167:386" style="top:282;left:86">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->lift_brand}}
                 </span>
             </div>
             <div class="pos" id="_227:386" style="top:386;left:227">
@@ -146,26 +152,29 @@
             </div>
             <div class="pos" id="_334:386" style="top:282;left:200">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
-                    Model:<span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> {{$maintenance->lift_model}}</span></span>
+                    Model:<span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"></span></span>
             </div>
-            <div class="pos" id="_503:386" style="top:386;left:503">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_503:386" style="top:282;left:298">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->lift_model}}
                 </span>
             </div>
             <div class="pos" id="_580:386" style="top:282;left:372">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Capacity:</span>
             </div>
-            <div class="pos" id="_714:386" style="top:386;left:714">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_714:386" style="top:282;left:444">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->capacity}}
                 </span>
             </div>
             <div class="pos" id="_96:407" style="top:297;left:30">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
-                    Plate Id: <span style="font-weight:normal;font-family:Calibri; font-size:14.0px;margin-left: 10px;"> {{$maintenance->lift_reg_number}}</span> </span>
+                    Plate Id: </span>
             </div>
-            <div class="pos" id="_167:417" style="top:417;left:167">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_167:417" style="top:300;left:86">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{$maintenance->lifts->lift_reg_number}}
                 </span>
             </div>
             <div class="pos" id="_227:417" style="top:417;left:227">
@@ -176,15 +185,16 @@
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
                 </span>
             </div>
-            <div class="pos" id="_334:417" style="top:297;left:200">
+            <div class="pos" id="_334:417" style="top:300;left:200">
                 <span id="_14.2" style="font-weight:normal; font-size:14.2px; color:#e17900">
                     Serial No.</span>
             </div>
-            <div class="pos" id="_503:417" style="top:417;left:503">
+            <div class="pos" id="_503:417" style="top:300;left:298">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+
                 </span>
             </div>
-            <div class="pos" id="_580:417" style="top:297;left:372">
+            <div class="pos" id="_580:417" style="top:300;left:372">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Size:</span>
             </div>
@@ -214,7 +224,7 @@
             </div>
             <div class="pos" id="_96:528" style="top:380;left:210">
                 <span id="_14.4" style="font-weight:normal; font-size:13.5px; color:#000000">
-                ITP Completed </span>
+                    ITP Completed </span>
             </div>
             <div class="pos" id="_96:605" style="top:435;left:30">
                 <span id="_14.4" style="font-weight:normal; font-size:14.4px; color:#e17900">
