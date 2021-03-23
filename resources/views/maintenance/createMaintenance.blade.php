@@ -498,47 +498,47 @@
         var nov = document.getElementById("btabs-static-10");
         var dec = document.getElementById("btabs-static-11");
 
-        if (selected === '1') {
+        if (selected === '01') {
             jan.style.display = "block";
         } else {
             jan.style.display = "none";
         }
-        if (selected === '2') {
+        if (selected === '02') {
             feb.style.display = "block";
         } else {
             feb.style.display = "none";
         }
-        if (selected === '3') {
+        if (selected === '03') {
             mar.style.display = "block";
         } else {
             mar.style.display = "none";
         }
-        if (selected === '4') {
+        if (selected === '04') {
             apr.style.display = "block";
         } else {
             apr.style.display = "none";
         }
-        if (selected === '5') {
+        if (selected === '05') {
             may.style.display = "block";
         } else {
             may.style.display = "none";
         }
-        if (selected === '6') {
+        if (selected === '06') {
             june.style.display = "block";
         } else {
             june.style.display = "none";
         }
-        if (selected === '7') {
+        if (selected === '07') {
             july.style.display = "block";
         } else {
             july.style.display = "none";
         }
-        if (selected === '8') {
+        if (selected === '08') {
             aug.style.display = "block";
         } else {
             aug.style.display = "none";
         }
-        if (selected === '9') {
+        if (selected === '09') {
             sep.style.display = "block";
         } else {
             sep.style.display = "none";
