@@ -73,7 +73,7 @@
         <p style="position:absolute;top:136px;left:400px;white-space:nowrap" class="ft15"><b>Inspection and Test Plan – CHECKLIST</b></p>
         <p style="position:absolute;top:146px;left:300px;white-space:nowrap" class="ft15"><b>(To be completed by the person(s) directly responsible for the work - Supervisor)</b></p>
         <p style="position:absolute;top:166px;left:55px;white-space:nowrap" class="ft17"><b>Contract Name:</b>Whole of Government Facilities Management Services Contract</p>
-        <p style="position:absolute;top:166px;left:555px;white-space:nowrap" class="ft17"><b>ContractNo.: </b>{{$maintenance->lifts->location == 'North' ? '7061005' : '7061007' }}</p>
+        <p style="position:absolute;top:166px;left:555px;white-space:nowrap" class="ft17"><b>ContractNo.: </b>{{$maintenance->lifts->contract_group_id == '2' ? '7061005' : '7061007' }}</p>
         <p style="position:absolute;top:190px;left:55px;white-space:nowrap" class="ft17"><b>Facility/Site:</b><span style="font-weight:normal"> {{$maintenance->job_name}} </span></p>
         <p style="position:absolute;top:190px;left:555px;white-space:nowrap" class="ft17"><b>Category of Work:</b></p>
         <p style="position:absolute;top:212px;left:55px;white-space:nowrap" class="ft17"><b>Contractor:</b> United Lift Services</p>

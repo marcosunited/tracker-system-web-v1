@@ -139,7 +139,7 @@
             </div>
             <div class="pos" id="_503:336" style="top:232;left:320">
                 <span id="_16.1" style="font-weight:bold;  font-size:16.1px; color:#202020">
-                    Attention: ERS Accounts</span>
+                    Attention: Accounts</span>
             </div>
             <div class="pos" id="_61:364" style="top:230;left:35">
                 <span id="_13.4" style="  font-size:13.0px; color:#000000">
@@ -172,7 +172,7 @@
             </div>
             <div class="pos" id="_130:504" style="top:298;left:86">
                 <span id="_13.4" style="  font-size:13.4px; color:#202020">
-                    Attend Maintenance at {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }} as at Docket ID {{$maintenance->docket_no == '' ? 'Not defined' : $maintenance->docket_no }}</span>
+                    Attend Maintenance at {{ \Carbon\Carbon::parse($maintenance->maintenance_date)->format('d/m/Y') }}.</span>
             </div>
             <div class="pos" id="_741:505" style="top:298;left:430">
                 <span id="_14.7" style="  font-size:14.7px; color:#000000">

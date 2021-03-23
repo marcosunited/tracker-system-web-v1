@@ -64,7 +64,7 @@ class MaintenanceController extends Controller
                         return $maintenance->jobs->id;
                     })
                     ->addColumn('job_address', function (MaintenanceN $maintenance) {
-                        return $maintenance->jobs->job_address_number . " " . $maintenance->jobs->job_address;
+                        return $maintenance->jobs->job_address_number . " " . $maintenance->jobs->job_address . " " . $maintenance->jobs->job_suburb;
                     })
                     ->addColumn('job_group', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_group;
@@ -411,14 +411,16 @@ class MaintenanceController extends Controller
 
                 //Invoice number
                 $this->setInvoiceNumber($maintenance);
+            }
 
-                try {
-                    //Send reports FFA
-                    $api_module =  new TechController();
-                    $api_module->customReportSendEmail($maintenance->id);
-                } catch (Exception $e) {
-                    echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
-                }
+            try {
+                //Send reports FFA
+                $api_module =  new TechController();
+                $api_module->customReportSendEmail($maintenance->id);
+            } catch (Exception $e) {
+                flash('Error updating maintenance')->error();
+                echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+                return back();
             }
         }
 

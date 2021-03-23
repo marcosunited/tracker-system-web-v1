@@ -1277,6 +1277,7 @@ class TechController extends Controller
     public function customReportSendEmail($maintenance_id)
     {
         $path = storage_path() . '/pdf/maintenance/';
+
         $public_path = getcwd();
 
         try {
@@ -1327,6 +1328,12 @@ class TechController extends Controller
             $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
             $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
             $invoiceFile = $path . 'Invoice - Docket No ' . $maintenance_id . '.pdf';
+
+            $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
+            $docketReport->save($docketFile);
+            array_push($files, $docketFile);
+
+            $subject_message = 'A Maintenance has finished in ' . $maintenance->job_name . ' for Lift ' .  $maintenance->lifts->lift_name;
 
             if ($maintenance->job_group == 'Facilities First') {
 
@@ -1382,13 +1389,11 @@ class TechController extends Controller
                 $checklistReport->save($checklistFile);
                 array_push($files, $checklistFile);
 
-                $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
-                $docketReport->save($docketFile);
-                array_push($files, $docketFile);
-
-                $checklistReport = PDF::loadView('reportnew.custom-reports.invoice', compact('maintenance'))->setPaper('a4', 'portrait');
-                $checklistReport->save($invoiceFile);
+                $invoiceReport = PDF::loadView('reportnew.custom-reports.invoice', compact('maintenance'))->setPaper('a4', 'portrait');
+                $invoiceReport->save($invoiceFile);
                 array_push($files, $invoiceFile);
+
+                $subject_message = "ULS Invoice # FFA" . $maintenance->invoice_number() . ' - Purchase order ' . $maintenance->order_no . ' - Lift ' . $maintenance->lifts->lift_name;
             } else {
                 array_push($recipients, $maintenance->job_email);
             }
@@ -1397,7 +1402,7 @@ class TechController extends Controller
             if (count($recipients) > 0) {
                 $from = "accounts@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
-                $subject = "ULS Invoice # FFA" . $maintenance->invoice_number() . ' - Purchase order ' . $maintenance->order_no;
+                $subject = $subject_message;
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
                 Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }

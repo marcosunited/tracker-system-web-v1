@@ -102,12 +102,6 @@
                 {
                     "data": "job_address",
                     "name": "jobs.job_address",
-                    "render": function(data, type, row) {
-                        if (type === 'display') {
-                            data = row.job_address_number + ' ' + row.job_address + ' ' + row.job_suburb;
-                        }
-                        return data;
-                    }
                 },
                 {
                     "data": "job_group",

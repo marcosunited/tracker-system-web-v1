@@ -45,7 +45,7 @@
             </div>
             <div class="pos" id="_411:188" style="top:130;left:250">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
-                    Contract No.: <span style="font-weight:normal"> {{$maintenance->lifts->location == 'North' ? '7061005' : '7061007' }}</span></span>
+                    Contract No.: <span style="font-weight:normal"> {{$maintenance->lifts->location == '2' ? '7061005' : '7061007' }}</span></span>
             </div>
             <div class="pos" id="_76:207" style="top:142;left:14">
                 <span id="_14.0" style=" font-size:14.0px; color:#000000">
