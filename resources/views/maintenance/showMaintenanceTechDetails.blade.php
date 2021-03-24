@@ -149,7 +149,7 @@
             <form action="/maintenances/{{$maintenance->id}}/techdetails" method="POST">
                 {{method_field('PATCH')}}
                 @csrf
-                <h2 class="content-heading pt-0">Technician Details
+                <h2 class="content-heading pt-0">Technical Details
                 
                     <div class="input-group-append" style="float:right;">
                         <button type="submit" class="btn-hero-warning">Update Maintenance</button>

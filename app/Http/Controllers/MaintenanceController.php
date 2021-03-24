@@ -288,144 +288,148 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, MaintenanceN $maintenance)
     {
-        $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        try {
+            $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-        if (isset($request['task_month1'])) {
-            foreach ($request['task_month1'] as $one_task) {
-                $task['jan'][] = $one_task;
+            if (isset($request['task_month1'])) {
+                foreach ($request['task_month1'] as $one_task) {
+                    $task['jan'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month2'])) {
-            foreach ($request['task_month2'] as $one_task) {
-                $task['feb'][] = $one_task;
+            if (isset($request['task_month2'])) {
+                foreach ($request['task_month2'] as $one_task) {
+                    $task['feb'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month3'])) {
-            foreach ($request['task_month3'] as $one_task) {
-                $task['mar'][] = $one_task;
+            if (isset($request['task_month3'])) {
+                foreach ($request['task_month3'] as $one_task) {
+                    $task['mar'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month4'])) {
-            foreach ($request['task_month4'] as $one_task) {
-                $task['apr'][] = $one_task;
+            if (isset($request['task_month4'])) {
+                foreach ($request['task_month4'] as $one_task) {
+                    $task['apr'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month5'])) {
-            foreach ($request['task_month5'] as $one_task) {
-                $task['may'][] = $one_task;
+            if (isset($request['task_month5'])) {
+                foreach ($request['task_month5'] as $one_task) {
+                    $task['may'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month6'])) {
-            foreach ($request['task_month6'] as $one_task) {
-                $task['jun'][] = $one_task;
+            if (isset($request['task_month6'])) {
+                foreach ($request['task_month6'] as $one_task) {
+                    $task['jun'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month7'])) {
-            foreach ($request['task_month7'] as $one_task) {
-                $task['jul'][] = $one_task;
+            if (isset($request['task_month7'])) {
+                foreach ($request['task_month7'] as $one_task) {
+                    $task['jul'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month8'])) {
-            foreach ($request['task_month8'] as $one_task) {
-                $task['aug'][] = $one_task;
+            if (isset($request['task_month8'])) {
+                foreach ($request['task_month8'] as $one_task) {
+                    $task['aug'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month9'])) {
-            foreach ($request['task_month9'] as $one_task) {
-                $task['sep'][] = $one_task;
+            if (isset($request['task_month9'])) {
+                foreach ($request['task_month9'] as $one_task) {
+                    $task['sep'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month10'])) {
-            foreach ($request['task_month10'] as $one_task) {
-                $task['oct'][] = $one_task;
+            if (isset($request['task_month10'])) {
+                foreach ($request['task_month10'] as $one_task) {
+                    $task['oct'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month11'])) {
-            foreach ($request['task_month11'] as $one_task) {
-                $task['nov'][] = $one_task;
+            if (isset($request['task_month11'])) {
+                foreach ($request['task_month11'] as $one_task) {
+                    $task['nov'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month12'])) {
-            foreach ($request['task_month12'] as $one_task) {
-                $task['dec'][] = $one_task;
-            }
-        }
-
-        $maintenance->update([
-            'technician_id' => request('technician_id'),
-            'completed_id' => request('completed_id'),
-            'maintenance_date' => request('maintenance_date'),
-            'task_ids' => json_encode($task),
-            'lift_id' => request('lift_id'),
-            'maintenance_tod' => date('Y-m-d H:i:s'),
-        ]);
-
-        //Complete maintenance
-        if (request('completed_id') == 2) {
-
-            $yearmonth = $maintenance->yearmonth;
-            $month_key = (int)substr($yearmonth, 4, 2);
-            $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
-            if ($lift->lift_type == 'L') {
-                $tasks_monthly  = LiftTask::select()->where('month' . $month_key, 0)->get()->count();
-            } else {
-                $tasks_monthly  = ESTask::select()->where('month' . $month_key, 0)->get()->count();
+            if (isset($request['task_month12'])) {
+                foreach ($request['task_month12'] as $one_task) {
+                    $task['dec'][] = $one_task;
+                }
             }
 
-            $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
-            $status = $tasks_monthly == $completed_tasks ? 'complete' : 'working';
-
-            $exist = MaintenanceComplete::select()
-                ->where('technician_id', $maintenance->technician_id)
-                ->where('job_id', $maintenance->job_id)
-                ->where('lift_id', $maintenance->lift_id)
-                ->where('yearmonth', $maintenance->yearmonth)
-                ->get()
-                ->first();
-
-            if ($exist) {
-                $exist->completed_tasks += $completed_tasks;
-                $exist->status = $status;
-                $exist->save();
-            } else {
-                MaintenanceComplete::create([
-                    'technician_id' => $maintenance->technician_id,
-                    'job_id' => $maintenance->job_id,
-                    'lift_id' => $maintenance->lift_id,
-                    'yearmonth' => $yearmonth,
-                    'month' => $month_key,
-                    'completed_tasks' => $completed_tasks,
-                    'status' => $status
-                ]);
+            if (isset($task)) {
+                $maintenance->task_ids = json_encode($task);
+                $maintenance->save();
             }
 
-            $job = Job::select()
-                ->where('id', $maintenance->job_id)
-                ->get()
-                ->first();
+            $maintenance->update([
+                'technician_id' => request('technician_id'),
+                'completed_id' => request('completed_id'),
+                'maintenance_date' => request('maintenance_date'),
+                'lift_id' => request('lift_id'),
+                'maintenance_tod' => date('Y-m-d H:i:s'),
+            ]);
 
-            if ($job && $job->job_group == 'Facilities First') {
+            //Complete maintenance
+            if (request('completed_id') == 2) {
 
-                //SaveChecklistActivities for FFA
-                $this->saveChecklistActivities($maintenance->id, $maintenance->technician_id);
+                $yearmonth = $maintenance->yearmonth;
+                $month_key = (int)substr($yearmonth, 4, 2);
+                $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
+                if ($lift->lift_type == 'L') {
+                    $tasks_monthly  = LiftTask::select()->where('month' . $month_key, 0)->get()->count();
+                } else {
+                    $tasks_monthly  = ESTask::select()->where('month' . $month_key, 0)->get()->count();
+                }
 
-                //Invoice number
-                $this->setInvoiceNumber($maintenance);
+                $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
+                $status = $tasks_monthly == $completed_tasks ? 'complete' : 'working';
+
+                $exist = MaintenanceComplete::select()
+                    ->where('technician_id', $maintenance->technician_id)
+                    ->where('job_id', $maintenance->job_id)
+                    ->where('lift_id', $maintenance->lift_id)
+                    ->where('yearmonth', $maintenance->yearmonth)
+                    ->get()
+                    ->first();
+
+                if ($exist) {
+                    $exist->completed_tasks += $completed_tasks;
+                    $exist->status = $status;
+                    $exist->save();
+                } else {
+                    MaintenanceComplete::create([
+                        'technician_id' => $maintenance->technician_id,
+                        'job_id' => $maintenance->job_id,
+                        'lift_id' => $maintenance->lift_id,
+                        'yearmonth' => $yearmonth,
+                        'month' => $month_key,
+                        'completed_tasks' => $completed_tasks,
+                        'status' => $status
+                    ]);
+                }
+
+                $job = Job::select()
+                    ->where('id', $maintenance->job_id)
+                    ->get()
+                    ->first();
+
+                if ($job && $job->job_group == 'Facilities First') {
+
+                    //SaveChecklistActivities for FFA
+                    $this->saveChecklistActivities($maintenance->id, $maintenance->technician_id);
+                }
+
+                try {
+                    //Send reports FFA
+                    $api_module =  new TechController();
+                    $api_module->customReportSendEmail($maintenance->id);
+                } catch (Exception $e) {
+                    throw $e;
+                }
             }
 
-            try {
-                //Send reports FFA
-                $api_module =  new TechController();
-                $api_module->customReportSendEmail($maintenance->id);
-            } catch (Exception $e) {
-                flash('Error updating maintenance')->error();
-                echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
-                return back();
-            }
+            flash('Maintenance Successfully Updated!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error updating maintenance')->error();
+            return back();
         }
-
-        flash('Maintenance Successfully Updated!')->success();
-        return back();
     }
 
     public function setInvoiceNumber($maintenance)

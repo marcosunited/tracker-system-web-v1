@@ -753,6 +753,8 @@ class TechController extends Controller
         $isPartRequired = $request['part_required'];
         $isPartReplaced = $request['part_replaced'];
         $partDescription = $request['part_description'];
+        $order_number = $request['order_number'];
+        $docket_number = $request['docket_number'];
 
         $maintenance = MaintenanceN::select()->where('id', $mainID)->get()->first();
 
@@ -802,6 +804,8 @@ class TechController extends Controller
             $maintenance->completed_id = 2;
             $maintenance->finish_pos = json_encode(['lat' => $pos_lat, 'lng' => $pos_lng]);
             $maintenance->maintenance_note = $note;
+            $maintenance->order_no = $order_number;
+            $maintenance->docket_no = $order_number;
 
             if ($request['toa'] != '') {
                 $maintenance->toa = date('Y-m-d H:i:s', strtotime(substr($request['toa'], 0, 10) . ' ' . substr($request['toa'], 11, 8)));

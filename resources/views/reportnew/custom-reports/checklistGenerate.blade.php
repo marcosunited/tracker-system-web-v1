@@ -75,7 +75,7 @@
         <p style="position:absolute;top:166px;left:55px;white-space:nowrap" class="ft17"><b>Contract Name:</b>Whole of Government Facilities Management Services Contract</p>
         <p style="position:absolute;top:166px;left:555px;white-space:nowrap" class="ft17"><b>ContractNo.: </b>{{$maintenance->lifts->contract_group_id == '2' ? '7061005' : '7061007' }}</p>
         <p style="position:absolute;top:190px;left:55px;white-space:nowrap" class="ft17"><b>Facility/Site:</b><span style="font-weight:normal"> {{$maintenance->job_name}} </span></p>
-        <p style="position:absolute;top:190px;left:555px;white-space:nowrap" class="ft17"><b>Category of Work:</b></p>
+        <p style="position:absolute;top:190px;left:555px;white-space:nowrap" class="ft17"><b>Category of Work: 2.2.10 Passenger Lifts</b></p>
         <p style="position:absolute;top:212px;left:55px;white-space:nowrap" class="ft17"><b>Contractor:</b> United Lift Services</p>
         <p style="position:absolute;top:212px;left:555px;white-space:nowrap" class="ft17"><b>Competent Person:</b> <span style="font-weight:normal"> {{$maintenance->techs->technician_name}}</span></p>
 
@@ -140,7 +140,7 @@
             </div>
             <div class="pos" id="_523:1110" style="position:absolute;top:642px;left:737px;white-space:nowrap;font-family: sans-serif;">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">
-                    OPS-CC-2.2.11a-AMC- Inspection and Test Plan</span>
+                    OPS-ITP-2.2.10-AMC- Inspection and Test Plan</span>
             </div>
             <div class="pos" id="_598:1123" style="position:absolute;top:654px;left:816px;white-space:nowrap;font-family: sans-serif;">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">
@@ -218,7 +218,7 @@
         </div>
         <div class="pos" id="_523:1110" style="position:absolute;top:642px;left:737px;white-space:nowrap;font-family: sans-serif;">
             <span id="_11.0" style=" font-size:11.0px; color:#000000">
-                OPS-CC-2.2.11a-AMC- Inspection and Test Plan</span>
+                OPS-ITP-2.2.10-AMC- Inspection and Test Plan</span>
         </div>
         <div class="pos" id="_598:1123" style="position:absolute;top:654px;left:816px;white-space:nowrap;font-family: sans-serif;">
             <span id="_11.0" style=" font-size:11.0px; color:#000000">

@@ -41,11 +41,11 @@
             </div>
             <div class="pos" id="_96:206" style="top:155;left:30">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
-                    Region of Work: <span style="font-weight:normal"> {{$maintenance->job_group}} </span> </span>
+                    Region of Work: <span style="font-weight:normal"> {{$maintenance->lifts->contract_group_id == 1 ? 'South Western Sydney' : 'Northern Sydney' }} </span> </span>
             </div>
             <div class="pos" id="_421:206" style="top:155;left:260">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
-                    Zone of Work:</span>
+                    Zone of Work: <span style="font-weight:normal"> </span></span>
             </div>
             <div class="pos" id="_96:230" style="top:173;left:30">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
@@ -125,7 +125,7 @@
             </div>
             <div class="pos" id="_668:355" style="top:260;left:390">
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
-                    {{$maintenance->lifts->equipment_number}}
+                    {{$maintenance->lifts->equipment_number == 0 ? 'N/A': $maintenance->lifts->equipment_number }}
                 </span>
             </div>
             <div class="pos" id="_96:364" style="top:265;left:30">
@@ -198,8 +198,9 @@
                 <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#e17900">
                     Size:</span>
             </div>
-            <div class="pos" id="_714:417" style="top:417;left:714">
-                <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
+            <div class="pos" id="_714:417" style="top:300;left:444">
+                <span id="_15.0" style="font-weight:normal; font-size:14.0px; color:#000000">
+                    {{ $maintenance->lifts->size_lift() }}
                 </span>
             </div>
             <div class="pos" id="_96:426" style="top:307;left:30">
