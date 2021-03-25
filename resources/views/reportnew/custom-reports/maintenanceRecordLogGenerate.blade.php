@@ -45,7 +45,7 @@
             </div>
             <div class="pos" id="_421:206" style="top:155;left:260">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
-                    Zone of Work: <span style="font-weight:normal"> </span></span>
+                    Zone of Work: <span style="font-weight:normal">{{$maintenance->lifts->zone }} </span></span>
             </div>
             <div class="pos" id="_96:230" style="top:173;left:30">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">
@@ -191,7 +191,6 @@
             </div>
             <div class="pos" id="_503:417" style="top:300;left:298">
                 <span id="_15.0" style="font-weight:bold; font-size:14.0px; color:#e17900">
-
                 </span>
             </div>
             <div class="pos" id="_580:417" style="top:300;left:372">
