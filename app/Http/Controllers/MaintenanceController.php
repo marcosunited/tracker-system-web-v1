@@ -684,25 +684,57 @@ class MaintenanceController extends Controller
 
     public function uploadfile(maintenancen $maintenance, Request $request)
     {
-        $file = $request->file('file');
+        try {
+            $virtual_path = '/attachments/maintenances/' . $maintenance->id . '/';
+            $storage_path = public_path() . $virtual_path;
+            $file = $request->file('file');
 
-        if ($file) {
-            $fileName = $file->getClientOriginalName();
-            $file->move('maintenances', $fileName);
-            $filePath = "/maintenances/$fileName";
-            $maintenance->files()->create([
-                'title' => $fileName,
-                'path' => $filePath
-            ]);
+            if ($file) {
+                if ($this->createDirectory($storage_path)) {
+                    $fileName = $file->getClientOriginalName();
+
+                    $file->move($storage_path, $fileName);
+                    $maintenance->files()->create([
+                        'title' => $fileName,
+                        'path' => $virtual_path
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            flash('Error attaching file!')->error();
+            return back();
+        }
+    }
+
+    public function createDirectory($path)
+    {
+        try {
+            if (!(\Illuminate\Support\Facades\File::exists($path))) {
+                \Illuminate\Support\Facades\File::makeDirectory($path, 0777, true, true);
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
         }
     }
 
     public function deletefile(maintenancen $maintenance, File $file)
     {
-        $file->delete();
-        unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->success();
-        return back();
+        try {
+            $storage_path = public_path() . '/attachments/maintenances/' . $maintenance->id . '/' . $file->title;
+
+            if ((\Illuminate\Support\Facades\File::exists($storage_path))) {
+                unlink($storage_path);
+            }
+
+            $file->delete();
+
+            flash('File Successfully Deleted!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error deleting file!')->error();
+            return back();
+        }
     }
 
     public function notes(maintenancen $maintenance)

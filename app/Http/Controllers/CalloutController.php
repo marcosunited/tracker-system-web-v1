@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CalloutMail;
 use PDF;
 use GoogleCloudPrint;
+use Exception;
 
 class CalloutController extends Controller
 {
@@ -340,30 +341,57 @@ class CalloutController extends Controller
 
     public function uploadfile(Calloutn $callout, Request $request)
     {
-        $file = $request->file('file');
-        // $validator = Validator::make($request->all(), [
-        //     'file' => 'max:2060', //2MB 
-        // ]);
+        try {
+            $virtual_path = '/attachments/callouts/' . $callout->id . '/';
+            $storage_path = public_path() . $virtual_path;
+            $file = $request->file('file');
 
-        if ($file) {
-            $fileName = $file->getClientOriginalName();
-            $file->move('callouts', $fileName);
-            $filePath = "/callouts/$fileName";
-            $callout->files()->create([
-                'title' => $fileName,
-                'path' => $filePath
-            ]);
+            if ($file) {
+                if ($this->createDirectory($storage_path)) {
+                    $fileName = $file->getClientOriginalName();
+
+                    $file->move($storage_path, $fileName);
+                    $callout->files()->create([
+                        'title' => $fileName,
+                        'path' => $virtual_path
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            flash('Error attaching file!')->error();
+            return back();
         }
-        flash('File Successfully Uploaded!')->success();
-        return back();
     }
 
     public function deletefile(Calloutn $callout, File $file)
     {
-        $file->delete();
-        unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->success();
-        return back();
+        try {
+            $storage_path = public_path() . '/attachments/callouts/' . $callout->id . '/' . $file->title;
+
+            if ((\Illuminate\Support\Facades\File::exists($storage_path))) {
+                unlink($storage_path);
+            }
+
+            $file->delete();
+
+            flash('File Successfully Deleted!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error deleting file!')->error();
+            return back();
+        }
+    }
+
+    public function createDirectory($path)
+    {
+        try {
+            if (!(\Illuminate\Support\Facades\File::exists($path))) {
+                \Illuminate\Support\Facades\File::makeDirectory($path, 0777, true, true);
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function notes(Calloutn $callout)
