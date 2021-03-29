@@ -54,6 +54,9 @@ class MaintenanceController extends Controller
                 ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id');
             try {
                 return DataTables::eloquent($finishedmaintenances)
+                    ->addColumn('maintenance_date', function (MaintenanceN $maintenance) {
+                        return date("d/m/Y", strtotime($maintenance->maintenance_date));
+                    })
                     ->addColumn('job_number', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_number;
                     })

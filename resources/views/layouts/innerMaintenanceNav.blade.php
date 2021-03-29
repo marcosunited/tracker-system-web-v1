@@ -50,9 +50,9 @@
                     <a class="dropdown-item" href="/maintenances/{{$maintenance->id}}/print" target="_blank">Docket</a>
                     <div class="dropdown-divider"></div>
                     <div class="hidden" id="menu-forms">
-                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=complianceGenerate" target="_blank">Compliance Certification (v2.2.10)</a>
-                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=checklistGenerate" target="_blank">Inspection and Test plan (v2.2.10)</a>
-                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=maintenanceRecordLogGenerate" target="_blank">Schedule Record log (v2.2.10)</a>
+                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=complianceGenerate" target="_blank">Compliance Certification</a>
+                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=checklistGenerate" target="_blank">Inspection and Test plan</a>
+                        <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=maintenanceRecordLogGenerate" target="_blank">Schedule Record log</a>
                         <a class="dropdown-item" href="/reports/new/custom-report?id={{$maintenance->id}}&name=invoice" target="_blank">Invoice</a>
                     </div>
                 </div>

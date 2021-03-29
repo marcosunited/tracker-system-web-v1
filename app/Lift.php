@@ -38,4 +38,21 @@ class Lift extends Model
         }
         return $abs_size;
     }
+
+    public function get_function()
+    {
+        try {
+            if (strpos(strtolower($this->function), "stairway") >= 0) {
+                return '2.2.11b - Stairway Lifts';
+            } else if (strpos(strtolower($this->function), "stage") >= 0) {
+                return '2.2.11a - Stage Lifts';
+            } else if (strpos(strtolower($this->function), "passenger") >= 0) {
+                return '2.2.10 - Passenger Lifts';
+            } else if (strpos(strtolower($this->function), "service") >= 0) {
+                return '2.2.12 - Service Lifts';
+            }
+        } catch (Exception $e) {
+            return '2.2.10 - Passenger Lifts';
+        }
+    }
 }

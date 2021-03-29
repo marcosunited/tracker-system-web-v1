@@ -29,7 +29,7 @@
     <nobr>
         <nowrap>
             <div class="pos" id="_0:0" style="top:0">
-                <img name="_1170:827" src="http://cloud.unitedlifts.com.au:8070/image/custom-reports/maintenance_record_log.png" height="980" width="680" border="0" usemap="#Map">
+                <img name="_1170:827" src="image/custom-reports/maintenance_record_log.png" height="980" width="680" border="0" usemap="#Map">
             </div>
             <div class="pos" id="_98:141" style="top:100;left:30">
                 <span id="_21.5" style="font-weight:bold; font-size:21.5px; color:#003490">
@@ -37,7 +37,7 @@
             </div>
             <div class="pos" id="_334:179" style="top:134;left:200">
                 <span id="_18.3" style="font-weight:bold; font-size:18.3px; color:#ffffff">
-                    2.2.10 - Passenger Lifts </span>
+                   {{$maintenance->lifts->get_function()}} </span>
             </div>
             <div class="pos" id="_96:206" style="top:155;left:30">
                 <span id="_14.4" style="font-weight:bold; font-size:14.4px; color:#000000">

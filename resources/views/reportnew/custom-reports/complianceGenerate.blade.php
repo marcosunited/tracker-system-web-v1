@@ -29,7 +29,7 @@
     <nobr>
         <nowrap>
             <div class="pos" id="_0:0" style="top:0">
-                <img name="_1170:827" src="http://cloud.unitedlifts.com.au:8070/image/custom-reports/compliance.jpg" height="980" width="680" border="0" usemap="#Map">
+                <img name="_1170:827" src="image/custom-reports/compliance.jpg" height="980" width="680" border="0" usemap="#Map">
             </div>
             <div class="pos" id="_98:136" style="top:84;left:10">
                 <span id="_21.7" style="font-weight:bold; font-size:21.7px; color:#003490">
@@ -101,7 +101,7 @@
                     Sub-Contractors Details:</span>
             </div>
             <div class="pos" id="_14:685" style="top:660;left:18">
-                <img src="http://cloud.unitedlifts.com.au:8070/image/logo.png" style="width: 205px; height:49px">
+                <img src="image/logo.png" style="width: 205px; height:49px">
             </div>
 
             <div class="pos" id="_523:1110" style="top:640;left:180">

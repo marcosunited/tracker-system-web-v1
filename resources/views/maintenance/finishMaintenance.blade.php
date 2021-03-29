@@ -108,6 +108,9 @@
                     "name": "jobs.job_group"
                 },
                 {
+                    "data": "order_no",
+                },
+                {
                     "data": "lift_name",
                     "name": "lifts.lift_name",
                     "render": function(data, type, row) {
@@ -204,6 +207,7 @@
                         <th class="d-none d-sm-table-cell" style="width: 5%;">Maintenance ID</th>
                         <th class="d-none d-sm-table-cell" style="width: 20%;">Job Address</th>
                         <th style="width: 15%;">Group</th>
+                        <th style="width: 15%;">Order no</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
                         <th style="width: 15%;">Report </th>
