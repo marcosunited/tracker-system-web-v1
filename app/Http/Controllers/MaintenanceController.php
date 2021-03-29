@@ -696,7 +696,7 @@ class MaintenanceController extends Controller
                     $file->move($storage_path, $fileName);
                     $maintenance->files()->create([
                         'title' => $fileName,
-                        'path' => $virtual_path
+                        'path' => $virtual_path . $fileName
                     ]);
                 }
             }

@@ -104,7 +104,7 @@
                         </td>
 
                         <td>
-                            <a href="{{$file->path}}{{$file->title}}">
+                            <a href="{{$file->path}}">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View">
                                         <i class="fa fa-pencil-alt"></i>
@@ -113,7 +113,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{$file->path}}{{$file->title}}">
+                            <a href="{{$file->path}}">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Download">
                                         <i class="fa fa-download"></i>

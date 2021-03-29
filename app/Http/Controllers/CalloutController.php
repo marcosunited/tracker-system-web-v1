@@ -353,7 +353,7 @@ class CalloutController extends Controller
                     $file->move($storage_path, $fileName);
                     $callout->files()->create([
                         'title' => $fileName,
-                        'path' => $virtual_path
+                        'path' => $virtual_path . $fileName
                     ]);
                 }
             }
