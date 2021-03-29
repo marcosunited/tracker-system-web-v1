@@ -57,7 +57,7 @@
             </div>
             <div class="pos" id="_411:227" style="top:162;left:250">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
-                    Category of Work: 2.2.10 - <span style="font-weight:normal"> Passenger Lifts</span></span>
+                    Category of Work: <span style="font-weight:normal"> {{ $maintenance->lifts->get_function()}}</span></span>
             </div>
             <div class="pos" id="_76:252" style="top:185;left:14">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
@@ -135,7 +135,7 @@
             </div>
             <div class="pos" id="_523:1110" style="top:760;left:346">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">
-                    OPS-CC-2.2.10-AMC- Compliance Certificate</span>
+                    OPS-CC-{{$maintenance->lifts->get_code_function()}}-AMC- Compliance Certificate</span>
             </div>
             <div class="pos" id="_598:1123" style="top:772;left:402">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">

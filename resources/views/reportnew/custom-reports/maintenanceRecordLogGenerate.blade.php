@@ -334,7 +334,7 @@
             </div>
             <div class="pos" id="_523:1110" style="top:760;left:300">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">
-                    OPS-CC-2.2.10-AMC- Maintenance Schedule Record Log</span>
+                    OPS-CC-{{$maintenance->lifts->get_code_function()}}-AMC- Maintenance Schedule Record Log</span>
             </div>
             <div class="pos" id="_598:1123" style="top:772;left:392">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">

@@ -23,7 +23,7 @@
     <nobr>
         <nowrap>
             <div class="pos" id="_0:0" style="top:0">
-                <img name="_1170:828" src="image/invoice.jpg" height="980" width="680" border="0" usemap="#Map">
+                <img name="_1170:828" src="image/images/invoice.jpg" height="980" width="680" border="0" usemap="#Map">
             </div>
             <div class="pos" id="_64:60" style="top:35;left:44">
                 <span id="_27.1" style="font-weight:bold;  font-size:27.1px; color:#000000">

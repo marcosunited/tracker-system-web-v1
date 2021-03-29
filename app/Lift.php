@@ -9,6 +9,13 @@ class Lift extends Model
 {
     protected $table = 'lifts';
     protected $guarded = ['id'];
+    protected $functions = [
+        "2.2.11b" => "2.2.11b - Stairway Lifts",
+        "2.2.11a" => "2.2.11a - Stage Lifts",
+        "2.2.10" => "2.2.10 - Passenger Lifts",
+        "2.2.12" => "2.2.12 -Service Lifts"
+    ];
+
 
     public function jobs()
     {
@@ -42,17 +49,34 @@ class Lift extends Model
     public function get_function()
     {
         try {
-            if (strpos(strtolower($this->function), "stairway") >= 0) {
-                return '2.2.11b - Stairway Lifts';
-            } else if (strpos(strtolower($this->function), "stage") >= 0) {
-                return '2.2.11a - Stage Lifts';
-            } else if (strpos(strtolower($this->function), "passenger") >= 0) {
-                return '2.2.10 - Passenger Lifts';
-            } else if (strpos(strtolower($this->function), "service") >= 0) {
-                return '2.2.12 - Service Lifts';
+            if (strpos(strtolower($this->functions['2.2.11b']), $this->function) >= 0) {
+                return $this->functions['2.2.11b'];
+            } else if (strpos(strtolower($this->functions['2.2.11a']), $this->function) >= 0) {
+                return $this->functions['2.2.11a'];
+            } else if (strpos(strtolower($this->functions['2.2.10']), $this->function) >= 0) {
+                return $this->functions['2.2.10'];
+            } else if (strpos(strtolower($this->functions['2.2.12']), $this->function) >= 0) {
+                return $this->functions['2.2.12'];
             }
         } catch (Exception $e) {
-            return '2.2.10 - Passenger Lifts';
+            return $this->functions['2.2.10'];
+        }
+    }
+
+    public function get_code_function()
+    {
+        try {
+            if (strpos(strtolower($this->functions['2.2.11b']), $this->function) >= 0) {
+                return '2.2.11b';
+            } else if (strpos(strtolower($this->functions['2.2.11a']), $this->function) >= 0) {
+                return '2.2.11a';
+            } else if (strpos(strtolower($this->functions['2.2.10']), $this->function) >= 0) {
+                return '2.2.10';
+            } else if (strpos(strtolower($this->functions['2.2.12']), $this->function) >= 0) {
+                return '2.2.12';
+            }
+        } catch (Exception $e) {
+            return '2.2.10';
         }
     }
 }

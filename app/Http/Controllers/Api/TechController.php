@@ -26,6 +26,7 @@ use App\Gps;
 use App\Calloutreport;
 use App\ChecklistActivities;
 use App\ChecklistMaintenance;
+use App\Jobs\SendEmail;
 use App\Maintenancereport;
 
 use PDF;
@@ -1408,6 +1409,7 @@ class TechController extends Controller
                 $domain  = "unitedlifts.com.au";
                 $subject = $subject_message;
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
+                //dispatch(new SendEmail($from, $recipients, $domain, $subject, $message, $files));
                 Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
 
@@ -1429,6 +1431,7 @@ class TechController extends Controller
             }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+            throw $e;
         }
     }
 
@@ -1585,7 +1588,7 @@ class TechController extends Controller
 
             //upload image to file
             $imageName = basename($_FILES['photo']['name']);
-            $destination_path = public_path($folder . '/');
+            $destination_path = public_path('/attachments/'. $folder . '/');
             $target_path = $destination_path . $imageName;
             move_uploaded_file($image, $target_path);
 
@@ -1594,7 +1597,7 @@ class TechController extends Controller
                 'calloutn_id' => $folder == 'callouts' ? $id : null,
                 'maintenance_n_id' => $folder != 'callouts' ? $id : null,
                 'title' => $imageName,
-                'path' => '/' . $folder . '/' . $imageName,
+                'path' => '/attachments/' . $folder . '/' . $imageName,
                 'status' => 'new'
             ]);
 
