@@ -81,6 +81,7 @@ Route::get('/callouts/closedcallouts', 'CalloutController@closed')->middleware('
 Route::get('/callouts/followupcallouts', 'CalloutController@followup')->middleware('auth');
 Route::get('/callouts/shutdowncallouts', 'CalloutController@shutdown')->middleware('auth');
 Route::get('/callouts/underrepaircallouts', 'CalloutController@underrepair')->middleware('auth');;
+Route::get('/callouts/all', 'CalloutController@all')->middleware('auth');;
 Route::get('/callouts/create', 'CalloutController@create')->middleware('auth');
 Route::post('/callouts/create', 'CalloutController@create')->middleware('auth');
 Route::get('/callouts/{callout}', 'CalloutController@show')->middleware('auth');

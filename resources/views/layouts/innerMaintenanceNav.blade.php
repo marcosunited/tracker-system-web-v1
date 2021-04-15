@@ -9,7 +9,7 @@
         <li class="nav-main-item">
             <a class="nav-main-link" href="/maintenances/{{$maintenance->id}}/techdetails">
                 <i class="nav-main-link-icon fa fa-user-cog"></i>
-                <span class="nav-main-link-name">Techinician Details</span>
+                <span class="nav-main-link-name">Techinical Details</span>
             </a>
         </li>
         <li class="nav-main-item">

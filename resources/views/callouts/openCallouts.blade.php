@@ -18,13 +18,14 @@
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
 <script>
- $(document).ready(function() {  $('#delete-modal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget) 
-      var callout_id = button.data('calloutid') 
-      var modal = $(this)
-      modal.find('.modal-content #callout_id').val(callout_id);
-}) });
-
+    $(document).ready(function() {
+        $('#delete-modal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget)
+            var callout_id = button.data('calloutid')
+            var modal = $(this)
+            modal.find('.modal-content #callout_id').val(callout_id);
+        })
+    });
 </script>
 @endsection
 
@@ -61,6 +62,7 @@
                         <th class="d-none d-sm-table-cell" style="width: 5%;">Callout ID</th>
                         <th class="d-none d-sm-table-cell" style="width: 20%;">Address</th>
                         <th style="width: 15%;">Reported Fault</th>
+                        <th style="width: 15%;">Order number</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
                         <th style="width: 15%;">Status</th>
@@ -73,18 +75,13 @@
                 <tbody>
                     @if($openCallouts)
                     @foreach($openCallouts as $callout)
-                    <?php 
-                    if ($callout->accept_decline ==1 ) $bgcolor='lightgreen';
-                    if ($callout->accept_decline ==2 ) $bgcolor='red';
-                    if ($callout->accept_decline == 0 ) $bgcolor='yellow';
-                    ?>
-                    <tr  style="background-color:{{$bgcolor}}">
+                    <tr>
                         <td class="text-center">
 
-                        {{date('d-m-Y H:i:s',strtotime($callout->callout_time))}}
+                            {{date('d-m-Y H:i:s',strtotime($callout->callout_time))}}
                         </td>
                         <td class="font-w600">
-                        <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>
+                            <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>
                         </td>
                         <td class="d-none d-sm-table-cell">
                             {{$callout->jobs->job_number}}
@@ -93,13 +90,15 @@
                             {{$callout->id}}
                         </td>
                         <td class="d-none d-sm-table-cell">
-                        {{$callout->jobs->job_address_number}} {{$callout->jobs->job_address}}
+                            {{$callout->jobs->job_address_number}} {{$callout->jobs->job_address}}
                         </td>
                         <td>
                             @if($callout->faults)
                             {{$callout->faults->fault_name}}
                             @endif
                         </td>
+                        <td class="d-none d-sm-table-cell">
+                            {{$callout->order_number}}
                         </td>
                         <td>
                             @foreach ($callout->lifts as $lift)
@@ -113,20 +112,16 @@
                             @endif
                         </td>
                         </td>
-                        <!-- <td>
-                            @if($callout->priority_id == 1)
-                            Low
-                            @elseif($callout->priority_id == 2)
-                            Medium
-                            @elseif($callout->priority_id == 3)
-                            High
-                            @endif
-                        </td> -->
                         </td>
                         <td>
                             Open
                         </td>
-                        <td>
+                        <?php
+                        $bgcolor = '#ED5565';
+                        if ($callout->accept_decline == 0) $bgcolor = '#4FC1E9';
+                        if ($callout->accept_decline == 1) $bgcolor = '#48CFAD';
+                        ?>
+                        <td style="background-color:{{$bgcolor}}; color: #ffffff">
                             @if ($callout->accept_decline==0)
                             Pending
                             @elseif ($callout->accept_decline==1)
@@ -134,7 +129,7 @@
                             @else
                             Declined
                             @endif
-                        </td>                        
+                        </td>
                         </td>
                         <td>
                             <a href="/callouts/{{$callout->id}}">

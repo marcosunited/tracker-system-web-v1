@@ -70,6 +70,15 @@ class CalloutController extends Controller
         return view('callouts.closedCallouts', compact('closedCallouts'));
     }
 
+    public function all()
+    {
+        $allCallouts  = Calloutn::where('id', '>', '0')
+            ->orderby('callout_time', 'desc')
+            ->get();
+
+        return view('callouts.allCallouts', compact('allCallouts'));
+    }
+
     public function followup()
     {
         $followupCallouts = Calloutn::where('callout_status_id', '4')
@@ -177,7 +186,6 @@ class CalloutController extends Controller
 
         flash('Callout Successfully Created!')->success();
         return back();
-        //dd($request);
     }
 
     /**
@@ -293,8 +301,6 @@ class CalloutController extends Controller
             'callout_time' => request('callout_time'),
             'floor_no' => request('floor_no'),
             'fault_id' => request('fault_id'),
-            //'priority_id' => request('priority_id'),
-            //'attributable_id' => request('attributable_id'),
             'callout_description' => request('callout_description'),
             'order_number' => request('order_number'),
             'chargeable_id' => request('chargeable_id'),

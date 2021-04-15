@@ -18,12 +18,14 @@
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
 <script>
- $(document).ready(function() {  $('#delete-modal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget) 
-      var callout_id = button.data('calloutid') 
-      var modal = $(this)
-      modal.find('.modal-content #callout_id').val(callout_id);
-}) });
+    $(document).ready(function() {
+        $('#delete-modal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget)
+            var callout_id = button.data('calloutid')
+            var modal = $(this)
+            modal.find('.modal-content #callout_id').val(callout_id);
+        })
+    });
 </script>
 @endsection
 
@@ -60,28 +62,24 @@
                         <th class="d-none d-sm-table-cell" style="width: 5%;">Callout ID</th>
                         <th class="d-none d-sm-table-cell" style="width: 20%;">Address</th>
                         <th style="width: 15%;">Reported Fault</th>
+                        <th style="width: 15%;">Order number</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
                         <th style="width: 15%;">Priority</th>
                         <th style="width: 15%;">Status</th>
-                        <th style="width: 15%;">Accept Status</th>                        
+                        <th style="width: 15%;">Accept Status</th>
                         <th style="width: 15%;">View</th>
                         <th style="width: 15%;">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($shutdownCallouts as $callout)
-                    <?php 
-                    if ($callout->accept_decline ==1 ) $bgcolor='lightgreen';
-                    if ($callout->accept_decline ==2 ) $bgcolor='red';
-                    if ($callout->accept_decline == 0 ) $bgcolor='yellow';
-                    ?>                    
-                    <tr style="background-color:{{$bgcolor}}">
+                    <tr>
                         <td class="text-center">
-                        {{$callout->callout_time}}
+                            {{$callout->callout_time}}
                         </td>
                         <td class="font-w600">
-                        <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>
+                            <a href="/jobs/{{$callout->jobs->id}}">{{$callout->jobs->job_name}}</a>
                         </td>
                         <td class="d-none d-sm-table-cell">
                             {{$callout->jobs->job_number}}
@@ -97,15 +95,17 @@
                             {{$callout->faults->fault_name}}
                             @endif
                         </td>
+                        <td class="d-none d-sm-table-cell">
+                            {{$callout->order_number}}
                         </td>
                         <td>
-                        @foreach ($callout->lifts as $lift)
+                            @foreach ($callout->lifts as $lift)
                             <a href="/jobs/{{$callout->jobs->id}}/lifts/{{$lift->id}}">{{$lift->lift_name}}</a>
                             @endforeach
                         </td>
                         </td>
                         <td>
-                        @if($callout->techs)
+                            @if($callout->techs)
                             <a href="/techs/{{$callout->techs->id}}">{{$callout->techs->technician_name}}</a>
                             @endif
                         </td>
@@ -123,7 +123,12 @@
                         <td>
                             Shutdown
                         </td>
-                        <td>
+                        <?php
+                        $bgcolor = '#ED5565';
+                        if ($callout->accept_decline == 0) $bgcolor = '#4FC1E9';
+                        if ($callout->accept_decline == 1) $bgcolor = '#48CFAD';
+                        ?>
+                        <td style="background-color:{{$bgcolor}}; color: #ffffff">
                             @if ($callout->accept_decline==0)
                             Pending
                             @elseif ($callout->accept_decline==1)
@@ -131,7 +136,7 @@
                             @else
                             Declined
                             @endif
-                        </td>   
+                        </td>
                         <td>
                             <a href="/callouts/{{$callout->id}}">
                                 <div class="btn-group">
@@ -142,7 +147,7 @@
                             </a>
                         </td>
                         <td>
-                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-calloutid={{$callout->id}}>
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#delete-modal" data-calloutid={{$callout->id}}>
                                 <i class="fa fa-times"></i></button>
                             </button>
                         </td>
@@ -180,6 +185,6 @@
                 </div>
             </div>
         </div>
-</div>
-<!-- END Page Content -->
-@endsection
+    </div>
+    <!-- END Page Content -->
+    @endsection

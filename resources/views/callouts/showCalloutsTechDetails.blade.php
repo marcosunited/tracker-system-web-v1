@@ -201,7 +201,7 @@
                 </h2>
                 <div class="row">
                     <div class="col-lg-8">
-                        <div class="row">
+                        <div class="row" style="padding-left: 40px;">
                             <div class="col-lg-4">
                                 <p class="text-muted">
                                     Time of Callout accept
@@ -344,15 +344,6 @@
                         </div>
                     </div>
                     <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
-                        <!-- <div class="form-group">
-                        <label for="example-text-input">Callout due to Outside interferance</label>
-                        <select class="form-control" name="attributable_id">
-                            <option value="">--- Select ---</option>
-                            <option value="1" @if($callout->attributable_id == 1) selected @endif>Attributable</option>
-                            <option value="2" @if($callout->attributable_id == 2) selected @endif>Not Attributable</option>
-                            <option value="3" @if($callout->attributable_id == 3) selected @endif>N/A</option>
-                        </select>
-                    </div> -->
                         <div class="form-group">
                             <label for="example-text-input">Chargeable?</label>
                             <select class="form-control" name="chargeable_id">
@@ -371,16 +362,16 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-10" style="padding-left: 50px;">
+                    <div class="col-lg-10" style="padding-left: 50px;">
 
-                    <div class="form-group">
-                        <label for="example-text-input">Parts Description</label>
-                        <textarea class="form-control" rows="2" placeholder="" name="part_description">{{$callout->part_description}}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="example-text-input">Technical Description</label>
-                        <textarea class="form-control" rows="3" placeholder="" name="tech_description">{{$callout->tech_description}}</textarea>
+                        <div class="form-group">
+                            <label for="example-text-input">Parts Description</label>
+                            <textarea class="form-control" rows="2" placeholder="" name="part_description">{{$callout->part_description}}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Technical Description</label>
+                            <textarea class="form-control" rows="3" placeholder="" name="tech_description">{{$callout->tech_description}}</textarea>
+                        </div>
                     </div>
                 </div>
         </div>

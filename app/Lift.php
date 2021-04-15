@@ -49,13 +49,25 @@ class Lift extends Model
     public function get_function()
     {
         try {
-            if (strpos(strtolower($this->functions['2.2.11b']), $this->function) >= 0) {
+            if (
+                strpos(strtolower($this->functions['2.2.11b']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.11b']), strtolower($this->function)) >= 0
+            ) {
                 return $this->functions['2.2.11b'];
-            } else if (strpos(strtolower($this->functions['2.2.11a']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.11a']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.11a']), strtolower($this->function)) >= 0
+            ) {
                 return $this->functions['2.2.11a'];
-            } else if (strpos(strtolower($this->functions['2.2.10']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.10']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.10']), strtolower($this->function)) >= 0
+            ) {
                 return $this->functions['2.2.10'];
-            } else if (strpos(strtolower($this->functions['2.2.12']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.12']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.12']), strtolower($this->function)) >= 0
+            ) {
                 return $this->functions['2.2.12'];
             }
         } catch (Exception $e) {
@@ -66,13 +78,25 @@ class Lift extends Model
     public function get_code_function()
     {
         try {
-            if (strpos(strtolower($this->functions['2.2.11b']), $this->function) >= 0) {
+            if (
+                strpos(strtolower($this->functions['2.2.11b']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.11b']), strtolower($this->function)) >= 0
+            ) {
                 return '2.2.11b';
-            } else if (strpos(strtolower($this->functions['2.2.11a']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.11a']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.11a']), strtolower($this->function)) >= 0
+            ) {
                 return '2.2.11a';
-            } else if (strpos(strtolower($this->functions['2.2.10']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.10']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.10']), strtolower($this->function)) >= 0
+            ) {
                 return '2.2.10';
-            } else if (strpos(strtolower($this->functions['2.2.12']), $this->function) >= 0) {
+            } else if (
+                strpos(strtolower($this->functions['2.2.12']), strtolower($this->function)) != false &&
+                strpos(strtolower($this->functions['2.2.12']), strtolower($this->function)) >= 0
+            ) {
                 return '2.2.12';
             }
         } catch (Exception $e) {

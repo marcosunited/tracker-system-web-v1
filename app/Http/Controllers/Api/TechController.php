@@ -318,6 +318,7 @@ class TechController extends Controller
                 $callout_time->toa = date('Y-m-d H:i:s', strtotime(substr($request['toa'], 0, 10) . ' ' . substr($request['toa'], 11, 8)));
                 $callout_time->tod = date('Y-m-d H:i:s', strtotime(substr($request['tod'], 0, 10) . ' ' . substr($request['tod'], 11, 8)));
             }
+
             if ($action == 2) { // finish
                 $calloutn->callout_status_id = $request['status_id'];
                 $calloutn->order_number = $request['order_no'];
@@ -1154,11 +1155,16 @@ class TechController extends Controller
             $fault = Fault::select()->where('id', $callout->fault_id)->get()->first();
             $tech_fault = TechFault::select()->where('id', $callout->technician_fault_id)->get()->first();
             $correction = Correction::select()->where('id', $callout->correction_id)->get()->first();
+
             //Send email to job creator with attachments
             //Generate Pdf file
             $job = Job::select()->where('id', $callout->job_id)->get()->first();
+
             if ($job) {
+
                 $email = explode(';', $job->job_email);
+                //$email = 'ffa@unitedlifts.com.au';
+
                 if (count($email) > 0) {
                     $address = $job->job_address_number . " " . $job->job_address;
                     $subject = "United Lifts Call Report";
@@ -1181,6 +1187,7 @@ class TechController extends Controller
                     $lift_names = substr($lift_names, 0, strlen($lift_names) - 2);
 
                     $user_email = $technician->technician_email;
+
                     if ($order_number == "") {
                         $order_number = "N/A";
                     }
@@ -1202,10 +1209,6 @@ class TechController extends Controller
                         <p>United Lift Services</p>
                     ";
 
-
-
-
-
                     $from = "call@unitedlifts.com.au";
                     $domain  = "unitedlifts.com.au";
                     Mail::to($email)->send(new CalloutMail($from, $domain, $subject, $message, $filename));
@@ -1223,6 +1226,7 @@ class TechController extends Controller
             }
         }
     }
+
     public function calloutSendPrint(Request $request)
     {
         $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
@@ -1400,12 +1404,12 @@ class TechController extends Controller
 
                 $subject_message = "ULS Invoice # FFA" . $maintenance->invoice_number() . ' - Purchase order ' . $maintenance->order_no . ' - Lift ' . $maintenance->lifts->lift_name;
             } else {
-                array_push($recipients, $maintenance->job_email);
+                $recipients = array_merge($recipients, explode(';', $maintenance->job_email));
             }
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
-                $from = "accounts@unitedlifts.com.au";
+                $from = "call@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
                 $subject = $subject_message;
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
@@ -1588,7 +1592,7 @@ class TechController extends Controller
 
             //upload image to file
             $imageName = basename($_FILES['photo']['name']);
-            $destination_path = public_path('/attachments/'. $folder . '/');
+            $destination_path = public_path('/attachments/' . $folder . '/');
             $target_path = $destination_path . $imageName;
             move_uploaded_file($image, $target_path);
 

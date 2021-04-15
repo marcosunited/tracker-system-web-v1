@@ -644,16 +644,35 @@ class MaintenanceController extends Controller
 
     public function techupdate(Request $request, MaintenanceN $maintenance)
     {
-        $maintenance->update([
+        try {
+            if (request('part_required') == '1') {
+                $rules = array(
+                    'part_description' => 'required',
+                    'part_required' => 'required',
+                );
 
-            'maintenance_toa' => request('toa_date'),
-            'maintenance_tod' => request('tod_date'),
-            'maintenance_note' => request('maintenance_note'),
-            'order_no' => request('order_no'),
-            'docket_no' => request('docket_no'),
-        ]);
+                $request->validate(
+                    $rules
+                );
+            }
 
-        flash('Maintenance Tech Details Successfully Updated!')->success();
+            $maintenance->update([
+
+                'maintenance_toa' => request('toa_date'),
+                'maintenance_tod' => request('tod_date'),
+                'maintenance_note' => request('maintenance_note'),
+                'order_no' => request('order_no'),
+                'docket_no' => request('docket_no'),
+                'part_description' => request('part_description'),
+                'part_required' => request('part_required') == null ? 0 : request('part_required'),
+                'part_replaced' => request('part_replaced') == null ? 0 : request('part_replaced'),
+            ]);
+
+            flash('Maintenance Tech Details Successfully Updated!')->success();
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $message = json_encode($exception->validator->getMessageBag()->getMessages());
+            flash('Error saving maintenance: ' . $message)->error();
+        }
         return back();
     }
 

@@ -111,11 +111,7 @@
                 }
             });
 
-            //Session::put('selectedJob',$(".job_select").select2("val"));
-            //$selectedJob = Session::get('selectedJob');
-            //window.location.reload(true);
             $("#here").load(window.location.href + " #here");
-            //$( "#there" ).load(window.location.href + " #there" );           
         });
     });
 </script>

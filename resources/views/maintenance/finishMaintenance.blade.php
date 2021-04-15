@@ -62,6 +62,7 @@
             order: [
                 [0, "desc"]
             ],
+            pageLength: 50,
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",
