@@ -19,7 +19,11 @@
 <script src="{{ asset('js/plugins/dropzone/dropzone.min.js') }}"></script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
-<script>jQuery(function(){ Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
+    });
+</script>
 @endsection
 
 @section('content')
@@ -40,7 +44,7 @@
 
         <div class="block-header block-header-default">
             <span class="badge badge-pill badge-success">Edit</span>&nbsp&nbsp Lift Name: &nbsp&nbsp<h3 class="block-title">{{$lift->lift_name}}</h3>
-            <a href="/jobs/{{$job->id}}/lifts/{{$lift->id}}/callouts"><button class="btn btn-primary">Lift Callouts</button></a>  &nbsp&nbsp
+            <a href="/jobs/{{$job->id}}/lifts/{{$lift->id}}/callouts"><button class="btn btn-primary">Lift Callouts</button></a> &nbsp&nbsp
         </div>
         <div class="block-content">
             <form action="/jobs/{{$job->id}}/lifts/{{$lift->id}}" method="POST">
@@ -81,7 +85,7 @@
                             <input type="text" class="form-control" name="lift_reg_number" placeholder="" value="{{$lift->lift_reg_number}}">
                         </div>
                     </div>
-                    <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
+                    <div class="col-lg-8 col-xl-6" style="padding-left: 150px;">
                         <div class="form-group">
                             <label for="example-text-input">Lift Brand</label>
                             <input type="text" class="form-control" name="lift_brand" placeholder="" value="{{$lift->lift_brand}}">
@@ -100,13 +104,90 @@
                         </div>
                         <div class="form-group">
                             <label for="example-text-input">Lift Installed Date</label>
-                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1"
-                                data-autoclose="true" data-today-highlight="true">
+                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1" data-autoclose="true" data-today-highlight="true">
                                 <input type="text" class="form-control" name="lift_installed_date" value="{{$lift->lift_installed_date}}">
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-12" style="padding-left: 50px;">
+                        <label for="example-text-input">Comments</label>
+                        <textarea class="form-control" name="comments">
+                            {{$lift->comments}}
+                        </textarea>
+                    </div>
+
+                </div>
+                <h2 class="content-heading">FFA Fields</h2>
+                <div class="row push">
+                    <!-- FFA Fields -->
+                    <div class="col-lg-4" style="padding-left: 50px;">
+                        <div class="form-group">
+                            <label for="example-text-input">Function</label>
+                            <select class="form-control" name="function" required>
+                                <option value="">--- Select function ---</option>
+                                <option value="Passenger" name="function" @if($lift->function == "Passenger") selected @endif>Passenger</option>
+                                <option value="Service" name="function" @if($lift->function == "Service") selected @endif>Service</option>
+                                <option value="Stage" name="function" @if($lift->function == "Stage") selected @endif>Stage</option>
+                                <option value="Stairway" name="function" @if($lift->function == "Stairway") selected @endif>Stairway</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Capacity</label>
+                            <input type="number" maxlength="6" class="form-control" name="capacity" placeholder="Capacity in KG" value="{{$lift->capacity}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Location</label>
+                            <input type="text" maxlength="80" class="form-control" name="location" placeholder="" value="{{$lift->location}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Room code</label>
+                            <input type="text" maxlength="6" class="form-control" name="room_code" placeholder="" value="{{$lift->room_code}}">
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-xl-6" style="padding-left: 150px;">
+                        <div class="form-group">
+                            <label for="example-text-input">Building code</label>
+                            <input type="text" maxlength="6" class="form-control" name="building_code" placeholder="" value="{{$lift->building_code}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Region</label>
+                            <select class="form-control" name="contract_group_id">
+                                <option value="0">--- Select region ---</option>
+                                <option value="1" name="contract_group_id" @if($lift->contract_group_id == "1") selected @endif>North Sydney</option>
+                                <option value="2" name="contract_group_id" @if($lift->contract_group_id == "2") selected @endif>South west Sydney</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Equipment number</label>
+                            <input type="number" maxlength="12" class="form-control" name="equipment_number" placeholder="# equipment" value="{{$lift->equipment_number}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="example-text-input">Zone</label>
+                            <select class="form-control" name="zone">
+                                <option value="">--- Select zone ---</option>
+                                <option value="BANKSTOWN" name="zone" @if($lift->zone == "BANKSTOWN") selected @endif>BANKSTOWN</option>
+                                <option value="CAMPBELLTOWN" name="zone" @if($lift->zone == "CAMPBELLTOWN") selected @endif>CAMPBELLTOWN</option>
+                                <option value="EAST HILLS" name="zone" @if($lift->zone == "EAST HILLS") selected @endif>EAST HILLS</option>
+                                <option value="Epping" name="zone" @if($lift->zone == "Epping") selected @endif>Epping</option>
+                                <option value="FAIRFIELD" name="zone" @if($lift->zone == "FAIRFIELD") selected @endif>FAIRFIELD</option>
+                                <option value="GRANVILLE" name="zone" @if($lift->zone == "GRANVILLE") selected @endif>GRANVILLE</option>
+                                <option value="Hills" name="zone" @if($lift->zone == "Hills") selected @endif>Hills</option>
+                                <option value="Hornsby" name="zone" @if($lift->zone == "Hornsby") selected @endif>Hornsby </option>
+                                <option value="HOXTON" name="zone" @if($lift->zone == "HOXTON") selected @endif>HOXTON</option>
+                                <option value="INGLEBURN" name="zone" @if($lift->zone == "INGLEBURN") selected @endif>INGLEBURN</option>
+                                <option value="LIVERPOOL" name="zone" @if($lift->zone == "LIVERPOOL") selected @endif>LIVERPOOL</option>
+                                <option value="MACARTHUR" name="zone" @if($lift->zone == "MACARTHUR") selected @endif>MACARTHUR</option>
+                                <option value="Manly Cove" name="zone" @if($lift->zone == "Manly Cove") selected @endif>Manly Cove</option>
+                                <option value="Manly Village" name="zone" @if($lift->zone == "Manly Village") selected @endif>Manly Village</option>
+                                <option value="Middle Harbour" name="zone" @if($lift->zone == "Middle Harbour") selected @endif>Middle Harbour</option>
+                                <option value="North Shore" name="zone" @if($lift->zone == "North Shore") selected @endif>North Shore</option>
+                                <option value="Peninsula" name="zone" @if($lift->zone == "Peninsula") selected @endif>Peninsula</option>
+                                <option value="South Western Sydney" name="zone" @if($lift->zone == "South Western Sydney") selected @endif>South Western Sydney</option>
+                                <option value="STRATHFIELD" name="zone" @if($lift->zone == "STRATHFIELD") selected @endif>STRATHFIELD</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
         </div>
-        
-@endsection
+
+        @endsection
