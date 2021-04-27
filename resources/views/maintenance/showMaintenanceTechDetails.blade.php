@@ -265,6 +265,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="example-text-input">Maintenance Note</label>
+                        <textarea class="form-control" rows="3" placeholder="" name="maintenance_note">{{$maintenance->maintenance_note}}</textarea>
+                    </div>
+
+                    <div class="form-group">
                         <label for="example-text-input">Docket Number</label>
                         <input type="text" class="form-control" value="{{$maintenance->docket_no}}" name="docket_no">
                     </div>

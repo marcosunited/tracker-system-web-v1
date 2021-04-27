@@ -42,7 +42,7 @@ Route::get('/jobs/{job}/lifts', 'LiftController@index')->middleware('auth');
 Route::get('/jobs/{job}/lifts/{lift}/callouts', 'LiftController@callouts')->middleware('auth');
 Route::get('/jobs/{job}/lifts/{lift}', 'LiftController@edit')->middleware('auth');
 Route::patch('/jobs/{job}/lifts/{lift}', 'LiftController@update')->middleware('auth');
-Route::delete('/jobs/{job}/lifts/{lift}', 'LiftController@destroy')->middleware('auth');
+Route::delete('/lifts', 'LiftController@destroy')->middleware('auth');
 Route::post('/jobs/{job}/lifts', 'LiftController@store')->middleware('auth');
 
 //Rounds

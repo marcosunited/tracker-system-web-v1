@@ -129,7 +129,10 @@ class CalloutController extends Controller
         Session::put('selectedJob', $selectedJob);
         $response = [];
 
-        $response['lifts'] = LIft::select()->where('job_id', $selectedJob->id)->get();
+        $response['lifts'] = LIft::select()
+            ->where('job_id', $selectedJob->id)
+            ->where('lift_status_id', 1)
+            ->get();
         $response['technician'] =  DB::table('technicians')
             ->select(['technicians.id', 'technicians.technician_name'])
             ->leftJoin('jobs', 'jobs.round_id', '=', 'technicians.round_id')

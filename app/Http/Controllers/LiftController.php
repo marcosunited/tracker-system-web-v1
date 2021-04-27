@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Job;
 use App\Lift;
+use Exception;
 
 class LiftController extends Controller
 {
@@ -121,8 +122,16 @@ class LiftController extends Controller
      */
     public function destroy(Job $job, Lift $lift)
     {
-        $lift->delete();
-        flash('Lift Successfully Deleted!')->success();
+        try {
+            $lift = LIft::find(request('lift_id'));
+            if ($lift) {
+                $lift->delete();
+            } else {
+                flash('Lift not found')->warning();
+            }
+        } catch (Exception $ex) {
+            flash('Lift is related to more data. Try to deactivate it')->warning();
+        }
         return back();
     }
 }

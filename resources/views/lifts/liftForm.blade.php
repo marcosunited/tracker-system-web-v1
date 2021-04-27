@@ -112,7 +112,7 @@
                     <div class="col-lg-12" style="padding-left: 50px;">
                         <label for="example-text-input">Comments</label>
                         <textarea class="form-control" name="comments">
-                            {{$lift->comments}}
+                        {{$lift->comments}}
                         </textarea>
                     </div>
 
@@ -153,8 +153,8 @@
                             <label for="example-text-input">Region</label>
                             <select class="form-control" name="contract_group_id">
                                 <option value="0">--- Select region ---</option>
-                                <option value="1" name="contract_group_id" @if($lift->contract_group_id == "1") selected @endif>North Sydney</option>
-                                <option value="2" name="contract_group_id" @if($lift->contract_group_id == "2") selected @endif>South west Sydney</option>
+                                <option value="2" name="contract_group_id" @if($lift->contract_group_id == "2") selected @endif>North Sydney</option>
+                                <option value="1" name="contract_group_id" @if($lift->contract_group_id == "1") selected @endif>South west Sydney</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -165,25 +165,24 @@
                             <label for="example-text-input">Zone</label>
                             <select class="form-control" name="zone">
                                 <option value="">--- Select zone ---</option>
-                                <option value="BANKSTOWN" name="zone" @if($lift->zone == "BANKSTOWN") selected @endif>BANKSTOWN</option>
-                                <option value="CAMPBELLTOWN" name="zone" @if($lift->zone == "CAMPBELLTOWN") selected @endif>CAMPBELLTOWN</option>
-                                <option value="EAST HILLS" name="zone" @if($lift->zone == "EAST HILLS") selected @endif>EAST HILLS</option>
-                                <option value="Epping" name="zone" @if($lift->zone == "Epping") selected @endif>Epping</option>
-                                <option value="FAIRFIELD" name="zone" @if($lift->zone == "FAIRFIELD") selected @endif>FAIRFIELD</option>
-                                <option value="GRANVILLE" name="zone" @if($lift->zone == "GRANVILLE") selected @endif>GRANVILLE</option>
+                                <option value="Middle Harbour" name="zone" @if($lift->zone == "Middle Harbour") selected @endif>Middle Harbour</option>
+                                <option value="Lane Cove" name="zone" @if($lift->zone == "Lane Cove") selected @endif>Lane Cove</option>
+                                <option value="Peninsula" name="zone" @if($lift->zone == "Peninsula") selected @endif>Peninsula</option>
+                                <option value="Hills" name="zone" @if($lift->zone == "Hills") selected @endif>Hills</option>
+                                <option value="North Shore" name="zone" @if($lift->zone == "North Shore") selected @endif>North Shore</option>
+                                <option value="Hornsby" name="zone" @if($lift->zone == "Hornsby") selected @endif>Hornsby</option>
                                 <option value="Hills" name="zone" @if($lift->zone == "Hills") selected @endif>Hills</option>
                                 <option value="Hornsby" name="zone" @if($lift->zone == "Hornsby") selected @endif>Hornsby </option>
-                                <option value="HOXTON" name="zone" @if($lift->zone == "HOXTON") selected @endif>HOXTON</option>
-                                <option value="INGLEBURN" name="zone" @if($lift->zone == "INGLEBURN") selected @endif>INGLEBURN</option>
-                                <option value="LIVERPOOL" name="zone" @if($lift->zone == "LIVERPOOL") selected @endif>LIVERPOOL</option>
-                                <option value="MACARTHUR" name="zone" @if($lift->zone == "MACARTHUR") selected @endif>MACARTHUR</option>
-                                <option value="Manly Cove" name="zone" @if($lift->zone == "Manly Cove") selected @endif>Manly Cove</option>
-                                <option value="Manly Village" name="zone" @if($lift->zone == "Manly Village") selected @endif>Manly Village</option>
-                                <option value="Middle Harbour" name="zone" @if($lift->zone == "Middle Harbour") selected @endif>Middle Harbour</option>
-                                <option value="North Shore" name="zone" @if($lift->zone == "North Shore") selected @endif>North Shore</option>
-                                <option value="Peninsula" name="zone" @if($lift->zone == "Peninsula") selected @endif>Peninsula</option>
-                                <option value="South Western Sydney" name="zone" @if($lift->zone == "South Western Sydney") selected @endif>South Western Sydney</option>
-                                <option value="STRATHFIELD" name="zone" @if($lift->zone == "STRATHFIELD") selected @endif>STRATHFIELD</option>
+                                <option value="Granville" name="zone" @if($lift->zone == "Granville") selected @endif>Granville</option>
+                                <option value="Bankstown" name="zone" @if($lift->zone == "Bankstown") selected @endif>Bankstown</option>
+                                <option value="Ingleburn" name="zone" @if($lift->zone == "Ingleburn") selected @endif>Ingleburn</option>
+                                <option value="Strathfield" name="zone" @if($lift->zone == "Strathfield") selected @endif>Strathfield</option>
+                                <option value="Campbelltown" name="zone" @if($lift->zone == "Campbelltown") selected @endif>Campbelltown</option>
+                                <option value="East Hills" name="zone" @if($lift->zone == "East Hills") selected @endif>East Hills</option>
+                                <option value="Fairfield" name="zone" @if($lift->zone == "Fairfield") selected @endif>Fairfield</option>
+                                <option value="Hoxton" name="zone" @if($lift->zone == "Hoxton") selected @endif>Hoxton</option>
+                                <option value="Macarthur" name="zone" @if($lift->zone == "Macarthur") selected @endif>Macarthur</option>
+                                <option value="Liverpool" name="zone" @if($lift->zone == "Liverpool") selected @endif>Liverpool</option>
                             </select>
                         </div>
                     </div>

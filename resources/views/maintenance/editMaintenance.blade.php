@@ -313,6 +313,7 @@
                                 <option value="">----------Select Status-----------</option>
                                 <option value="1" @if($maintenance->completed_id == 1) selected @endif>Pending</option>
                                 <option value="2" @if($maintenance->completed_id == 2) selected @endif>Completed</option>
+                                <option value="3" @if($maintenance->completed_id == 3) selected @endif>Anulled</option>
                             </select>
                         </div>
                         <div class="form-group" id="here">
