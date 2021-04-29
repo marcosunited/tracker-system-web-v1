@@ -17,7 +17,7 @@ class RoundController extends Controller
     {
         $rounds = Round::all();
 
-        return view('rounds.allRound',compact('rounds'));
+        return view('rounds.allRound', compact('rounds'));
     }
 
     /**
@@ -57,7 +57,7 @@ class RoundController extends Controller
      */
     public function show(Round $round)
     {
-        return view('rounds.showRound' ,compact('round'));
+        return view('rounds.showRound', compact('round'));
     }
 
     /**
@@ -106,13 +106,13 @@ class RoundController extends Controller
     {
         $jobRounds = $round->jobs;
 
-        return view('rounds.jobRound' ,compact('jobRounds','round'));
+        return view('rounds.jobRound', compact('jobRounds', 'round'));
     }
 
     public function techs(Round $round)
     {
         $techRounds = $round->techs;
 
-        return view('rounds.techRound' ,compact('techRounds','round'));
+        return view('rounds.techRound', compact('techRounds', 'round'));
     }
 }

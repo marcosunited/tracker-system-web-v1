@@ -18,7 +18,7 @@ Route::view('/', 'auth/login');
 
 
 Route::get('/dashboard', 'DashboardController@index')->middleware('auth');
-Route::post('/getreloadmap','DashboardController@reloadmap')->middleware('auth');
+Route::post('/getreloadmap', 'DashboardController@reloadmap')->middleware('auth');
 //Jobs
 Route::get('/jobs/all', 'JobController@index')->middleware('auth');
 Route::get('/jobs/create', 'JobController@create')->middleware('auth');
@@ -123,12 +123,12 @@ Route::delete('/fault/{fault}', 'FaultController@destroy')->middleware('auth');
 
 //Print Callout
 Route::get('/callouts/{callout}/print', 'CalloutController@print');
-Route::post('/callouts/calloutsendemail','CalloutController@calloutSendEmail')->middleware('auth');
-Route::post('/callouts/calloutprint','CalloutController@calloutPrint')->middleware('auth');
+Route::post('/callouts/calloutsendemail', 'CalloutController@calloutSendEmail')->middleware('auth');
+Route::post('/callouts/calloutprint', 'CalloutController@calloutPrint')->middleware('auth');
 //Print Maintenance
 Route::get('/maintenances/{mainid}/print', 'MaintenanceController@print');
-Route::post('/maintenances/maintenancesendemail','MaintenanceController@maintenanceSendEmail')->middleware('auth');
-Route::post('/maintenances/maintenanceprint','MaintenanceController@maintenancePrint')->middleware('auth');
+Route::post('/maintenances/maintenancesendemail', 'MaintenanceController@maintenanceSendEmail')->middleware('auth');
+Route::post('/maintenances/maintenanceprint', 'MaintenanceController@maintenancePrint')->middleware('auth');
 //Print Repair
 Route::get('/repairs/{repair}/print', 'RepairController@print');
 
@@ -207,9 +207,9 @@ Route::post('/reports/selectedJob', 'ReportNewController@selectedJob')->middlewa
 
 //Custom reports
 Route::get('/reports/new/custom-report', 'ReportNewController@customReport')->middleware('auth');
-
-Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');;
-Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');;
+Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');
+Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');
+Route::view('/map/rounds', 'rounds.allRoundsMap')->middleware('auth');;
 
 /**
  * Lift Task
@@ -221,5 +221,3 @@ Route::get('/tasks/create', 'TaskController@create')->middleware('auth');
 Route::post('/tasks', 'TaskController@store')->middleware('auth');
 Route::get('/task/{type}/{id}', 'TaskController@show')->middleware('auth');
 Route::post('/task/{type}/{id}', 'TaskController@update')->middleware('auth');
-
-
