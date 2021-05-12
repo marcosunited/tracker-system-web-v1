@@ -138,17 +138,15 @@
 
             onSelectJob(groupName);
 
-            $('#label-lift-' + selectedJobId).remove();
-            $('#lift-' + selectedJobId).select2('destroy');
-            $('#lift-' + selectedJobId).remove();
+            $('#accordion_h' + selectedJobId).remove();
+            $('#accordion_q' + selectedJobId).remove();
 
         });
 
         $(".job_select").on('select2:clear', function(e) {
             if (e) {
-                $("[name*='lift-']").select2('destroy');
-                $("[name*='lift-']").remove();
-                $("[name*='label-lift-']").remove();
+                $("[id*='accordion_h']").remove();
+                $("[id*='accordion_q']").remove();
             }
 
             onSelectJob('');
@@ -221,9 +219,9 @@
                                 });
                             } else {
                                 $.unblockUI();
+                                maintenance = {};
                                 alert('Please, select at least one task');
                                 event.stopImmediatePropagation();
-
                             }
 
                             maintenance['tasks'] = checkedTasks;
@@ -235,12 +233,14 @@
                         });
                     } else {
                         $.unblockUI();
+                        maintenance = {};
                         alert('Please, select at least one lift');
                         event.stopImmediatePropagation();
                     }
                 });
             } else {
                 $.unblockUI();
+                maintenance = {};
                 alert('Please, select at least one job');
                 event.stopImmediatePropagation();
             }
@@ -756,7 +756,7 @@
 </div>
 <div id="accordion" role="tablist" aria-multiselectable="true" class="template invisible">
     <div class="block block-rounded mb-1">
-        <div class="block-header block-header-default" role="tab" id="accordion_h{id}">
+        <div id="accordion_h{id}" class="block-header block-header-default" role="tab">
             <a class="font-w600" data-toggle="collapse" data-parent="#accordion" href="#accordion_q{id}" aria-expanded="true" aria-controls="accordion_q{id}">{job_name}</a>
         </div>
         <div id="accordion_q{id}" class="collapse show" role="tabpanel" aria-labelledby="accordion_h{id}" data-parent="#accordion">
