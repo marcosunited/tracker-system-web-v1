@@ -174,6 +174,7 @@ class MaintenanceController extends Controller
                 'lift_id' => $maintenance['lift_id'],
                 'maintenance_date' => $maintenance['maintenance_date'],
                 'task_ids' => json_encode($finalTask),
+                'order_no' => $maintenance['order_no'],
                 'yearmonth' => ($maintenanceDate->format("Y") . $maintenance['active_month'])
             ]);
 
