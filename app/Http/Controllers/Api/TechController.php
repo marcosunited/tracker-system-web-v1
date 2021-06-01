@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CalloutMail;
 use App\Mail\MaintenanceMail;
 use Exception;
+use Mockery\Undefined;
 use Response;
 
 class TechController extends Controller
@@ -105,6 +106,10 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
+        $from = $request->get('from');
+        $end = $request->get('end');
+        $state = $request->get('state');
+
         $callout_list = Calloutn::select(
             'jobs.job_name as job_name',
             'jobs.job_address as job_address',
@@ -117,16 +122,35 @@ class TechController extends Controller
             'calloutsnew.job_id as job_id',
             'calloutsnew.technician_id as technician_id',
             'calloutsnew.callout_status_id as callout_status_id',
-            'calloutsnew.callout_time as time'
+            'calloutsnew.callout_time as time',
+            DB::raw('DATE_FORMAT(calloutsnew.callout_time, "%d/%m/%Y") as short_time'),
         )
             ->leftjoin('jobs', 'jobs.id', '=', 'calloutsnew.job_id')
+
             ->where('calloutsnew.technician_id', $technician_id)
             ->where('calloutsnew.callout_status_id', '!=', 2)
-            ->where(function ($query) use ($keyword) {
-                if ($keyword != '')
+            ->where(function ($query) use ($keyword, $from, $end, $state) {
+                if ($keyword != '') {
                     $query->where('jobs.job_name', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address_number', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address', 'like', '%' . $keyword . '%');
+                }
+
+                if ($from != '' && $from != null) {
+                    $query->where('calloutsnew.callout_time', '>=',  $from);
+                }
+
+                if ($end != '' && $end != null) {
+                    $query->where('calloutsnew.callout_time', '<=',  $end);
+                }
+
+                if ($state != '' && $state != null) {
+                    if ($state <> '2') {
+                        $query->where('calloutsnew.callout_status_id', '<>',  2);
+                    } else {
+                        $query->where('calloutsnew.callout_status_id', '==',  2);
+                    }
+                }
             })
             ->orderBy('time', 'desc')
             ->get();
@@ -143,6 +167,41 @@ class TechController extends Controller
 
         echo json_encode(['status' => 'success', 'msg' => 'Get callout lists', 'list' => $list]);
     }
+
+    public function getRecentCallouts(Request $request)
+    {
+        $liftId = $request->get('liftId');
+
+        $callout_list = Calloutn::select(
+            'jobs.job_name as job_name',
+            'jobs.job_address as job_address',
+            'jobs.job_address_number as job_address_no',
+            'jobs.job_suburb as job_suburb',
+            'jobs.job_latitude as job_lat',
+            'jobs.job_longitude as job_long',
+            'jobs.tel_phone as telphone',
+            '_corrections.correction_name',
+            '_faults.fault_name',
+            'calloutsnew.id as id',
+            'calloutsnew.callout_time',
+            'calloutsnew.callout_status_id',
+            'calloutsnew.job_id as job_id',
+            'calloutsnew.technician_id as technician_id',
+            'calloutsnew.callout_status_id as callout_status_id',
+            'calloutsnew.callout_time as time'
+        )
+            ->leftjoin('jobs', 'jobs.id', '=', 'calloutsnew.job_id')
+            ->join('_faults', '_faults.id', '=', 'calloutsnew.fault_id')
+            ->join('_corrections', '_corrections.id', '=', 'calloutsnew.correction_id')
+            ->join('callout_lift', 'calloutsnew.id', '=', 'callout_lift.calloutn_id')
+            ->where('callout_lift.lift_id', $liftId)
+            ->orderBy('time', 'desc')
+            ->get();
+
+        echo json_encode(['status' => 'success', 'msg' => 'Get recent callouts', 'callouts' => $callout_list]);
+    }
+
+
     public function getCalloutClosedlist(Request $request)
     {
         $technician_id = $request->get('technician_id');
@@ -370,6 +429,46 @@ class TechController extends Controller
         echo json_encode(['status' => 'success', 'msg' => 'action done', 'lift' => $lift]);
     }
 
+    public function getJobLifts(Request $request)
+    {
+        try {
+            $lifts = Lift::select()->where('job_id', $request->get('job_id'))->get();
+            echo json_encode(['status' => 'success', 'msg' => 'action done', 'lifts' => $lifts]);
+        } catch (Exception $ex) {
+            echo json_encode(['status' => 'error', 'msg' => $ex]);
+        }
+    }
+
+    public function updateLift(Request $request)
+    {
+        try {
+            $lift = Lift::select()->where('id', $request->get('lift_id'))->get()->first();
+
+            $lift->update([
+                'lift_name' => $request->get('lift_name') == 'null' ? null : $request->get('lift_name'),
+                'lift_type' => $request->get('lift_type') == 'null' ? null : $request->get('lift_type'),
+                'lift_phone' => $request->get('lift_phone') == 'null' ? null : $request->get('lift_phone'),
+                'lift_brand' => $request->get('lift_brand') == 'null' ? null : $request->get('lift_brand'),
+                'comments' => $request->get('comments') == 'null' ? null : $request->get('comments'),
+                'lift_reg_number' => $request->get('lift_reg_number') == 'null' ? null : $request->get('lift_reg_number'),
+                'lift_model' => $request->get('lift_model') == 'null' ? null : $request->get('lift_model'),
+                'lift_installed_date' => $request->get('lift_installed_date') == 'null' ? null :  date('Y-m-d H:i:s', strtotime($request->get('lift_installed_date'))),
+                'function' => $request->get('function') == 'null' ? null : $request->get('function'),
+                'capacity' => $request->get('capacity') == 'null' ? null : $request->get('capacity'),
+                'location' => $request->get('location') == 'null' ? null :  $request->get('location'),
+                'room_code' => $request->get('room_code') == 'null' ? null : $request->get('room_code'),
+                'building_code' => $request->get('building_code') == 'null' ? null : $request->get('building_code'),
+                'contract_group_id' => $request->get('contract_group_id') == 'null' ? null : $request->get('contract_group_id'),
+                'equipment_number' => $request->get('equipment_number') == 'null' ? null : $request->get('equipment_number'),
+                'zone' => $request->get('zone') == 'null' ? null : $request->get('zone'),
+            ]);
+
+            echo json_encode(['status' => 'success', 'msg' => 'action done']);
+        } catch (Exception $ex) {
+            echo json_encode(['status' => 'error', 'msg' => $ex]);
+        }
+    }
+
     /**
      *  Maintenance Functions
      *
@@ -378,18 +477,32 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
+        $from = $request->get('from');
+        $end = $request->get('end');
+        $state = $request->get('state');
 
         $related_jobs = MaintenanceN::select('maintenancenew.job_id as job_id')
             ->join('jobs', 'jobs.id', '=', 'maintenancenew.job_id')
-            ->where(function ($query) use ($keyword) {
-                if ($keyword != '')
+            ->where(function ($query) use ($keyword, $from, $end, $state) {
+                if ($keyword != '') {
                     $query->where('jobs.job_name', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address_number', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address', 'like', '%' . $keyword . '%');
+                }
+                if ($from != '' && $from != null) {
+                    $query->where('maintenancenew.maintenance_date', '>=',  $from);
+                }
+
+                if ($end != '' && $end != null) {
+                    $query->where('maintenancenew.maintenance_date', '<=',  $end);
+                }
+
+                if ($state != '' && $state != null) {
+                    $query->where('maintenancenew.completed_id', '=',  $state);
+                }
             })
             ->where('maintenancenew.technician_id', '=', $technician_id)
             ->groupBy('maintenancenew.job_id')
-            ->where('maintenancenew.completed_id', '=', 1)
             ->limit(20)
             ->get();
 
@@ -425,7 +538,6 @@ class TechController extends Controller
                 $tmp['tasks']['n_months'] = [];
                 $tmp['tasks']['index_months'] = [];
                 $tmp['tasks']['months'] = [];
-                //dd($list_base_job);
 
                 foreach ($list_base_job as $one_base_job) {
                     $yearmonth = $one_base_job->yearmonth;
@@ -463,11 +575,7 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
-        // $related_jobs = MaintenanceN::select('job_id')->where('technician_id',$technician_id)
-        //                 ->groupBy('job_id')
-        //                 ->orderBy('maintenance_date','desc')
-        //                 ->limit(10)
-        //                 ->get();
+
         $related_jobs = MaintenanceN::select('maintenancenew.job_id as job_id')
             ->leftjoin('jobs', 'jobs.id', '=', 'maintenancenew.job_id')
             ->where(function ($query) use ($keyword) {

@@ -173,8 +173,7 @@ class CalloutController extends Controller
             'priority_id' => request('priority_id'),
             'callout_description' => request('callout_description'),
             'order_number' => request('order_number'),
-            'contact_details' => request('contact_details'),
-            // 'notify_email' => request('notify_email'),
+            'contact_details' => request('contact_details'),            
             'reported_customer' => request('reported_customer'),
 
         ]);

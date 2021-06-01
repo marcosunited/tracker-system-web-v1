@@ -39,8 +39,10 @@ Route::get('/docket_detail', array('middleware' => 'cors', 'uses' => 'Api\TechCo
 Route::get('/callout_action', array('middleware' => 'cors', 'uses' => 'Api\TechController@updateCalloutaction'));
 Route::get('/callout_docket_action', array('middleware' => 'cors', 'uses' => 'Api\TechController@updateCalloutDocektaction'));
 Route::get('/callout_closed_list', array('middleware' => 'cors', 'uses' => 'Api\TechController@getCalloutClosedlist'))->name('api.get.callout.closedlist');
+Route::get('/callout_recent', array('middleware' => 'cors', 'uses' => 'Api\TechController@getRecentCallouts'))->name('api.get.callout.recentCallouts');
 
 Route::get('/lift_detail', array('middleware' => 'cors', 'uses' => 'Api\TechController@getLiftdetail'))->name('api.get.lift.detail');
+Route::get('/lift_update', array('middleware' => 'cors', 'uses' => 'Api\TechController@updateLift'))->name('api.get.lift.update');
 Route::get('/calloutsendemail', array('middleware' => 'cors', 'uses' => 'Api\TechController@calloutSendEmail'));
 Route::get('/calloutsendprint', array('middleware' => 'cors', 'uses' => 'Api\TechController@calloutSendPrint'));
 
@@ -72,6 +74,7 @@ Route::get('/job_more_detail', array('middleware' => 'cors', 'uses' => 'Api\Tech
 Route::get('/job_maintenace_gettasks', array('middleware' => 'cors', 'uses' => 'Api\TechController@getMaintenanceTasks'))->name('api.get.job.detail');
 Route::get('/job_maintenance_create', array('middleware' => 'cors', 'uses' => 'Api\TechController@postCreateJobMaintenanceTasks'));
 Route::get('/callout_create', array('middleware' => 'cors', 'uses' => 'Api\TechController@postCreateJobCallout'));
+Route::get('/job_lifts', array('middleware' => 'cors', 'uses' => 'Api\TechController@getJobLifts'));
 
 /**
  * RealTime tracking gps
