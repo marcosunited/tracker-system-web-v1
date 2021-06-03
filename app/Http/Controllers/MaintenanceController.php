@@ -134,7 +134,7 @@ class MaintenanceController extends Controller
     {
         // updated creating maintenace function 2020-1-31
         $jobs = Job::where('status_id', 1)->get();
-        $technicians = Technician::all();
+        $technicians = Technician::select()->where('status_id', 1)->get();
         $selectedTech = array();
         $sopa_tasks = DB::table('tasks_sopa')
             ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'tasks_sopa.type as task_type'])
