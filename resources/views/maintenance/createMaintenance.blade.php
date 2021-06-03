@@ -101,7 +101,6 @@
                         /*Create Date's control*/
                         $('#maintenance-date-' + selectedJobId).datepicker({
                             format: 'yyyy-mm-dd',
-                            startDate: '1',
                             autoclose: true,
                             clearBtn: true,
                             title: "Maintenance date",
