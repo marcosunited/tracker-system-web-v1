@@ -191,10 +191,9 @@ class MaintenanceController extends Controller
         $technicians = Technician::all();
         $lifts = $selectedjob->lifts;
         $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
-        $selecttasks[] = [];
+        //$selecttasks[] = [];
 
         if ($maintenance->jobs->job_group != 'SOPA' && strtolower($maintenance->jobs->job_group) != 'sydney olympic park') {
-
             if ($lift->lift_type == 'L') {
                 $selecttasks[] = LiftTask::select()->where('month1', 1)->get();
                 $selecttasks[] = LiftTask::select()->where('month2', 1)->get();

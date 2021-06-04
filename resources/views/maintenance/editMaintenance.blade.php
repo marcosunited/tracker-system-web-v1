@@ -129,7 +129,7 @@
             $('#menu-forms').removeClass('hidden');
 
         }
-        
+
         if (jobGroup && (jobGroup == 'SOPA' || jobGroup.toLowerCase() == 'sydney olympic park')) {
             $('#menuSOPATasks').show();
             $('#menuStandardTasks').hide();
@@ -367,7 +367,7 @@
                                 <div class="block-content tab-content">
                                     @foreach ($selecttasks as $key=>$select_month_task)
                                     @if ($key==$selected_task_month-1)
-                                    <div class="tab-pane {{$key==$selected_task_month-1?'active':''}}" id="btabs-static-{{$key}}" role="tabpane{{$key}}">
+                                    <div class="tab-pane {{$key==$selected_task_month-1 ? 'active':''}}" id="btabs-static-{{$key}}" role="tabpane{{$key}}">
                                         <h4 class="font-w400">{{$months[$key]}} Tasks</h4>
                                         <table class="table table-bordered table-striped table-vcenter">
                                             <thead>
