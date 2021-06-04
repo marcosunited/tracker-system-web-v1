@@ -313,6 +313,7 @@
                                 <option value="">----------Select Status-----------</option>
                                 <option value="1" @if($maintenance->completed_id == 1) selected @endif>Pending</option>
                                 <option value="2" @if($maintenance->completed_id == 2) selected @endif>Completed</option>
+                                <option value="3" @if($maintenance->completed_id == 3) selected @endif>Anulled</option>
                             </select>
                         </div>
                         <div class="form-group" id="here">
@@ -351,15 +352,15 @@
                             <div class="tab-pane active" id="standard" role="tabpanel">
                                 <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
                                     <option value="">Select montly tasks:</option>
-                                    <option value="1" {{$selected_task_month==1?'selected':''}}>January</option>
-                                    <option value="2" {{$selected_task_month==2?'selected':''}}>February</option>
-                                    <option value="3" {{$selected_task_month==3?'selected':''}}>March</option>
-                                    <option value="4" {{$selected_task_month==4?'selected':''}}>April</option>
-                                    <option value="5" {{$selected_task_month==5?'selected':''}}>May</option>
-                                    <option value="6" {{$selected_task_month==6?'selected':''}}>June</option>
-                                    <option value="7" {{$selected_task_month==7?'selected':''}}>July</option>
-                                    <option value="8" {{$selected_task_month==8?'selected':''}}>August</option>
-                                    <option value="9" {{$selected_task_month==9?'selected':''}}>September</option>
+                                    <option value="01" {{$selected_task_month==1?'selected':''}}>January</option>
+                                    <option value="02" {{$selected_task_month==2?'selected':''}}>February</option>
+                                    <option value="03" {{$selected_task_month==3?'selected':''}}>March</option>
+                                    <option value="04" {{$selected_task_month==4?'selected':''}}>April</option>
+                                    <option value="05" {{$selected_task_month==5?'selected':''}}>May</option>
+                                    <option value="06" {{$selected_task_month==6?'selected':''}}>June</option>
+                                    <option value="07" {{$selected_task_month==7?'selected':''}}>July</option>
+                                    <option value="08" {{$selected_task_month==8?'selected':''}}>August</option>
+                                    <option value="09" {{$selected_task_month==9?'selected':''}}>September</option>
                                     <option value="10" {{$selected_task_month==10?'selected':''}}>October</option>
                                     <option value="11" {{$selected_task_month==11?'selected':''}}>November</option>
                                     <option value="12" {{$selected_task_month==12?'selected':''}}>December</option>

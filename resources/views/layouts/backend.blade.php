@@ -183,6 +183,11 @@
                                     <span class="nav-main-link-name">Under-Repair Callouts</span>
                                 </a>
                             </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" href="/callouts/all">
+                                    <span class="nav-main-link-name">All</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-main-heading">Maintenance</li>

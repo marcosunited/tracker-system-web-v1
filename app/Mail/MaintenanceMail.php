@@ -20,10 +20,11 @@ class MaintenanceMail extends Mailable
     public  $subject;
     public  $message_content;
     public  $filename_file;
+    public  $domain;
     public function __construct($from, $domain, $subject, $message, $filename)
     {
-        //
         $this->from_email = $from;
+        $this->domain = $domain;
         $this->subject = $subject;
         $this->message_content = $message;
         $this->filename_file = $filename;
@@ -36,7 +37,9 @@ class MaintenanceMail extends Mailable
      */
     public function build()
     {
-        $email = $this->subject($this->subject)->from($this->from_email)->view('emails.maintenance');
+        $email = $this->subject($this->subject)
+        ->from($this->from_email, 'Notifications ULS')
+        ->view('emails.maintenance');
 
         if (is_array($this->filename_file)) {
 

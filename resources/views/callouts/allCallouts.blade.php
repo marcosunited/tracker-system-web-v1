@@ -34,16 +34,7 @@
 <div class="bg-body-light">
 
     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
-        <h1 class="flex-sm-fill font-size-h2" style="padding-left: 50px;">All FollowUp Callouts Table</h1>
-        <a class="block text-center bg-gd-lake" href="javascript:void(0)">
-            <div class="block-content block-content-full aspect-ratio-1-1 d-flex justify-content-center align-items-center">
-                <div>
-                    <div class="font-size-h1 font-w300 text-white">{{count($followupCallouts)}}</div>
-                    <div class="font-w600 mt-2 text-uppercase text-white-75">Callouts</div>
-                </div>
-            </div>
-        </a>
-
+        <h1 class="flex-sm-fill font-size-h2" style="padding-left: 50px;margin:revert">All callouts</h1>
     </div>
 </div>
 <!-- END Hero -->
@@ -58,22 +49,20 @@
                     <tr>
                         <th class="text-center" style="width:10%;">Time</th>
                         <th style="width: 20%;">Job Name</th>
-                        <th style="width: 20%;">Job Number</th>
+                        <th style="width: 10%;">Job Number</th>
                         <th class="d-none d-sm-table-cell" style="width: 5%;">Callout ID</th>
                         <th class="d-none d-sm-table-cell" style="width: 20%;">Address</th>
-                        <th style="width: 15%;">Reported Fault</th>
-                        <th style="width: 15%;">Order number</th>
+                        <th style="width: 10%;">Reported Fault</th>
+                        <th style="width: 10%;">Order number</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
-                        <th style="width: 15%;">Priority</th>
-                        <th style="width: 15%;">Status</th>
-                        <th style="width: 15%;">Accept Status</th>
+                        <th style="width: 10%;">Status</th>
                         <th style="width: 15%;">View</th>
                         <th style="width: 15%;">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($followupCallouts as $callout)
+                    @foreach($allCallouts as $callout)
                     <tr>
                         <td class="text-center">
                             {{$callout->callout_time}}
@@ -110,31 +99,24 @@
                             @endif
                         </td>
                         </td>
-                        <td>
-                            @if($callout->priority_id == 1)
-                            Low
-                            @elseif($callout->priority_id == 2)
-                            Medium
-                            @elseif($callout->priority_id == 3)
-                            High
-                            @endif
-                        </td>
-                        </td>
-                        <td>
-                            Follow Up
-                        </td>
                         <?php
-                        $bgcolor = '#ED5565';
-                        if ($callout->accept_decline == 0) $bgcolor = '#4FC1E9';
-                        if ($callout->accept_decline == 1) $bgcolor = '#48CFAD';
+                        if ($callout->callout_status_id == 1) $bgcolor = '#3CAEA3';
+                        if ($callout->callout_status_id == 2) $bgcolor = '#ED553B';
+                        if ($callout->callout_status_id == 3) $bgcolor = '#F6D55C';
+                        if ($callout->callout_status_id == 4) $bgcolor = '#20639B';
+                        if ($callout->callout_status_id == 5) $bgcolor = '#173F5F';
                         ?>
                         <td style="background-color:{{$bgcolor}}; color: #ffffff">
-                            @if ($callout->accept_decline==0)
-                            Pending
-                            @elseif ($callout->accept_decline==1)
-                            Accepted
-                            @else
-                            Declined
+                            @if($callout->callout_status_id == 1)
+                            Open
+                            @elseif($callout->callout_status_id == 2)
+                            Closed
+                            @elseif($callout->callout_status_id == 3)
+                            Shutdown
+                            @elseif($callout->callout_status_id == 4)
+                            Follow up
+                            @elseif($callout->callout_status_id == 5)
+                            Under repair
                             @endif
                         </td>
                         <td>
@@ -158,6 +140,7 @@
         </div>
     </div>
     <!-- END Dynamic Table Full -->
+
     <div class="modal" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="delete-modal" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">

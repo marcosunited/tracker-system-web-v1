@@ -18,7 +18,7 @@ Route::view('/', 'auth/login');
 
 
 Route::get('/dashboard', 'DashboardController@index')->middleware('auth');
-Route::post('/getreloadmap','DashboardController@reloadmap')->middleware('auth');
+Route::post('/getreloadmap', 'DashboardController@reloadmap')->middleware('auth');
 //Jobs
 Route::get('/jobs/all', 'JobController@index')->middleware('auth');
 Route::get('/jobs/create', 'JobController@create')->middleware('auth');
@@ -42,7 +42,7 @@ Route::get('/jobs/{job}/lifts', 'LiftController@index')->middleware('auth');
 Route::get('/jobs/{job}/lifts/{lift}/callouts', 'LiftController@callouts')->middleware('auth');
 Route::get('/jobs/{job}/lifts/{lift}', 'LiftController@edit')->middleware('auth');
 Route::patch('/jobs/{job}/lifts/{lift}', 'LiftController@update')->middleware('auth');
-Route::delete('/jobs/{job}/lifts/{lift}', 'LiftController@destroy')->middleware('auth');
+Route::delete('/lifts', 'LiftController@destroy')->middleware('auth');
 Route::post('/jobs/{job}/lifts', 'LiftController@store')->middleware('auth');
 
 //Rounds
@@ -81,6 +81,7 @@ Route::get('/callouts/closedcallouts', 'CalloutController@closed')->middleware('
 Route::get('/callouts/followupcallouts', 'CalloutController@followup')->middleware('auth');
 Route::get('/callouts/shutdowncallouts', 'CalloutController@shutdown')->middleware('auth');
 Route::get('/callouts/underrepaircallouts', 'CalloutController@underrepair')->middleware('auth');;
+Route::get('/callouts/all', 'CalloutController@all')->middleware('auth');;
 Route::get('/callouts/create', 'CalloutController@create')->middleware('auth');
 Route::post('/callouts/create', 'CalloutController@create')->middleware('auth');
 Route::get('/callouts/{callout}', 'CalloutController@show')->middleware('auth');
@@ -122,12 +123,12 @@ Route::delete('/fault/{fault}', 'FaultController@destroy')->middleware('auth');
 
 //Print Callout
 Route::get('/callouts/{callout}/print', 'CalloutController@print');
-Route::post('/callouts/calloutsendemail','CalloutController@calloutSendEmail')->middleware('auth');
-Route::post('/callouts/calloutprint','CalloutController@calloutPrint')->middleware('auth');
+Route::post('/callouts/calloutsendemail', 'CalloutController@calloutSendEmail')->middleware('auth');
+Route::post('/callouts/calloutprint', 'CalloutController@calloutPrint')->middleware('auth');
 //Print Maintenance
 Route::get('/maintenances/{mainid}/print', 'MaintenanceController@print');
-Route::post('/maintenances/maintenancesendemail','MaintenanceController@maintenanceSendEmail')->middleware('auth');
-Route::post('/maintenances/maintenanceprint','MaintenanceController@maintenancePrint')->middleware('auth');
+Route::post('/maintenances/maintenancesendemail', 'MaintenanceController@maintenanceSendEmail')->middleware('auth');
+Route::post('/maintenances/maintenanceprint', 'MaintenanceController@maintenancePrint')->middleware('auth');
 //Print Repair
 Route::get('/repairs/{repair}/print', 'RepairController@print');
 
@@ -205,10 +206,10 @@ Route::post('/reports/new/period/generate', 'ReportNewController@periodgenerate'
 Route::post('/reports/selectedJob', 'ReportNewController@selectedJob')->middleware('auth');
 
 //Custom reports
-Route::get('/reports/new/custom-report', 'ReportNewController@customReportCompliance')->middleware('auth');
-
-Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');;
-Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');;
+Route::get('/reports/new/custom-report', 'ReportNewController@customReport')->middleware('auth');
+Route::view('/callouts/plugin', 'callouts.plugin')->middleware('auth');
+Route::view('/callouts/blank', 'callouts.blank')->middleware('auth');
+Route::view('/map/rounds', 'rounds.allRoundsMap')->middleware('auth');;
 
 /**
  * Lift Task
@@ -220,5 +221,3 @@ Route::get('/tasks/create', 'TaskController@create')->middleware('auth');
 Route::post('/tasks', 'TaskController@store')->middleware('auth');
 Route::get('/task/{type}/{id}', 'TaskController@show')->middleware('auth');
 Route::post('/task/{type}/{id}', 'TaskController@update')->middleware('auth');
-
-

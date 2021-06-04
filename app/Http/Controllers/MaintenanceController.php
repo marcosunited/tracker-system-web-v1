@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\MaintenanceN;
-use App\MaintenanceNWeek;
-use App\Maintenance;
 use App\SopaTasks;
+use App\Http\Controllers\Api\TechController;
 use App\Maintenancereport;
 use App\Job;
 use App\Technician;
@@ -23,7 +22,8 @@ use App\Note;
 use App\MaintenanceComplete;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Session;
+use App\ChecklistActivities;
+use App\ChecklistMaintenance;
 use PDF;
 use GoogleCloudPrint;
 use DateTime;
@@ -31,8 +31,7 @@ use Exception;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MaintenanceMail;
-use phpDocumentor\Reflection\Types\Boolean;
-use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class MaintenanceController extends Controller
@@ -54,7 +53,10 @@ class MaintenanceController extends Controller
                 ->where('maintenancenew.completed_id', '2')
                 ->leftjoin('maintenance_reports', 'maintenance_reports.main_id', '=', 'maintenancenew.id');
             try {
-                return DataTables::of($finishedmaintenances)
+                return DataTables::eloquent($finishedmaintenances)
+                    ->addColumn('maintenance_date', function (MaintenanceN $maintenance) {
+                        return date("d/m/Y", strtotime($maintenance->maintenance_date));
+                    })
                     ->addColumn('job_number', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_number;
                     })
@@ -65,7 +67,7 @@ class MaintenanceController extends Controller
                         return $maintenance->jobs->id;
                     })
                     ->addColumn('job_address', function (MaintenanceN $maintenance) {
-                        return $maintenance->jobs->job_address_number . " " . $maintenance->jobs->job_address;
+                        return $maintenance->jobs->job_address_number . " " . $maintenance->jobs->job_address . " " . $maintenance->jobs->job_suburb;
                     })
                     ->addColumn('job_group', function (MaintenanceN $maintenance) {
                         return $maintenance->jobs->job_group;
@@ -87,7 +89,7 @@ class MaintenanceController extends Controller
                     })->blacklist(['report_status'])
                     ->toJson();
             } catch (Exception $e) {
-                echo($e);
+                echo ($e);
             }
         }
         return view('maintenance.finishMaintenance');
@@ -132,7 +134,7 @@ class MaintenanceController extends Controller
     {
         // updated creating maintenace function 2020-1-31
         $jobs = Job::where('status_id', 1)->get();
-        $technicians = Technician::all();
+        $technicians = Technician::select()->where('status_id', 1)->get();
         $selectedTech = array();
         $sopa_tasks = DB::table('tasks_sopa')
             ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'tasks_sopa.type as task_type'])
@@ -172,7 +174,8 @@ class MaintenanceController extends Controller
                 'lift_id' => $maintenance['lift_id'],
                 'maintenance_date' => $maintenance['maintenance_date'],
                 'task_ids' => json_encode($finalTask),
-                'yearmonth' => ($maintenanceDate->format("Y") . $maintenanceDate->format("m"))
+                'order_no' => $maintenance['order_no'],
+                'yearmonth' => ($maintenanceDate->format("Y") . $maintenance['active_month'])
             ]);
 
             flash('Maintenance Successfully Created!')->success();
@@ -288,117 +291,218 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, MaintenanceN $maintenance)
     {
+        try {
+            $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
-        $months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-        if (isset($request['task_month1'])) {
-            foreach ($request['task_month1'] as $one_task) {
-                $task['jan'][] = $one_task;
+            if (isset($request['task_month1'])) {
+                foreach ($request['task_month1'] as $one_task) {
+                    $task['jan'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month2'])) {
-            foreach ($request['task_month2'] as $one_task) {
-                $task['feb'][] = $one_task;
+            if (isset($request['task_month2'])) {
+                foreach ($request['task_month2'] as $one_task) {
+                    $task['feb'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month3'])) {
-            foreach ($request['task_month3'] as $one_task) {
-                $task['mar'][] = $one_task;
+            if (isset($request['task_month3'])) {
+                foreach ($request['task_month3'] as $one_task) {
+                    $task['mar'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month4'])) {
-            foreach ($request['task_month4'] as $one_task) {
-                $task['apr'][] = $one_task;
+            if (isset($request['task_month4'])) {
+                foreach ($request['task_month4'] as $one_task) {
+                    $task['apr'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month5'])) {
-            foreach ($request['task_month5'] as $one_task) {
-                $task['may'][] = $one_task;
+            if (isset($request['task_month5'])) {
+                foreach ($request['task_month5'] as $one_task) {
+                    $task['may'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month6'])) {
-            foreach ($request['task_month6'] as $one_task) {
-                $task['jun'][] = $one_task;
+            if (isset($request['task_month6'])) {
+                foreach ($request['task_month6'] as $one_task) {
+                    $task['jun'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month7'])) {
-            foreach ($request['task_month7'] as $one_task) {
-                $task['jul'][] = $one_task;
+            if (isset($request['task_month7'])) {
+                foreach ($request['task_month7'] as $one_task) {
+                    $task['jul'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month8'])) {
-            foreach ($request['task_month8'] as $one_task) {
-                $task['aug'][] = $one_task;
+            if (isset($request['task_month8'])) {
+                foreach ($request['task_month8'] as $one_task) {
+                    $task['aug'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month9'])) {
-            foreach ($request['task_month9'] as $one_task) {
-                $task['sep'][] = $one_task;
+            if (isset($request['task_month9'])) {
+                foreach ($request['task_month9'] as $one_task) {
+                    $task['sep'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month10'])) {
-            foreach ($request['task_month10'] as $one_task) {
-                $task['oct'][] = $one_task;
+            if (isset($request['task_month10'])) {
+                foreach ($request['task_month10'] as $one_task) {
+                    $task['oct'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month11'])) {
-            foreach ($request['task_month11'] as $one_task) {
-                $task['nov'][] = $one_task;
+            if (isset($request['task_month11'])) {
+                foreach ($request['task_month11'] as $one_task) {
+                    $task['nov'][] = $one_task;
+                }
             }
-        }
-        if (isset($request['task_month12'])) {
-            foreach ($request['task_month12'] as $one_task) {
-                $task['dec'][] = $one_task;
-            }
-        }
-
-        $maintenance->update([
-            'technician_id' => request('technician_id'),
-            'completed_id' => request('completed_id'),
-            'maintenance_date' => request('maintenance_date'),
-            'task_ids' => json_encode($task),
-            'lift_id' => request('lift_id'),
-            'maintenance_tod' => date('Y-m-d H:i:s'),
-        ]);
-
-        if (request('completed_id') == 2) {
-            //completion table update
-            $yearmonth = $maintenance->yearmonth;
-            $month_key = (int)substr($yearmonth, 4, 2);
-            $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
-            if ($lift->lift_type == 'L') {
-                $tasks_monthly  = LiftTask::select()->where('month' . $month_key, 0)->get()->count();
-            } else {
-                $tasks_monthly  = ESTask::select()->where('month' . $month_key, 0)->get()->count();
+            if (isset($request['task_month12'])) {
+                foreach ($request['task_month12'] as $one_task) {
+                    $task['dec'][] = $one_task;
+                }
             }
 
-            $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
-            $status = $tasks_monthly == $completed_tasks ? 'complete' : 'working';
-            $exist = MaintenanceComplete::select()
-                ->where('technician_id', $maintenance->technician_id)
-                ->where('job_id', $maintenance->job_id)
-                ->where('lift_id', $maintenance->lift_id)
-                ->where('yearmonth', $maintenance->yearmonth)
-                ->get()
-                ->first();
-            if ($exist) {
-                $exist->completed_tasks += $completed_tasks;
-                $exist->status = $status;
-                $exist->save();
-            } else {
-                MaintenanceComplete::create([
-                    'technician_id' => $maintenance->technician_id,
-                    'job_id' => $maintenance->job_id,
-                    'lift_id' => $maintenance->lift_id,
-                    'yearmonth' => $yearmonth,
-                    'month' => $month_key,
-                    'completed_tasks' => $completed_tasks,
-                    'status' => $status
-                ]);
+            if (isset($task)) {
+                $maintenance->task_ids = json_encode($task);
+                $maintenance->save();
+            }
+
+            $maintenance->update([
+                'technician_id' => request('technician_id'),
+                'completed_id' => request('completed_id'),
+                'maintenance_date' => request('maintenance_date'),
+                'lift_id' => request('lift_id'),
+                'maintenance_tod' => date('Y-m-d H:i:s'),
+            ]);
+
+            //Complete maintenance
+            if (request('completed_id') == 2) {
+
+                $yearmonth = $maintenance->yearmonth;
+                $month_key = (int)substr($yearmonth, 4, 2);
+                $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
+                if ($lift->lift_type == 'L') {
+                    $tasks_monthly  = LiftTask::select()->where('month' . $month_key, 0)->get()->count();
+                } else {
+                    $tasks_monthly  = ESTask::select()->where('month' . $month_key, 0)->get()->count();
+                }
+
+                $completed_tasks = count(json_decode($maintenance->task_ids)->{$this->getMonthKey($month_key)});
+                $status = $tasks_monthly == $completed_tasks ? 'complete' : 'working';
+
+                $exist = MaintenanceComplete::select()
+                    ->where('technician_id', $maintenance->technician_id)
+                    ->where('job_id', $maintenance->job_id)
+                    ->where('lift_id', $maintenance->lift_id)
+                    ->where('yearmonth', $maintenance->yearmonth)
+                    ->get()
+                    ->first();
+
+                if ($exist) {
+                    $exist->completed_tasks += $completed_tasks;
+                    $exist->status = $status;
+                    $exist->save();
+                } else {
+                    MaintenanceComplete::create([
+                        'technician_id' => $maintenance->technician_id,
+                        'job_id' => $maintenance->job_id,
+                        'lift_id' => $maintenance->lift_id,
+                        'yearmonth' => $yearmonth,
+                        'month' => $month_key,
+                        'completed_tasks' => $completed_tasks,
+                        'status' => $status
+                    ]);
+                }
+
+                $job = Job::select()
+                    ->where('id', $maintenance->job_id)
+                    ->get()
+                    ->first();
+
+                if ($job && $job->job_group == 'Facilities First') {
+
+                    //SaveChecklistActivities for FFA
+                    $this->saveChecklistActivities($maintenance->id, $maintenance->technician_id);
+                }
+
+                try {
+                    //Send reports FFA
+                    $api_module =  new TechController();
+                    $api_module->customReportSendEmail($maintenance->id);
+                } catch (Exception $e) {
+                    throw $e;
+                }
+            }
+
+            flash('Maintenance Successfully Updated!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error updating maintenance')->error();
+            return back();
+        }
+    }
+
+    public function setInvoiceNumber($maintenance)
+    {
+        //Update invoice name 
+        if ($maintenance->invoice_number <= 0) {
+
+            DB::beginTransaction();
+
+            try {
+
+                $settings = DB::table('settings')
+                    ->select(['value'])
+                    ->where('key', '=', 'ffa_invoice_number')
+                    ->get()
+                    ->first();
+
+                if ($settings) {
+                    $new_invoice_id = ($settings->value + 1);
+                    $maintenance->update([
+                        'invoice_number' => $new_invoice_id,
+                    ]);
+
+                    $new_setting = DB::table('settings')
+                        ->where('key', '=', 'ffa_invoice_number')
+                        ->update([
+                            'value' => $new_invoice_id
+                        ]);
+                }
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollback();
             }
         }
+    }
 
-        flash('Maintenance Successfully Updated!')->success();
-        return back();
+    private function saveChecklistActivities($maintenance_id, $user_id)
+    {
+        try {
+
+            $hasActivities = ChecklistMaintenance::select('id')
+                ->where('maintenance_id', '=', $maintenance_id)
+                ->get();
+
+            if (isset($hasActivities) && count($hasActivities) == 0) {
+
+                $activities = ChecklistActivities::select(
+                    'checklist_activities.id as id'
+                )
+                    ->join('checklist_categories', 'checklist_categories.id', '=', 'checklist_activities.category_id')
+                    ->leftjoin('checklist_maintenance', function ($leftJoin) use ($maintenance_id) {
+                        $leftJoin->on('checklist_activities.id', '=', 'checklist_maintenance.activity_id')
+                            ->where('checklist_maintenance.maintenance_id', '=', $maintenance_id);
+                    })
+                    ->get();
+
+                foreach ($activities as $item) {
+                    $activity = ChecklistMaintenance::create(
+                        [
+                            'activity_id' => $item->id,
+                            'maintenance_id' => $maintenance_id,
+                            'user_id' => $user_id,
+                            'value' =>  1,
+                        ]
+                    );
+                }
+            }
+        } catch (Exception $e) {
+            echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+        }
     }
 
     public function getMonthTaskIDs($taskids, $key)
@@ -540,29 +644,35 @@ class MaintenanceController extends Controller
 
     public function techupdate(Request $request, MaintenanceN $maintenance)
     {
-        $maintenance->update([
+        try {
+            if (request('part_required') == '1') {
+                $rules = array(
+                    'part_description' => 'required',
+                    'part_required' => 'required',
+                );
 
-            'maintenance_toa' => request('toa_date'),
-            'maintenance_tod' => request('tod_date'),
-            'maintenance_note' => request('maintenance_note'),
-            'order_no' => request('order_no'),
-            'docket_no' => request('docket_no'),
-        ]);
+                $request->validate(
+                    $rules
+                );
+            }
 
-        // $active_week = request('active_week');
-        // $year_month_week = $maintenance->year_month . $active_week;
+            $maintenance->update([
 
-        // MaintenanceNweek::create([
+                'maintenance_toa' => request('toa_date'),
+                'maintenance_tod' => request('tod_date'),
+                'maintenance_note' => request('maintenance_note'),
+                'order_no' => request('order_no'),
+                'docket_no' => request('docket_no'),
+                'part_description' => request('part_description'),
+                'part_required' => request('part_required') == null ? 0 : request('part_required'),
+                'part_replaced' => request('part_replaced') == null ? 0 : request('part_replaced'),
+            ]);
 
-        //     'toa_date' => request('toa_date'),
-        //     'tod_date' => request('tod_date'),
-        //     'year_month_week' => $year_month_week,
-        //     'maintenance_id' => $maintenance->id,
-        //     'task_ids' => implode("|",$request->task)
-
-        // ]);
-
-        flash('Maintenance Tech Details Successfully Updated!')->success();
+            flash('Maintenance Tech Details Successfully Updated!')->success();
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $message = json_encode($exception->validator->getMessageBag()->getMessages());
+            flash('Error saving maintenance: ' . $message)->error();
+        }
         return back();
     }
 
@@ -596,30 +706,57 @@ class MaintenanceController extends Controller
 
     public function uploadfile(maintenancen $maintenance, Request $request)
     {
-        $file = $request->file('file');
-        // $validator = Validator::make($request->all(), [
-        //     'file' => 'max:2060', //2MB
-        // ]);
+        try {
+            $virtual_path = '/attachments/maintenances/' . $maintenance->id . '/';
+            $storage_path = public_path() . $virtual_path;
+            $file = $request->file('file');
 
-        if ($file) {
-            $fileName = $file->getClientOriginalName();
-            $file->move('maintenances', $fileName);
-            $filePath = "/maintenances/$fileName";
-            $maintenance->files()->create([
-                'title' => $fileName,
-                'path' => $filePath
-            ]);
+            if ($file) {
+                if ($this->createDirectory($storage_path)) {
+                    $fileName = $file->getClientOriginalName();
+
+                    $file->move($storage_path, $fileName);
+                    $maintenance->files()->create([
+                        'title' => $fileName,
+                        'path' => $virtual_path . $fileName
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            flash('Error attaching file!')->error();
+            return back();
         }
-        // flash('File Successfully Uploaded!')->success();
-        // return back();
+    }
+
+    public function createDirectory($path)
+    {
+        try {
+            if (!(\Illuminate\Support\Facades\File::exists($path))) {
+                \Illuminate\Support\Facades\File::makeDirectory($path, 0777, true, true);
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function deletefile(maintenancen $maintenance, File $file)
     {
-        $file->delete();
-        unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->success();
-        return back();
+        try {
+            $storage_path = public_path() . '/attachments/maintenances/' . $maintenance->id . '/' . $file->title;
+
+            if ((\Illuminate\Support\Facades\File::exists($storage_path))) {
+                unlink($storage_path);
+            }
+
+            $file->delete();
+
+            flash('File Successfully Deleted!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error deleting file!')->error();
+            return back();
+        }
     }
 
     public function notes(maintenancen $maintenance)
@@ -692,12 +829,6 @@ class MaintenanceController extends Controller
         return $pdf->download($id . "-" . $job . "-" . $maintenancedate . ".pdf");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request)
     {
         try {
@@ -747,7 +878,6 @@ class MaintenanceController extends Controller
 
         return back();
     }
-
 
     public function maintenanceSendEmail(Request $request)
     {

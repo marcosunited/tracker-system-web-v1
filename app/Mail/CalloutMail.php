@@ -20,7 +20,7 @@ class CalloutMail extends Mailable
     public  $subject;
     public  $message_content;
     public  $filename_file;
-    public function __construct($from, $domain, $subject, $message,$filename)
+    public function __construct($from, $domain, $subject, $message, $filename)
     {
         //
         $this->from_email = $from;
@@ -36,10 +36,12 @@ class CalloutMail extends Mailable
      */
     public function build()
     {
-        return $this->subject($this->subject)->from($this->from_email)->view('emails.callout')
-                    ->attach(storage_path().'/pdf/callout/'.$this->filename_file.'.pdf', [
-                        'as' => $this->filename_file.'.pdf',
-                        'mime' => 'application/pdf',
-                    ]);
+        return $this->subject($this->subject)
+            ->from($this->from_email, 'Notifications ULS')
+            ->view('emails.callout')
+            ->attach(storage_path() . '/pdf/callout/' . $this->filename_file . '.pdf', [
+                'as' => $this->filename_file . '.pdf',
+                'mime' => 'application/pdf',
+            ]);
     }
 }

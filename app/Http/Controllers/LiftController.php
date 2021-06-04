@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Job;
 use App\Lift;
+use Exception;
 
 class LiftController extends Controller
 {
@@ -16,7 +17,7 @@ class LiftController extends Controller
     public function index(Job $job)
     {
         $lifts = $job->lifts;
-        return view('lifts.allLifts',compact('job','lifts'));
+        return view('lifts.allLifts', compact('job', 'lifts'));
     }
 
     /**
@@ -35,12 +36,13 @@ class LiftController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,Job $job)
+    public function store(Request $request, Job $job)
     {
-        $attributes = request()->validate(['lift_name' => 'required',
-                                           'lift_status_id' => 'required',
-                                           'lift_type' => 'required',
-        
+        $attributes = request()->validate([
+            'lift_name' => 'required',
+            'lift_status_id' => 'required',
+            'lift_type' => 'required',
+
         ]);
 
         $job->addLift($attributes);
@@ -66,17 +68,17 @@ class LiftController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Job $job,Lift $lift)
+    public function edit(Job $job, Lift $lift)
     {
-        return view('lifts.liftForm',compact('job','lift'));
+        return view('lifts.liftForm', compact('job', 'lift'));
     }
 
-    public function callouts(Job $job,Lift $lift)
+    public function callouts(Job $job, Lift $lift)
     {
         $liftcallouts = $lift->callouts;
-        return view('lifts.liftcallouts',compact('job','lift','liftcallouts'));
+        return view('lifts.liftcallouts', compact('job', 'lift', 'liftcallouts'));
     }
-    
+
 
     /**
      * Update the specified resource in storage.
@@ -85,23 +87,31 @@ class LiftController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,Job $job,Lift $lift)
+    public function update(Request $request, Job $job, Lift $lift)
     {
-       $lift->update([
-        'lift_name' => request('lift_name'),
-        'lift_status_id' => request('lift_status_id'),
-        'lift_type' => request('lift_type'),
-        'lift_phone' => request('lift_phone'),
-        'lift_brand' => request('lift_brand'),
-        'lift_reg_number' => request('lift_reg_number'),
-        'lift_model' => request('lift_model'),
-        'lift_speed' => request('lift_speed'),
-        'lift_floor' => request('lift_floor'),
-        'lift_installed_date' => request('lift_installed_date'),
-       ]); 
+        $lift->update([
+            'lift_name' => request('lift_name'),
+            'lift_status_id' => request('lift_status_id'),
+            'lift_type' => request('lift_type'),
+            'lift_phone' => request('lift_phone'),
+            'lift_brand' => request('lift_brand'),
+            'lift_reg_number' => request('lift_reg_number'),
+            'lift_model' => request('lift_model'),
+            'lift_speed' => request('lift_speed'),
+            'lift_floor' => request('lift_floor'),
+            'lift_installed_date' => request('lift_installed_date'),
+            'function' => request('function'),
+            'capacity' => request('capacity'),
+            'location' => request('location'),
+            'room_code' => request('room_code'),
+            'building_code' => request('building_code'),
+            'contract_group_id' => request('contract_group_id'),
+            'equipment_number' => request('equipment_number'),
+            'zone' => request('zone'),
+        ]);
 
-       flash('Lift Successfully Updated!')->success();
-       return back();
+        flash('Lift Successfully Updated!')->success();
+        return back();
     }
 
     /**
@@ -110,10 +120,18 @@ class LiftController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Job $job,Lift $lift)
+    public function destroy(Job $job, Lift $lift)
     {
-        $lift->delete();
-        flash('Lift Successfully Deleted!')->success();
+        try {
+            $lift = LIft::find(request('lift_id'));
+            if ($lift) {
+                $lift->delete();
+            } else {
+                flash('Lift not found')->warning();
+            }
+        } catch (Exception $ex) {
+            flash('Lift is related to more data. Try to deactivate it')->warning();
+        }
         return back();
     }
 }

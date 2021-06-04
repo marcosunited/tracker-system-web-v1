@@ -115,7 +115,7 @@ class ReportNewController extends Controller
         return view('reportnew.groupReport', compact('group_list'));
     }
 
-    public function customReportCompliance(Request $request)
+    public function customReport(Request $request)
     {
 
         try {

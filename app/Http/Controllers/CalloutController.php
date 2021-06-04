@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CalloutMail;
 use PDF;
 use GoogleCloudPrint;
+use Exception;
 
 class CalloutController extends Controller
 {
@@ -67,6 +68,15 @@ class CalloutController extends Controller
             ->get();
 
         return view('callouts.closedCallouts', compact('closedCallouts'));
+    }
+
+    public function all()
+    {
+        $allCallouts  = Calloutn::where('id', '>', '0')
+            ->orderby('callout_time', 'desc')
+            ->get();
+
+        return view('callouts.allCallouts', compact('allCallouts'));
     }
 
     public function followup()
@@ -119,7 +129,10 @@ class CalloutController extends Controller
         Session::put('selectedJob', $selectedJob);
         $response = [];
 
-        $response['lifts'] = LIft::select()->where('job_id', $selectedJob->id)->get();
+        $response['lifts'] = LIft::select()
+            ->where('job_id', $selectedJob->id)
+            ->where('lift_status_id', 1)
+            ->get();
         $response['technician'] =  DB::table('technicians')
             ->select(['technicians.id', 'technicians.technician_name'])
             ->leftJoin('jobs', 'jobs.round_id', '=', 'technicians.round_id')
@@ -160,8 +173,7 @@ class CalloutController extends Controller
             'priority_id' => request('priority_id'),
             'callout_description' => request('callout_description'),
             'order_number' => request('order_number'),
-            'contact_details' => request('contact_details'),
-            // 'notify_email' => request('notify_email'),
+            'contact_details' => request('contact_details'),            
             'reported_customer' => request('reported_customer'),
 
         ]);
@@ -176,7 +188,6 @@ class CalloutController extends Controller
 
         flash('Callout Successfully Created!')->success();
         return back();
-        //dd($request);
     }
 
     /**
@@ -249,15 +260,19 @@ class CalloutController extends Controller
 
         $callouttime = CalloutTime::select()->where('calloutn_id', $callout->id)->get()->first();
 
-        $callouttime->update([
+        if (isset($callouttime)) {
+            $callouttime->update([
 
-            'accept_time' =>  request('time_of_callout_start') ? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))) : NULL,
-            'toa' =>  request('mtime_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))) : NULL,
-            'tod' =>  request('mtime_of_departure') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))) : NULL,
-        ]);
-
-        flash('Callout Tech Details Successfully Updated!')->success();
-        return back();
+                'accept_time' =>  request('time_of_callout_start') ? date('Y-m-d H:i:s', strtotime(request('time_of_callout_start'))) : NULL,
+                'toa' =>  request('mtime_of_arrival') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_arrival'))) : NULL,
+                'tod' =>  request('mtime_of_departure') ? date('Y-m-d H:i:s', strtotime(request('mtime_of_departure'))) : NULL,
+            ]);
+            flash('Callout Tech Details Successfully Updated!')->success();
+            return back();
+        } else {
+            flash('Error updating callout')->error();
+            return back();
+        }
     }
 
 
@@ -288,8 +303,6 @@ class CalloutController extends Controller
             'callout_time' => request('callout_time'),
             'floor_no' => request('floor_no'),
             'fault_id' => request('fault_id'),
-            //'priority_id' => request('priority_id'),
-            //'attributable_id' => request('attributable_id'),
             'callout_description' => request('callout_description'),
             'order_number' => request('order_number'),
             'chargeable_id' => request('chargeable_id'),
@@ -336,30 +349,57 @@ class CalloutController extends Controller
 
     public function uploadfile(Calloutn $callout, Request $request)
     {
-        $file = $request->file('file');
-        // $validator = Validator::make($request->all(), [
-        //     'file' => 'max:2060', //2MB 
-        // ]);
+        try {
+            $virtual_path = '/attachments/callouts/' . $callout->id . '/';
+            $storage_path = public_path() . $virtual_path;
+            $file = $request->file('file');
 
-        if ($file) {
-            $fileName = $file->getClientOriginalName();
-            $file->move('callouts', $fileName);
-            $filePath = "/callouts/$fileName";
-            $callout->files()->create([
-                'title' => $fileName,
-                'path' => $filePath
-            ]);
+            if ($file) {
+                if ($this->createDirectory($storage_path)) {
+                    $fileName = $file->getClientOriginalName();
+
+                    $file->move($storage_path, $fileName);
+                    $callout->files()->create([
+                        'title' => $fileName,
+                        'path' => $virtual_path . $fileName
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            flash('Error attaching file!')->error();
+            return back();
         }
-        flash('File Successfully Uploaded!')->success();
-        return back();
     }
 
     public function deletefile(Calloutn $callout, File $file)
     {
-        $file->delete();
-        unlink(public_path($file->path));
-        flash('File Successfully Deleted!')->success();
-        return back();
+        try {
+            $storage_path = public_path() . '/attachments/callouts/' . $callout->id . '/' . $file->title;
+
+            if ((\Illuminate\Support\Facades\File::exists($storage_path))) {
+                unlink($storage_path);
+            }
+
+            $file->delete();
+
+            flash('File Successfully Deleted!')->success();
+            return back();
+        } catch (Exception $e) {
+            flash('Error deleting file!')->error();
+            return back();
+        }
+    }
+
+    public function createDirectory($path)
+    {
+        try {
+            if (!(\Illuminate\Support\Facades\File::exists($path))) {
+                \Illuminate\Support\Facades\File::makeDirectory($path, 0777, true, true);
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function notes(Calloutn $callout)
@@ -392,10 +432,10 @@ class CalloutController extends Controller
         $logo =  storage_path() . '/logo.png';
         $callout = Calloutn::select()->where('id', $id)->get()->first();
         $callouttime = CalloutTime::select()
-        ->where('calloutn_id', $callout->id)
-        ->where('technician_id', $callout->technician_id)
-        ->orderBy('updated_at', 'desc')
-        ->get()->first();
+            ->where('calloutn_id', $callout->id)
+            ->where('technician_id', $callout->technician_id)
+            ->orderBy('updated_at', 'desc')
+            ->get()->first();
         $files = File::select()->where('calloutn_id', $id)->get();
         return view('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'));
     }
@@ -407,10 +447,10 @@ class CalloutController extends Controller
         $callout_time = $callout->callout_time;
         $job_address = $callout->jobs->job_address;
         $callouttime = CalloutTime::select()
-        ->where('calloutn_id', $callout->id)
-        ->where('technician_id', $callout->technician_id)
-        ->orderBy('updated_at', 'desc')
-        ->get()->first();
+            ->where('calloutn_id', $callout->id)
+            ->where('technician_id', $callout->technician_id)
+            ->orderBy('updated_at', 'desc')
+            ->get()->first();
         $logo =  storage_path() . '/logo.png';
         $files = File::select()->where('calloutn_id', $id)->get();
         $pdf = PDF::loadView('callouts.printCallout', compact('callout', 'logo', 'callouttime', 'files'))->setPaper('a4', 'portrait');;

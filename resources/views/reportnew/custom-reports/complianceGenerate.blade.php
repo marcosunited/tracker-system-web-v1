@@ -29,7 +29,8 @@
     <nobr>
         <nowrap>
             <div class="pos" id="_0:0" style="top:0">
-                <img name="_1170:827" src="http://sydney.unitedlifts.com.au/image/custom-reports/compliance.jpg" height="980" width="680" border="0" usemap="#Map"></div>
+                <img name="_1170:827" src="image/custom-reports/compliance.jpg" height="980" width="680" border="0" usemap="#Map">
+            </div>
             <div class="pos" id="_98:136" style="top:84;left:10">
                 <span id="_21.7" style="font-weight:bold; font-size:21.7px; color:#003490">
                     COMPLIANCE CERTIFICATION</span>
@@ -44,7 +45,7 @@
             </div>
             <div class="pos" id="_411:188" style="top:130;left:250">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
-                    Contract No.: <span style="font-weight:normal"> 7061007</span></span>
+                    Contract No.: <span style="font-weight:normal"> {{$maintenance->lifts->location == '2' ? '7061005' : '7061007' }}</span></span>
             </div>
             <div class="pos" id="_76:207" style="top:142;left:14">
                 <span id="_14.0" style=" font-size:14.0px; color:#000000">
@@ -56,7 +57,7 @@
             </div>
             <div class="pos" id="_411:227" style="top:162;left:250">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
-                    Category of Work: 2.2.10 - <span style="font-weight:normal"> Passenger Lifts</span></span>
+                    Category of Work: <span style="font-weight:normal"> {{ $maintenance->lifts->get_function()}}</span></span>
             </div>
             <div class="pos" id="_76:252" style="top:185;left:14">
                 <span id="_14.0" style="font-weight:bold; font-size:14.0px; color:#000000">
@@ -100,7 +101,7 @@
                     Sub-Contractors Details:</span>
             </div>
             <div class="pos" id="_14:685" style="top:660;left:18">
-                <img src="http://sydney.unitedlifts.com.au/image/logo.png" style="width: 205px; height:49px">
+                <img src="image/logo.png" style="width: 205px; height:49px">
             </div>
 
             <div class="pos" id="_523:1110" style="top:640;left:180">
@@ -134,7 +135,7 @@
             </div>
             <div class="pos" id="_523:1110" style="top:760;left:346">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">
-                    OPS-CC-2.2.10-AMC- Compliance Certificate</span>
+                    OPS-CC-{{$maintenance->lifts->get_code_function()}}-AMC- Compliance Certificate</span>
             </div>
             <div class="pos" id="_598:1123" style="top:772;left:402">
                 <span id="_11.0" style=" font-size:11.0px; color:#000000">

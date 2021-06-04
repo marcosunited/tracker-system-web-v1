@@ -50,6 +50,7 @@
         let table = $('#mytabla').DataTable({
             retrieve: true,
         });
+
         table.destroy();
 
         table = $('#mytabla').on('preXhr.dt',
@@ -58,61 +59,83 @@
                     message: $('.blockUI-layout')
                 });
             }).DataTable({
-            initComplete: function(settings, json) {
-                $('#mytabla_filter input').unbind();
-                $('#mytabla_filter input').bind('keyup', function(e) {
-                    if(e.keyCode == 13) {
-                        table.search( this.value ).draw();
-                    }
-                });
-            },
-            order: [[0, "desc"]],
+            order: [
+                [0, "desc"]
+            ],
+            pageLength: 50,
             processing: true,
             serverSide: true,
             ajax: "{{ route('get_finished_maintenances') }}",
-            dom: 'Bfrtip',
-            buttons: [
-                'copy','csv','print'
-            ],
-            columns: [
-                {"data": "maintenance_date"},
-                {"data": "job_number",
-                 "name": "jobs.job_number"},
-                {
-                     "data": "job_name",
-                     "name": "jobs.job_name",
-                     "render": function(data, type, row){
-                         if(type === 'display'){
-                             data = '<a href="/jobs/' + row.job_id + '">' + data + '</a>';
-                         }
-                         return data;
-                     }
+            dom: "<'row'<'col-sm-12'<'text-center bg-body-light py-2 mb-2'B>>><'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [{
+                extend: "copy",
+                className: "btn btn-sm btn-primary"
+            }, {
+                extend: "csv",
+                className: "btn btn-sm btn-primary"
+            }, {
+                extend: "print",
+                className: "btn btn-sm btn-primary"
+            }],
+            columns: [{
+                    "data": "maintenance_date",
+                    "render": function(data, type, row) {
+                        return row.maintenance_date;
+                    }
                 },
-                {"data": "id"},
-                {"data": "job_address",
-                 "name": "jobs.job_address"},
-                {"data": "job_group",
-                 "name": "jobs.job_group"},
-                {"data": "lift_name",
-                 "name": "lifts.lift_name",
-                 "render": function(data, type, row){
-                     if(type === 'display'){
-                         data = '<a href="/jobs/' + row.job_id + '/lifts/' + row.lift_id + '">' + data + '</a>';
-                     }
-                     return data;
-                 }},
-                {"data": "technician_name",
-                 "name": "techs.technician_name",
-                 "render": function(data, type, row){
-                     if(type === 'display'){
-                         data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
-                     }
-                     return data;
-                 }},
-                {"data": "report_status",
-                    "render": function(data, type, row){
-                        if(type === 'display'){
-                            if(data == 'none'){
+                {
+                    "data": "job_number",
+                    "name": "jobs.job_number"
+                },
+                {
+                    "data": "job_name",
+                    "name": "jobs.job_name",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            data = '<a href="/jobs/' + row.job_id + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "id"
+                },
+                {
+                    "data": "job_address",
+                    "name": "jobs.job_address",
+                },
+                {
+                    "data": "job_group",
+                    "name": "jobs.job_group"
+                },
+                {
+                    "data": "order_no",
+                },
+                {
+                    "data": "lift_name",
+                    "name": "lifts.lift_name",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            data = '<a href="/jobs/' + row.job_id + '/lifts/' + row.lift_id + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "technician_name",
+                    "name": "techs.technician_name",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            data = '<a href="/techs/' + row.technician_id + '">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "report_status",
+                    "render": function(data, type, row) {
+                        if (type === 'display') {
+                            if (data == 'none') {
                                 data = '<a data-mainid=' + row.id + ' class="act_send btn btn-success btn-sm text-white">Send  &nbsp; Email</a>';
                                 data = data + '<a data-mainid=' + row.id + ' class="act_print btn btn-warning btn-sm text-white">Print Report</a>';
                             } else if (data == 'sent') {
@@ -150,6 +173,13 @@
                 },
             ],
         });
+
+        $("div.dataTables_filter input").unbind();
+        $("div.dataTables_filter input").keyup(function(e) {
+            if (e.keyCode == 13) {
+                table.search(this.value).draw();
+            }
+        });
     });
 </script>
 @endsection
@@ -178,6 +208,7 @@
                         <th class="d-none d-sm-table-cell" style="width: 5%;">Maintenance ID</th>
                         <th class="d-none d-sm-table-cell" style="width: 20%;">Job Address</th>
                         <th style="width: 15%;">Group</th>
+                        <th style="width: 15%;">Order no</th>
                         <th style="width: 15%;">Lifts</th>
                         <th style="width: 15%;">Techinician</th>
                         <th style="width: 15%;">Report </th>
@@ -204,7 +235,7 @@
                         </div>
                     </div>
                     <div class="block-content block-content-full text-right bg-light">
-                        <h1>Are you Sure?</h1>
+                        <h5>Are you Sure?</h5>
 
                         <form method="POST" action="/maintenances/{{isset($maintenance)?$maintenance->id:''}}">
                             @method('DELETE')

@@ -26,7 +26,7 @@ use App\Gps;
 use App\Calloutreport;
 use App\ChecklistActivities;
 use App\ChecklistMaintenance;
-use App\ChecklistMaintenances;
+use App\Jobs\SendEmail;
 use App\Maintenancereport;
 
 use PDF;
@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CalloutMail;
 use App\Mail\MaintenanceMail;
 use Exception;
+use Mockery\Undefined;
 use Response;
 
 class TechController extends Controller
@@ -105,6 +106,10 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
+        $from = $request->get('from');
+        $end = $request->get('end');
+        $state = $request->get('state');
+
         $callout_list = Calloutn::select(
             'jobs.job_name as job_name',
             'jobs.job_address as job_address',
@@ -117,16 +122,35 @@ class TechController extends Controller
             'calloutsnew.job_id as job_id',
             'calloutsnew.technician_id as technician_id',
             'calloutsnew.callout_status_id as callout_status_id',
-            'calloutsnew.callout_time as time'
+            'calloutsnew.callout_time as time',
+            DB::raw('DATE_FORMAT(calloutsnew.callout_time, "%d/%m/%Y") as short_time'),
         )
             ->leftjoin('jobs', 'jobs.id', '=', 'calloutsnew.job_id')
+
             ->where('calloutsnew.technician_id', $technician_id)
             ->where('calloutsnew.callout_status_id', '!=', 2)
-            ->where(function ($query) use ($keyword) {
-                if ($keyword != '')
+            ->where(function ($query) use ($keyword, $from, $end, $state) {
+                if ($keyword != '') {
                     $query->where('jobs.job_name', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address_number', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address', 'like', '%' . $keyword . '%');
+                }
+
+                if ($from != '' && $from != null) {
+                    $query->where('calloutsnew.callout_time', '>=',  $from);
+                }
+
+                if ($end != '' && $end != null) {
+                    $query->where('calloutsnew.callout_time', '<=',  $end);
+                }
+
+                if ($state != '' && $state != null) {
+                    if ($state <> '2') {
+                        $query->where('calloutsnew.callout_status_id', '<>',  2);
+                    } else {
+                        $query->where('calloutsnew.callout_status_id', '==',  2);
+                    }
+                }
             })
             ->orderBy('time', 'desc')
             ->get();
@@ -143,6 +167,41 @@ class TechController extends Controller
 
         echo json_encode(['status' => 'success', 'msg' => 'Get callout lists', 'list' => $list]);
     }
+
+    public function getRecentCallouts(Request $request)
+    {
+        $liftId = $request->get('liftId');
+
+        $callout_list = Calloutn::select(
+            'jobs.job_name as job_name',
+            'jobs.job_address as job_address',
+            'jobs.job_address_number as job_address_no',
+            'jobs.job_suburb as job_suburb',
+            'jobs.job_latitude as job_lat',
+            'jobs.job_longitude as job_long',
+            'jobs.tel_phone as telphone',
+            '_corrections.correction_name',
+            '_faults.fault_name',
+            'calloutsnew.id as id',
+            'calloutsnew.callout_time',
+            'calloutsnew.callout_status_id',
+            'calloutsnew.job_id as job_id',
+            'calloutsnew.technician_id as technician_id',
+            'calloutsnew.callout_status_id as callout_status_id',
+            'calloutsnew.callout_time as time'
+        )
+            ->leftjoin('jobs', 'jobs.id', '=', 'calloutsnew.job_id')
+            ->join('_faults', '_faults.id', '=', 'calloutsnew.fault_id')
+            ->join('_corrections', '_corrections.id', '=', 'calloutsnew.correction_id')
+            ->join('callout_lift', 'calloutsnew.id', '=', 'callout_lift.calloutn_id')
+            ->where('callout_lift.lift_id', $liftId)
+            ->orderBy('time', 'desc')
+            ->get();
+
+        echo json_encode(['status' => 'success', 'msg' => 'Get recent callouts', 'callouts' => $callout_list]);
+    }
+
+
     public function getCalloutClosedlist(Request $request)
     {
         $technician_id = $request->get('technician_id');
@@ -318,6 +377,7 @@ class TechController extends Controller
                 $callout_time->toa = date('Y-m-d H:i:s', strtotime(substr($request['toa'], 0, 10) . ' ' . substr($request['toa'], 11, 8)));
                 $callout_time->tod = date('Y-m-d H:i:s', strtotime(substr($request['tod'], 0, 10) . ' ' . substr($request['tod'], 11, 8)));
             }
+
             if ($action == 2) { // finish
                 $calloutn->callout_status_id = $request['status_id'];
                 $calloutn->order_number = $request['order_no'];
@@ -369,6 +429,46 @@ class TechController extends Controller
         echo json_encode(['status' => 'success', 'msg' => 'action done', 'lift' => $lift]);
     }
 
+    public function getJobLifts(Request $request)
+    {
+        try {
+            $lifts = Lift::select()->where('job_id', $request->get('job_id'))->get();
+            echo json_encode(['status' => 'success', 'msg' => 'action done', 'lifts' => $lifts]);
+        } catch (Exception $ex) {
+            echo json_encode(['status' => 'error', 'msg' => $ex]);
+        }
+    }
+
+    public function updateLift(Request $request)
+    {
+        try {
+            $lift = Lift::select()->where('id', $request->get('lift_id'))->get()->first();
+
+            $lift->update([
+                'lift_name' => $request->get('lift_name') == 'null' ? null : $request->get('lift_name'),
+                'lift_type' => $request->get('lift_type') == 'null' ? null : $request->get('lift_type'),
+                'lift_phone' => $request->get('lift_phone') == 'null' ? null : $request->get('lift_phone'),
+                'lift_brand' => $request->get('lift_brand') == 'null' ? null : $request->get('lift_brand'),
+                'comments' => $request->get('comments') == 'null' ? null : $request->get('comments'),
+                'lift_reg_number' => $request->get('lift_reg_number') == 'null' ? null : $request->get('lift_reg_number'),
+                'lift_model' => $request->get('lift_model') == 'null' ? null : $request->get('lift_model'),
+                'lift_installed_date' => $request->get('lift_installed_date') == 'null' ? null :  date('Y-m-d H:i:s', strtotime($request->get('lift_installed_date'))),
+                'function' => $request->get('function') == 'null' ? null : $request->get('function'),
+                'capacity' => $request->get('capacity') == 'null' ? null : $request->get('capacity'),
+                'location' => $request->get('location') == 'null' ? null :  $request->get('location'),
+                'room_code' => $request->get('room_code') == 'null' ? null : $request->get('room_code'),
+                'building_code' => $request->get('building_code') == 'null' ? null : $request->get('building_code'),
+                'contract_group_id' => $request->get('contract_group_id') == 'null' ? null : $request->get('contract_group_id'),
+                'equipment_number' => $request->get('equipment_number') == 'null' ? null : $request->get('equipment_number'),
+                'zone' => $request->get('zone') == 'null' ? null : $request->get('zone'),
+            ]);
+
+            echo json_encode(['status' => 'success', 'msg' => 'action done']);
+        } catch (Exception $ex) {
+            echo json_encode(['status' => 'error', 'msg' => $ex]);
+        }
+    }
+
     /**
      *  Maintenance Functions
      *
@@ -377,18 +477,32 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
+        $from = $request->get('from');
+        $end = $request->get('end');
+        $state = $request->get('state');
 
         $related_jobs = MaintenanceN::select('maintenancenew.job_id as job_id')
             ->join('jobs', 'jobs.id', '=', 'maintenancenew.job_id')
-            ->where(function ($query) use ($keyword) {
-                if ($keyword != '')
+            ->where(function ($query) use ($keyword, $from, $end, $state) {
+                if ($keyword != '') {
                     $query->where('jobs.job_name', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address_number', 'like', '%' . $keyword . '%')
                         ->orWhere('jobs.job_address', 'like', '%' . $keyword . '%');
+                }
+                if ($from != '' && $from != null) {
+                    $query->where('maintenancenew.maintenance_date', '>=',  $from);
+                }
+
+                if ($end != '' && $end != null) {
+                    $query->where('maintenancenew.maintenance_date', '<=',  $end);
+                }
+
+                if ($state != '' && $state != null) {
+                    $query->where('maintenancenew.completed_id', '=',  $state);
+                }
             })
             ->where('maintenancenew.technician_id', '=', $technician_id)
             ->groupBy('maintenancenew.job_id')
-            ->where('maintenancenew.completed_id', '=', 1)
             ->limit(20)
             ->get();
 
@@ -424,7 +538,6 @@ class TechController extends Controller
                 $tmp['tasks']['n_months'] = [];
                 $tmp['tasks']['index_months'] = [];
                 $tmp['tasks']['months'] = [];
-                //dd($list_base_job);
 
                 foreach ($list_base_job as $one_base_job) {
                     $yearmonth = $one_base_job->yearmonth;
@@ -462,11 +575,7 @@ class TechController extends Controller
     {
         $technician_id = $request->get('technician_id');
         $keyword = $request->get('keyword');
-        // $related_jobs = MaintenanceN::select('job_id')->where('technician_id',$technician_id)
-        //                 ->groupBy('job_id')
-        //                 ->orderBy('maintenance_date','desc')
-        //                 ->limit(10)
-        //                 ->get();
+
         $related_jobs = MaintenanceN::select('maintenancenew.job_id as job_id')
             ->leftjoin('jobs', 'jobs.id', '=', 'maintenancenew.job_id')
             ->where(function ($query) use ($keyword) {
@@ -754,6 +863,8 @@ class TechController extends Controller
         $isPartRequired = $request['part_required'];
         $isPartReplaced = $request['part_replaced'];
         $partDescription = $request['part_description'];
+        $order_number = $request['order_number'];
+        $docket_number = $request['docket_number'];
 
         $maintenance = MaintenanceN::select()->where('id', $mainID)->get()->first();
 
@@ -803,6 +914,8 @@ class TechController extends Controller
             $maintenance->completed_id = 2;
             $maintenance->finish_pos = json_encode(['lat' => $pos_lat, 'lng' => $pos_lng]);
             $maintenance->maintenance_note = $note;
+            $maintenance->order_no = $order_number;
+            $maintenance->docket_no = $order_number;
 
             if ($request['toa'] != '') {
                 $maintenance->toa = date('Y-m-d H:i:s', strtotime(substr($request['toa'], 0, 10) . ' ' . substr($request['toa'], 11, 8)));
@@ -857,13 +970,10 @@ class TechController extends Controller
                 'status' => 'verified'
             ]);
 
-            /*Start integraction FFA*/
-
+            /*Integraction FFA*/
             if ($exist) {
-                //$this->customReportSendEmail($mainID);
+                $this->customReportSendEmail($mainID);
             }
-
-            /*End integration*/
         }
 
         echo json_encode(
@@ -1153,11 +1263,16 @@ class TechController extends Controller
             $fault = Fault::select()->where('id', $callout->fault_id)->get()->first();
             $tech_fault = TechFault::select()->where('id', $callout->technician_fault_id)->get()->first();
             $correction = Correction::select()->where('id', $callout->correction_id)->get()->first();
+
             //Send email to job creator with attachments
             //Generate Pdf file
             $job = Job::select()->where('id', $callout->job_id)->get()->first();
+
             if ($job) {
+
                 $email = explode(';', $job->job_email);
+                //$email = 'ffa@unitedlifts.com.au';
+
                 if (count($email) > 0) {
                     $address = $job->job_address_number . " " . $job->job_address;
                     $subject = "United Lifts Call Report";
@@ -1180,6 +1295,7 @@ class TechController extends Controller
                     $lift_names = substr($lift_names, 0, strlen($lift_names) - 2);
 
                     $user_email = $technician->technician_email;
+
                     if ($order_number == "") {
                         $order_number = "N/A";
                     }
@@ -1201,10 +1317,6 @@ class TechController extends Controller
                         <p>United Lift Services</p>
                     ";
 
-
-
-
-
                     $from = "call@unitedlifts.com.au";
                     $domain  = "unitedlifts.com.au";
                     Mail::to($email)->send(new CalloutMail($from, $domain, $subject, $message, $filename));
@@ -1222,6 +1334,7 @@ class TechController extends Controller
             }
         }
     }
+
     public function calloutSendPrint(Request $request)
     {
         $printerId = 'c93cc4db-d76e-1f12-3364-86dc9d640884';
@@ -1282,10 +1395,20 @@ class TechController extends Controller
     {
         $path = storage_path() . '/pdf/maintenance/';
 
+        $public_path = getcwd();
+
         try {
 
             /*Get information*/
-            $maintenance = MaintenanceN::select()
+            $maintenance = MaintenanceN::select([
+                'maintenancenew.id as id', 'maintenance_date', 'technician_id', 'job_id', 'lift_id',
+                'maintenance_note', 'completed_id', 'maintenance_toa', 'maintenance_tod', 'order_no',
+                'docket_no', 'invoice_number', 'user_id', 'notify_email', 'yearmonth', 'customer_name',
+                'maintenancenew.created_at', 'maintenancenew.updated_at', 'task_ids', 'start_pos', 'finish_pos',
+                'toa', 'tod', 'part_description', 'part_required', 'part_replaced', 'job_number', 'job_name',
+                'job_address', 'job_address_number', 'job_suburb', 'job_contact_details', 'job_email',
+                'job_owner_details', 'job_group'
+            ])
                 ->join('jobs', 'jobs.id', '=', 'job_id')
                 ->where('maintenancenew.id', '=', $maintenance_id)
                 ->get()
@@ -1303,6 +1426,7 @@ class TechController extends Controller
 
             $month_label = $this->getMonthLabel($month_key);
             $lift = Lift::select()->where('id', $maintenance->lift_id)->get()->first();
+            $maintenanceFiles = File::select()->where('maintenance_n_id', $maintenance->id)->get();
 
             $sopa_tasks = DB::table('tasks_sopa')
                 ->select(['tasks_sopa.id as task_id', 'tasks_sopa.name as task_name', 'maintenancenew.id as checked'])
@@ -1320,8 +1444,20 @@ class TechController extends Controller
             $complianceFile = $path . 'Compliance Certification - ' . $maintenance_id . '.pdf';
             $scheduleFile = $path . 'Scheduled Report Log - ' . $maintenance_id . '.pdf';
             $checklistFile = $path . 'Inspection and Test Plan - Checklist - ' . $maintenance_id . '.pdf';
+            $invoiceFile = $path . 'Invoice - Docket No ' . $maintenance_id . '.pdf';
+
+            $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
+            $docketReport->save($docketFile);
+            array_push($files, $docketFile);
+
+            $subject_message = 'A Maintenance has finished in ' . $maintenance->job_name . ' for Lift ' .  $maintenance->lifts->lift_name;
 
             if ($maintenance->job_group == 'Facilities First') {
+
+                //Set invoice number
+                $module =  new MaintenanceController();
+                $module->setInvoiceNumber($maintenance);
+
                 $checklist = DB::table('checklist_maintenance')
                     ->select(['checklist_activities.id', 'checklist_activities.name', 'checklist_maintenance.value'])
                     ->where('maintenancenew.id', '=', $maintenance_id)
@@ -1330,18 +1466,31 @@ class TechController extends Controller
                     ->orderBy('checklist_activities.id', 'asc')
                     ->get();
 
-
                 $settings_email = DB::table('settings')
                     ->select(['value'])
                     ->where(function ($query) {
                         $query->where('key', '=', 'email_ffa_customer')
-                            ->orWhere('key', '=', 'email_ffa_office');
+                            ->orWhere('key', '=', 'email_ffa_office')
+                            ->orWhere('key', '=', 'email_accounts_uls');
                     })
                     ->get();
 
-
+                //Recipients emails
                 foreach ($settings_email as $setting) {
-                    array_push($recipients, $setting->value);
+                    $emails = explode(',', $setting->value);
+
+                    if (count($emails) > 1) {
+                        foreach ($emails as $email) {
+                            array_push($recipients, $email);
+                        }
+                    } else {
+                        array_push($recipients, $setting->value);
+                    }
+                }
+
+                //Attachments
+                foreach ($maintenanceFiles as $file) {
+                    array_push($files, $public_path . $file->path);
                 }
 
                 /*Save PDF's files*/
@@ -1357,19 +1506,22 @@ class TechController extends Controller
                 $checklistReport->save($checklistFile);
                 array_push($files, $checklistFile);
 
-                $docketReport = PDF::loadView('maintenance.printmaintenance', compact('maintenance', 'month_label', 'tasks', 'lift', 'sopa_tasks'))->setPaper('a4', 'portrait');;
-                $docketReport->save($docketFile);
-                array_push($files, $docketFile);
+                $invoiceReport = PDF::loadView('reportnew.custom-reports.invoice', compact('maintenance'))->setPaper('a4', 'portrait');
+                $invoiceReport->save($invoiceFile);
+                array_push($files, $invoiceFile);
+
+                $subject_message = "ULS Invoice # FFA" . $maintenance->invoice_number() . ' - Purchase order ' . $maintenance->order_no . ' - Lift ' . $maintenance->lifts->lift_name;
             } else {
-                array_push($recipients, $maintenance->job_email);
+                $recipients = array_merge($recipients, explode(';', $maintenance->job_email));
             }
 
             /*Send PDF's files trought email*/
             if (count($recipients) > 0) {
                 $from = "call@unitedlifts.com.au";
                 $domain  = "unitedlifts.com.au";
-                $subject = "ULS Service - Maintenance finished";
+                $subject = $subject_message;
                 $message = "Hello, <br/><br/> Our technical team have finished the maintenance " . $maintenance_id . " in " . $maintenance->job_address_number . "," . $maintenance->job_address . "," . $maintenance->job_suburb . " (" . $maintenance->job_name . ")<br/><br/> Thanks! <br/><br/> United Lift Services";
+                //dispatch(new SendEmail($from, $recipients, $domain, $subject, $message, $files));
                 Mail::to($recipients)->send(new MaintenanceMail($from, $domain, $subject, $message, $files));
             }
 
@@ -1386,8 +1538,12 @@ class TechController extends Controller
             if (File::exists($docketFile)) {
                 \Illuminate\Support\Facades\File::delete($docketFile);
             }
+            if (File::exists($invoiceFile)) {
+                \Illuminate\Support\Facades\File::delete($invoiceFile);
+            }
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'msg' => $e->getMessage()]);
+            throw $e;
         }
     }
 
@@ -1544,7 +1700,7 @@ class TechController extends Controller
 
             //upload image to file
             $imageName = basename($_FILES['photo']['name']);
-            $destination_path = public_path($folder . '/');
+            $destination_path = public_path('/attachments/' . $folder . '/');
             $target_path = $destination_path . $imageName;
             move_uploaded_file($image, $target_path);
 
@@ -1553,7 +1709,7 @@ class TechController extends Controller
                 'calloutn_id' => $folder == 'callouts' ? $id : null,
                 'maintenance_n_id' => $folder != 'callouts' ? $id : null,
                 'title' => $imageName,
-                'path' => '/' . $folder . '/' . $imageName,
+                'path' => '/attachments/' . $folder . '/' . $imageName,
                 'status' => 'new'
             ]);
 

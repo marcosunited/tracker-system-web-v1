@@ -78,9 +78,15 @@
                     if (data['lifts'] && data['lifts'].length > 0) {
 
                         /*Add html template*/
-                        var htmlTemplate = $('#content-select').html();
+                        var htmlTemplate = $('.template').html();
                         htmlTemplate = htmlTemplate.replaceAll("{id}", selectedJobId, ).replace('{job_name}', selectedJobName);
-                        $('#lifts').append(htmlTemplate);
+                        $('#lifts > div').append(htmlTemplate);
+
+                        setTimeout(function() {
+                            $('.content-lifts').animate({
+                                scrollTop: $('.content-lifts').get(0).scrollHeight
+                            }, 1000);
+                        }, 0)
 
                         /*Transform data*/
                         var lifts = [];
@@ -90,6 +96,15 @@
                                 "text": obj.lift_name + '(' + obj.lift_type + ')',
                                 "lift-type": obj.lift_type
                             })
+                        });
+
+                        /*Create Date's control*/
+                        $('#maintenance-date-' + selectedJobId).datepicker({
+                            format: 'yyyy-mm-dd',
+                            autoclose: true,
+                            clearBtn: true,
+                            title: "Maintenance date",
+                            showWeekDays: false
                         });
 
                         /*Create Lift's control*/
@@ -122,17 +137,15 @@
 
             onSelectJob(groupName);
 
-            $('#label-lift-' + selectedJobId).remove();
-            $('#lift-' + selectedJobId).select2('destroy');
-            $('#lift-' + selectedJobId).remove();
+            $('#accordion_h' + selectedJobId).remove();
+            $('#accordion_q' + selectedJobId).remove();
 
         });
 
         $(".job_select").on('select2:clear', function(e) {
             if (e) {
-                $("[name*='lift-']").select2('destroy');
-                $("[name*='lift-']").remove();
-                $("[name*='label-lift-']").remove();
+                $("[id*='accordion_h']").remove();
+                $("[id*='accordion_q']").remove();
             }
 
             onSelectJob('');
@@ -205,9 +218,9 @@
                                 });
                             } else {
                                 $.unblockUI();
+                                maintenance = {};
                                 alert('Please, select at least one task');
                                 event.stopImmediatePropagation();
-
                             }
 
                             maintenance['tasks'] = checkedTasks;
@@ -219,12 +232,14 @@
                         });
                     } else {
                         $.unblockUI();
+                        maintenance = {};
                         alert('Please, select at least one lift');
                         event.stopImmediatePropagation();
                     }
                 });
             } else {
                 $.unblockUI();
+                maintenance = {};
                 alert('Please, select at least one job');
                 event.stopImmediatePropagation();
             }
@@ -241,12 +256,15 @@
     function postMaintenance(maintenance, flagRequest) {
         var statusId = $("[name='completed_id']").val() || 0;
         var technicianId = $("[name='technician_id']").val() || 0;
+        var maintenanceDate = $("[name='maintenance-date-" + maintenance.job_id + "']").val() || '';
+        var orderNumber = $("[name='order-number-" + maintenance.job_id + "']").val() || '';
 
         if (statusId !== 0 && technicianId !== 0) {
             maintenance['completed_id'] = statusId;
             maintenance['technician_id'] = technicianId;
-            maintenance['maintenance_date'] = $("[name='maintenance_date']").val();
+            maintenance['maintenance_date'] = maintenanceDate;
             maintenance['active_month'] = $("[name='active_month']").val() || 0;
+            maintenance['order_no'] = orderNumber;
 
             var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
@@ -498,47 +516,47 @@
         var nov = document.getElementById("btabs-static-10");
         var dec = document.getElementById("btabs-static-11");
 
-        if (selected === '1') {
+        if (selected === '01') {
             jan.style.display = "block";
         } else {
             jan.style.display = "none";
         }
-        if (selected === '2') {
+        if (selected === '02') {
             feb.style.display = "block";
         } else {
             feb.style.display = "none";
         }
-        if (selected === '3') {
+        if (selected === '03') {
             mar.style.display = "block";
         } else {
             mar.style.display = "none";
         }
-        if (selected === '4') {
+        if (selected === '04') {
             apr.style.display = "block";
         } else {
             apr.style.display = "none";
         }
-        if (selected === '5') {
+        if (selected === '05') {
             may.style.display = "block";
         } else {
             may.style.display = "none";
         }
-        if (selected === '6') {
+        if (selected === '06') {
             june.style.display = "block";
         } else {
             june.style.display = "none";
         }
-        if (selected === '7') {
+        if (selected === '07') {
             july.style.display = "block";
         } else {
             july.style.display = "none";
         }
-        if (selected === '8') {
+        if (selected === '08') {
             aug.style.display = "block";
         } else {
             aug.style.display = "none";
         }
-        if (selected === '9') {
+        if (selected === '09') {
             sep.style.display = "block";
         } else {
             sep.style.display = "none";
@@ -603,7 +621,7 @@
                 </h2>
                 <div class="row push">
                     <div class="col-lg-8" style="padding-left: 50px;">
-                        <p>Take into consideration that only may create maintenances per lift type. Thus may not add escalators and elevators simultaneously.
+                        <p>Take into consideration that only can be created maintenances per lift type. It is not permitted to add escalators and elevators simultaneously.
                         </p>
                     </div>
                 </div>
@@ -611,7 +629,7 @@
 
                     <div class="col-lg-4" style="padding-left: 50px;">
                         <div class="form-group">
-                            <label for="example-text-input">Job Name</label>
+                            <label for="example-text-input">1. Job Name</label>
                             <select class="form-control job_select" name="job_id" required multiple>
                                 @foreach ($jobs as $data)
                                 <option value="{{ $data->id }}" data-group="{{$data->job_group}}">{{ $data->job_address_number }} {{
@@ -620,26 +638,16 @@
                             </select>
                         </div>
                         <fieldset class="content-lifts">
-                            <legend>Lifts</legend>
-                            <div class="form-group" id="lifts" class="selected-lifts">
-
+                            <div id="lifts" class="selected-lifts">
+                                <div id="accordion" role="tablist" aria-multiselectable="false"></div>
                             </div>
                         </fieldset>
-                        <div class="form-group">
-                            <label for="example-text-input">Maintenance Date</label>
-                            <div class="input-daterange input-group" data-date-format="yyyy-mm-dd" data-week-start="1" data-autoclose="true" data-today-highlight="true">
-                                <input type="text" class="form-control" name="maintenance_date">
-                            </div>
-                        </div>
-                        <div class="form-group" id="there">
-                            <button style="float:right;" class="btn btn-warning offset-md-1 col-md-3" id="liftcheck">Get Tasks</button>
-                        </div>
                         <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
                         </div>
                     </div>
                     <div class="col-lg-8 col-xl-6" style="padding-left: 230px;">
                         <div class="form-group">
-                            <label for="example-text-input">Current Status</label>
+                            <label for="example-text-input">3. Current Status</label>
                             <select class="form-control" name="completed_id" required>
                                 <option value="">----------Select Status-----------</option>
                                 <option value="1">Pending</option>
@@ -647,7 +655,7 @@
                             </select>
                         </div>
                         <div class="form-group" id="here">
-                            <label for="example-text-input">Technician</label>
+                            <label for="example-text-input">4. Technician</label>
                             <select class="form-control tech_select" name="technician_id" required>
                                 <option value="">--- Select Technician ---</option>
                                 @foreach ($technicians as $data)
@@ -658,9 +666,11 @@
                     </div>
                 </div>
                 <div id="where">
-
-                    <h2 class="content-heading">Task Info</h2>
-
+                    <h2 class="content-heading">2. Task Info</h2>
+                    <div class="form-group">
+                        <label for="example-text-input">2.1 Load the tasks for the maintenance </label>
+                        <button class="btn btn-warning col-md-1" id="liftcheck">Get Tasks</button>
+                    </div>
                     <div class="block block-rounded">
                         <ul class="nav nav-tabs nav-tabs-block js-tabs-enabled" role="tablist">
                             <li class="nav-item" id="menuStandardTasks">
@@ -678,21 +688,23 @@
                         </ul>
                         <div class="block-content tab-content">
                             <div class="tab-pane active" id="standard" role="tabpanel">
-                                <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
-                                    <option value="">Select montly tasks:</option>
-                                    <option value="1">January</option>
-                                    <option value="2">February</option>
-                                    <option value="3">March</option>
-                                    <option value="4">April</option>
-                                    <option value="5">May</option>
-                                    <option value="6">June</option>
-                                    <option value="7">July</option>
-                                    <option value="8">August</option>
-                                    <option value="9">September</option>
-                                    <option value="10">October</option>
-                                    <option value="11">November</option>
-                                    <option value="12">December</option>
-                                </select>
+                                <div class="col-lg-4">
+                                    <select id="active_month" name="active_month" class="form-control" onchange="change(this.value)">
+                                        <option value="">2.2 Select a month and tick the tasks</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
                                 <div class="block-content" id="task_info_panel">
                                 </div>
                             </div>
@@ -741,9 +753,28 @@
         </form>
     </div>
 </div>
-<div id="content-select" class="invisible">
-    <label id="label-lift-{id}" name="label-lift-{id}">{job_name}</label>
-    <select id="lift-{id}" name="lift-{id}" class="form-control col-md-8"></select>
+<div id="accordion" role="tablist" aria-multiselectable="true" class="template invisible">
+    <div class="block block-rounded mb-1">
+        <div id="accordion_h{id}" class="block-header block-header-default" role="tab">
+            <a class="font-w600" data-toggle="collapse" data-parent="#accordion" href="#accordion_q{id}" aria-expanded="true" aria-controls="accordion_q{id}">{job_name}</a>
+        </div>
+        <div id="accordion_q{id}" class="collapse show" role="tabpanel" aria-labelledby="accordion_h{id}" data-parent="#accordion">
+            <div class="block-content">
+                <div class="form-group">
+                    <label id="label-lift-{id}" name="label-lift-{id}">Lifts</label>
+                    <select id="lift-{id}" name="lift-{id}" class="form-control col-md-12"></select>
+                </div>
+                <div class="form-group">
+                    <label id="label-date-{id}" name="label-date-{id}">Maintenance date</label>
+                    <input id="maintenance-date-{id}" type="text" class="form-control" name="maintenance-date-{id}">
+                </div>
+                <div class="form-group">
+                    <label id="label-order-{id}" name="label-order-{id}">Order number</label>
+                    <input type="text" class="form-control col-md-12" name="order-number-{id}">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </div>
 

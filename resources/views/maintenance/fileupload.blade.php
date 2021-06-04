@@ -28,7 +28,11 @@
 <script src="{{asset('js/plugins/datatables/buttons/buttons.colVis.min.js')}}"></script>
 
 <!-- Page JS Helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Ion Range Slider + Masked Inputs plugins) -->
-<script>jQuery(function(){ Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']); });</script>
+<script>
+    jQuery(function() {
+        Dashmix.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'rangeslider', 'masked-inputs']);
+    });
+</script>
 
 <!-- Page JS Code -->
 <script src="{{asset('js/pages/be_tables_datatables.min.js')}}"></script>
@@ -65,8 +69,7 @@
                 </div>
                 <div class="col-lg-8 col-xl-5">
                     <!-- DropzoneJS Container -->
-                    <form class="dropzone" action="/maintenances/{{$maintenance->id}}/file" id="my-awesome-dropzone" method="post"
-                        enctype="mulipart/form-data">
+                    <form class="dropzone" action="/maintenances/{{$maintenance->id}}/file" id="my-awesome-dropzone" method="post" enctype="mulipart/form-data">
                         @csrf
                     </form>
                 </div>
@@ -76,9 +79,9 @@
     <!-- END Dropzone -->
     <div class="block block-rounded block-bordered">
         <div class="block-content block-content-full">
-        <div class="block-header block-header-default">
-            <h3 class="block-title">Files for maintenance ID {{$maintenance->id}} {{$maintenance->jobs->job_name}}</h3>
-        </div>
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Files for maintenance ID {{$maintenance->id}} {{$maintenance->jobs->job_name}}</h3>
+            </div>
             <!-- DataTables init on table by adding .js-dataTable-full class, functionality is initialized in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
             <table class="table table-bordered table-striped table-vcenter">
                 <thead>
@@ -94,14 +97,14 @@
                     @foreach($maintenance->files as $file)
                     <tr>
                         <td class="text-center">
-                        {{$file->created_at}}
+                            {{$file->created_at}}
                         </td>
                         <td class="font-w600">
                             {{$file->title}}
                         </td>
-                       
+
                         <td>
-                            <a href="/maintenances/{{$file->title}}">
+                            <a href="{{$file->path}}">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="View">
                                         <i class="fa fa-pencil-alt"></i>
@@ -110,22 +113,22 @@
                             </a>
                         </td>
                         <td>
-                        <a href="/maintenances/{{$file->title}}">
-                                 <div class="btn-group">
+                            <a href="{{$file->path}}">
+                                <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Download">
                                         <i class="fa fa-download"></i>
                                     </button>
                                 </div>
-</a>
+                            </a>
                         </td>
                         <td>
-                        <form method="POST" action="/maintenances/{{$maintenance->id}}/file/{{$file->id}}">
+                            <form method="POST" action="/maintenances/{{$maintenance->id}}/file/{{$file->id}}">
                                 @method('DELETE')
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Delete">
                                     <i class="fa fa-times"></i>
                                 </button>
-                        </form>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
